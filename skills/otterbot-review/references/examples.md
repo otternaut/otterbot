@@ -16,9 +16,7 @@ in the conversation (§6).
 **Report produced:**
 
 ```markdown
-# 🦦 OtterBot · Code Review
-
-## ✨ Summary
+## 🦦 OtterBot · Code Review
 
 Solid, focused change that adds a token-bucket limiter in front of the
 webhook endpoint. Mergeable after the missing-lock issue below is fixed —
@@ -132,9 +130,7 @@ in the conversation only; nothing is posted anywhere (§6).
 **Report produced:**
 
 ```markdown
-# 🦦 OtterBot · Code Review
-
-## ✨ Summary
+## 🦦 OtterBot · Code Review
 
 Small, well-scoped addition. One real gap: the new export endpoint has no
 authorization check, so any authenticated user could export any merchant's

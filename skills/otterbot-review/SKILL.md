@@ -131,9 +131,7 @@ within Findings — the section headings and the blockquote cards already
 create enough visual separation on their own.
 
 ```markdown
-# 🦦 OtterBot · Code Review
-
-## ✨ Summary
+## 🦦 OtterBot · Code Review
 
 Briefly state overall quality, merge readiness, and the highest-risk
 concern, if any. Leave the verdict itself to the Recommendation section —
