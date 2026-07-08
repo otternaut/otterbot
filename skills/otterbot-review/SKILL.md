@@ -1,6 +1,6 @@
 ---
 name: otterbot-review
-description: Perform a principal-level code review, producing a structured Markdown report with severity-tagged findings and a scorecard. Given a pull/merge request URL, reviews that PR and submits the report as a formal review — approving it when the recommendation is Approve or Comment only, requesting changes otherwise. Given no URL, reviews the current local code changes and presents the report in the conversation. Use this whenever the user asks to "review this PR", "review my diff", "analyze this code change", "do a code review", "check this pull request for issues", pastes a pull-request URL and asks for feedback, or wants a merge-readiness assessment. Works with any git hosting provider (GitHub, GitLab, Bitbucket, etc.).
+description: Perform a principal-level code review, producing a structured Markdown report with severity-tagged findings and a scorecard. Given a pull/merge request URL, reviews that PR and submits the report as a formal review — approving it when the recommendation is Approve or Comment Only, requesting changes otherwise. Given no URL, reviews the current local code changes and presents the report in the conversation. Use this whenever the user asks to "review this PR", "review my diff", "analyze this code change", "do a code review", "check this pull request for issues", pastes a pull-request URL and asks for feedback, or wants a merge-readiness assessment. Works with any git hosting provider (GitHub, GitLab, Bitbucket, etc.).
 version: 1.5.0
 ---
 
@@ -122,66 +122,92 @@ section is a better signal than a padded one.
 ## 5. Output format
 
 Produce the report in exactly this structure. Keep it clean and scannable:
-plain section headings and each finding in its own callout card. Separate
-the title and each top-level section (Summary, Requirements, Scorecard,
-Findings, Testing) with a horizontal rule (`---`) so the report reads
-as distinct blocks. Do **not** add horizontal rules between individual
-finding cards within Findings — the blockquote already sets each finding
-apart, so rules there only add visual noise.
+plain section headings and each finding in its own callout card. Use a
+top-level heading (`#`) for the title so its underline rule visually
+separates it from the rest of the report. Do **not** add horizontal rules
+anywhere else — not between top-level sections (Summary, Requirements,
+Scorecard, Recommendation, Findings, Testing) and not between individual finding cards
+within Findings — the section headings and the blockquote cards already
+create enough visual separation on their own.
 
 ```markdown
-### 🦦 OtterBot · Code Review
+# 🦦 OtterBot · Code Review
 
----
-
-### ✨ Summary
+## ✨ Summary
 
 Briefly state overall quality, merge readiness, and the highest-risk
-concern, if any.
+concern, if any. Leave the verdict itself to the Recommendation section —
+the Summary sets up the narrative, not the decision.
 
----
-
-### 📋 Requirements
+## 📋 Requirements
 
 State whether the change appears to satisfy the intended business/product
 requirements. Note any ambiguity or missing acceptance criteria.
 
----
-
-### 📊 Scorecard
+## 📊 Scorecard
 
 Score each category from 0-100, where 100 means excellent and merge-ready
 with no meaningful concerns.
 
-Keep the `Category` and `Score` columns wide enough that their values never
-wrap — each should stay on a single line — and let `Notes` take the remaining
-width and overflow as needed.
+Keep the table to just `Category` and `Score` — GitHub's renderer sizes
+table columns by available width, not by source padding, so a wide `Notes`
+cell squeezes the other columns until even short header words wrap
+mid-word. Don't put the rationale in the table; collect it as a bullet list
+under a **Score Notes** label below instead.
 
-| Category            | Score      | Notes |
-| ------------------- | ---------: | ----- |
-| Correctness         | 0-100      | Brief rationale |
-| Completeness        | 0-100      | Brief rationale |
-| Regression Risk     | 0-100      | Brief rationale |
-| Code Quality        | 0-100      | Brief rationale |
-| Testing             | 0-100      | Brief rationale |
-| Security            | 0-100      | Brief rationale |
+| Category            | Score      |
+| ------------------- | ---------: |
+| Correctness         | 0-100      |
+| Completeness        | 0-100      |
+| Regression Risk     | 0-100      |
+| Code Quality        | 0-100      |
+| Testing             | 0-100      |
+| Security            | 0-100      |
 
-**Overall Score:** 0-100
+Follow the table with the **Overall Score** line (a middot then `N / 100`,
+so the scale is explicit and the style matches elsewhere), then a **Score
+Notes** label and a bullet list — one bullet per category that needs context
+(isn't self-evidently near-perfect). Lead each bullet with the bold category
+name so it ties back to the table. Skip categories that don't need comment.
 
-**Recommendation:** Choose one — ✅ Approve, ⚠️ Request changes, or
-💬 Comment only.
+**Overall Score** · 0-100 / 100
+
+**Score Notes**
+
+- **Correctness:** Brief rationale.
+- **Testing:** Brief rationale.
+- **Security:** Brief rationale.
+
+## ⚠️ Recommendation · Request Changes
+
+The verdict lives in the heading itself: set the emoji dynamically to match
+the call and name the verdict after a middot — `## ✅ Recommendation · Approve`,
+`## ⚠️ Recommendation · Request Changes`, or `## 💬 Recommendation · Comment
+Only`. This keeps the section identifiable while surfacing the decision in the
+header's own underline rule, with no separate banner line in the body.
+
+Open the body with the 1-2 sentence explanation of the call. When the verdict
+is ⚠️ Request Changes, follow with a **Blocking** label and a bullet list of
+the specific must-fix items that gate merge — each a one-liner that ends with
+the severity of the finding it maps to, e.g. `(High)`, rather than restating
+the whole finding. For ✅ Approve or 💬 Comment Only, omit **Blocking**;
+optionally add a **Follow-ups** label with non-blocking suggestions worth
+doing later.
 
 Explain the recommendation in 1-2 concise sentences.
 
----
+**Blocking**
 
-### 🔎 Findings
+- Concrete must-fix item that gates merge. (High)
+- Another must-fix item. (Medium)
+
+## 🔎 Findings
 
 Group findings by severity, most severe first. Severity headings use the
 exact emoji and labels from §3 (🔴 Critical, 🟠 High, 🟡 Medium, 🔵 Low,
 ⚪ Optional) followed by a middot and the count of findings in that
-section, e.g. `#### 🟠 High · 2 Issues`. Use singular "Issue" for a count
-of exactly one, e.g. `#### 🟡 Medium · 1 Issue`. Omit empty severity
+section, e.g. `### 🟠 High · 2 Issues`. Use singular "Issue" for a count
+of exactly one, e.g. `### 🟡 Medium · 1 Issue`. Omit empty severity
 sections unless there are no findings at all.
 
 Present each finding as a blockquote card: a bold one-line issue statement,
@@ -194,7 +220,7 @@ concern). Every line of the code block, **including its fences**, is
 prefixed with `>` so it stays inside the card. Put a blank line between
 consecutive cards so they render as separate callouts — no horizontal rules:
 
-#### 🟠 High · 2 Issues
+### 🟠 High · 2 Issues
 
 > **Clear, concise statement of the problem.**
 >
@@ -214,7 +240,7 @@ consecutive cards so they render as separate callouts — no horizontal rules:
 > - **Why it matters:** The risk.
 > - **Fix:** The fix.
 
-#### 🟡 Medium · 1 Issue
+### 🟡 Medium · 1 Issue
 
 > **Issue stated in one line.**
 >
@@ -222,9 +248,7 @@ consecutive cards so they render as separate callouts — no horizontal rules:
 > - **Why it matters:** ...
 > - **Fix:** ...
 
----
-
-### 🧪 Testing
+## 🧪 Testing
 
 Give a thorough, specific picture of testing — not a one-line note. Cover,
 as applicable:
@@ -268,8 +292,8 @@ Delivery follows the mode determined in §1:
   environment provides for that host (e.g. a hosting-provider CLI or API).
   Set the review verdict from the **Recommendation** in §5:
 
-  - ✅ **Approve** or 💬 **Comment only** → submit the review as **approved**.
-  - ⚠️ **Request changes** → submit the review as **changes requested**.
+  - ✅ **Approve** or 💬 **Comment Only** → submit the review as **approved**.
+  - ⚠️ **Request Changes** → submit the review as **changes requested**.
 
   The report Markdown is the body of that review in every case; only the
   verdict differs. Also show the report in the conversation so the user
@@ -311,7 +335,7 @@ for what a full pass looks like):
 - [ ] Delivery matches mode: PR mode submits a formal review **and** shows
       the report in-conversation; local mode shows it in-conversation only
 - [ ] PR review verdict matches the Merge Recommendation: Approve or
-      Comment only → approved; Request changes → changes requested (§6)
+      Comment Only → approved; Request Changes → changes requested (§6)
 - [ ] Any fetch or post failure is stated explicitly, not silently worked
       around
 
@@ -323,7 +347,7 @@ for what a full pass looks like):
 
 → Fetch PR #42's title, description, and diff from the host; produce the
 report in §5's format; submit it as a formal review on PR #42 — approved
-if the Merge Recommendation is Approve or Comment only, changes requested
+if the Merge Recommendation is Approve or Comment Only, changes requested
 otherwise; also show it in the conversation.
 
 **Local review mode** — no URL, uncommitted changes exist:

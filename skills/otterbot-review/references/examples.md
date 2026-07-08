@@ -16,49 +16,52 @@ in the conversation (§6).
 **Report produced:**
 
 ```markdown
-### 🦦 OtterBot · Code Review
+# 🦦 OtterBot · Code Review
 
----
-
-### ✨ Summary
+## ✨ Summary
 
 Solid, focused change that adds a token-bucket limiter in front of the
 webhook endpoint. Mergeable after the missing-lock issue below is fixed —
 under concurrent requests the limiter can currently be bypassed.
 
----
-
-### 📋 Requirements
+## 📋 Requirements
 
 Ticket PAY-881 asks for "no more than 50 requests/minute per merchant." The
 implementation matches that at the code level, but see the High finding
 below — under load, the actual enforced rate can exceed the limit.
 
----
+## 📊 Scorecard
 
-### 📊 Scorecard
+| Category            | Score      |
+| ------------------- | ---------: |
+| Correctness         | 65         |
+| Completeness        | 85         |
+| Regression Risk     | 80         |
+| Code Quality        | 90         |
+| Testing             | 60         |
+| Security            | 95         |
 
-| Category            | Score      | Notes |
-| ------------------- | ---------: | ----- |
-| Correctness         | 65         | Rate limiter has a race condition under concurrent requests. |
-| Completeness        | 85         | Covers the main path; no handling for the limiter's Redis dependency being unavailable. |
-| Regression Risk     | 80         | Isolated to the webhook handler; existing endpoints untouched. |
-| Code Quality        | 90         | Clean, well-named, consistent with existing handler patterns. |
-| Testing             | 60         | Unit tests cover the happy path only; no concurrency or Redis-down test. |
-| Security            | 95         | No new sensitive data handling; rate limiting is itself a security improvement. |
+**Overall Score** · 79 / 100
 
-**Overall Score:** 79
+**Score Notes**
 
-**Recommendation:** ⚠️ Request changes
+- **Correctness:** Rate limiter has a race condition under concurrent requests.
+- **Completeness:** Covers the main path; no handling for the limiter's Redis dependency being unavailable.
+- **Testing:** Unit tests cover the happy path only; no concurrency or Redis-down test.
+
+## ⚠️ Recommendation · Request Changes
 
 The race condition means the rate limit isn't reliably enforced, which
 defeats the ticket's purpose — worth a fix before merge, not a fast-follow.
 
----
+**Blocking**
 
-### 🔎 Findings
+- Make the read-check-increment in `checkRateLimit()` atomic so concurrent requests can't all pass the limit. (High)
+- Add a Redis-down fallback so a connection blip doesn't 500 all webhook traffic. (Medium)
 
-#### 🟠 High · 1 Issue
+## 🔎 Findings
+
+### 🟠 High · 1 Issue
 
 > **The read-check-increment sequence in `checkRateLimit()` isn't atomic, so concurrent requests from the same merchant can all read the same counter value and all pass the check.**
 >
@@ -73,7 +76,7 @@ defeats the ticket's purpose — worth a fix before merge, not a fast-follow.
 > return true;
 > ```
 
-#### 🟡 Medium · 1 Issue
+### 🟡 Medium · 1 Issue
 
 > **No fallback behavior when Redis is unreachable — the handler currently throws, which would 500 all webhook traffic.**
 >
@@ -86,7 +89,7 @@ defeats the ticket's purpose — worth a fix before merge, not a fast-follow.
 > if (!allowed) return res.status(429).end();
 > ```
 
-#### 🔵 Low · 1 Issue
+### 🔵 Low · 1 Issue
 
 > **Magic number `50` for the rate limit is inlined directly in the handler.**
 >
@@ -98,9 +101,7 @@ defeats the ticket's purpose — worth a fix before merge, not a fast-follow.
 > const LIMIT = 50;
 > ```
 
----
-
-### 🧪 Testing
+## 🧪 Testing
 
 > **Existing coverage.**
 >
@@ -131,50 +132,52 @@ in the conversation only; nothing is posted anywhere (§6).
 **Report produced:**
 
 ```markdown
-### 🦦 OtterBot · Code Review
+# 🦦 OtterBot · Code Review
 
----
-
-### ✨ Summary
+## ✨ Summary
 
 Small, well-scoped addition. One real gap: the new export endpoint has no
 authorization check, so any authenticated user could export any merchant's
 transactions.
 
----
-
-### 📋 Requirements
+## 📋 Requirements
 
 No ticket was linked; based on the branch name (`csv-export`) and the diff,
 this appears to implement a merchant-facing "export transactions" feature.
 Can't confirm acceptance criteria without a ticket — worth double-checking
 against whatever spec exists before merging.
 
----
+## 📊 Scorecard
 
-### 📊 Scorecard
+| Category            | Score      |
+| ------------------- | ---------: |
+| Correctness         | 90         |
+| Completeness        | 70         |
+| Regression Risk     | 90         |
+| Code Quality        | 85         |
+| Testing             | 50         |
+| Security            | 40         |
 
-| Category            | Score      | Notes |
-| ------------------- | ---------: | ----- |
-| Correctness         | 90         | CSV generation logic is correct and handles empty result sets. |
-| Completeness        | 70         | Missing authorization check (see Critical finding). |
-| Regression Risk     | 90         | New endpoint, doesn't touch existing routes. |
-| Code Quality        | 85         | Consistent with existing route/controller structure. |
-| Testing             | 50         | No tests added for the new endpoint (new file, untracked). |
-| Security            | 40         | Missing authorization check is a real data-exposure risk. |
+**Overall Score** · 71 / 100
 
-**Overall Score:** 71
+**Score Notes**
 
-**Recommendation:** ⚠️ Request changes
+- **Completeness:** Missing authorization check (see Critical finding).
+- **Testing:** No tests added for the new endpoint (new file, untracked).
+- **Security:** Missing authorization check is a real data-exposure risk.
+
+## ⚠️ Recommendation · Request Changes
 
 The missing authorization check is a data-exposure issue and should block
 merge on its own; everything else here is minor.
 
----
+**Blocking**
 
-### 🔎 Findings
+- Add a merchant-ownership check to `GET /merchants/:id/export` before generating the export. (Critical)
 
-#### 🔴 Critical · 1 Issue
+## 🔎 Findings
+
+### 🔴 Critical · 1 Issue
 
 > **`GET /merchants/:id/export` doesn't verify the requesting user has access to `:id` — it only checks that the user is authenticated, not that they belong to that merchant.**
 >
@@ -189,7 +192,7 @@ merge on its own; everything else here is minor.
 > });
 > ```
 
-#### 🔵 Low · 1 Issue
+### 🔵 Low · 1 Issue
 
 > **No tests for the new endpoint.** (No code block — there's nothing to quote for a missing test.)
 >
@@ -197,9 +200,7 @@ merge on its own; everything else here is minor.
 > - **Why it matters:** Nothing currently guards against a regression here, and the missing-auth issue above is exactly the kind of thing a test would have caught.
 > - **Fix:** Add a test asserting a user from merchant A gets a 403 when requesting merchant B's export.
 
----
-
-### 🧪 Testing
+## 🧪 Testing
 
 > **Existing coverage.**
 >
