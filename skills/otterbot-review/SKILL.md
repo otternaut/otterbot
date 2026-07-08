@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Perform a principal-level code review, producing a structured Markdown report with severity-tagged findings and a scorecard. Given a pull/merge request URL, reviews that PR and submits the report as a formal review — approving it when the recommendation is Approve or Comment only, requesting changes otherwise. Given no URL, reviews the current local code changes and presents the report in the conversation. Use this whenever the user asks to "review this PR", "review my diff", "analyze this code change", "do a code review", "check this pull request for issues", pastes a pull-request URL and asks for feedback, or wants a merge-readiness assessment. Works with any git hosting provider (GitHub, GitLab, Bitbucket, etc.).
-version: 1.2.0
+version: 1.2.1
 ---
 
 # Otterbot Review
@@ -128,7 +128,7 @@ in its own callout card. Do **not** separate cards with horizontal rules
 add visual noise.
 
 ```markdown
-# 🦦 otterbot - code review
+### 🦦 otterbot - code review
 
 **<actual PR/change title>**
 
@@ -147,14 +147,18 @@ requirements. Note any ambiguity or missing acceptance criteria.
 Score each category from 0-100, where 100 means excellent and merge-ready
 with no meaningful concerns.
 
-| Category | Score | Notes |
-| --- | ---: | --- |
-| Correctness | 0-100 | Brief rationale |
-| Completeness | 0-100 | Brief rationale |
-| Regression Risk | 0-100 | Brief rationale |
-| Code Quality | 0-100 | Brief rationale |
-| Testing | 0-100 | Brief rationale |
-| Security | 0-100 | Brief rationale |
+Keep the `Category` and `Score` columns wide enough that their values never
+wrap — each should stay on a single line — and let `Notes` take the remaining
+width and overflow as needed.
+
+| Category            | Score      | Notes |
+| ------------------- | ---------: | ----- |
+| Correctness         | 0-100      | Brief rationale |
+| Completeness        | 0-100      | Brief rationale |
+| Regression Risk     | 0-100      | Brief rationale |
+| Code Quality        | 0-100      | Brief rationale |
+| Testing             | 0-100      | Brief rationale |
+| Security            | 0-100      | Brief rationale |
 
 **Overall Score:** 0-100
 

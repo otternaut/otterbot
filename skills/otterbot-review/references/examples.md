@@ -16,7 +16,7 @@ in the conversation (§6).
 **Report produced:**
 
 ```markdown
-# 🦦 otterbot - code review
+### 🦦 otterbot - code review
 
 **Add rate limiting to payment webhook handler**
 
@@ -34,14 +34,14 @@ below — under load, the actual enforced rate can exceed the limit.
 
 ### 📊 Scorecard
 
-| Category | Score | Notes |
-| --- | ---: | --- |
-| Correctness | 65 | Rate limiter has a race condition under concurrent requests. |
-| Completeness | 85 | Covers the main path; no handling for the limiter's Redis dependency being unavailable. |
-| Regression Risk | 80 | Isolated to the webhook handler; existing endpoints untouched. |
-| Code Quality | 90 | Clean, well-named, consistent with existing handler patterns. |
-| Testing | 60 | Unit tests cover the happy path only; no concurrency or Redis-down test. |
-| Security | 95 | No new sensitive data handling; rate limiting is itself a security improvement. |
+| Category            | Score      | Notes |
+| ------------------- | ---------: | ----- |
+| Correctness         | 65         | Rate limiter has a race condition under concurrent requests. |
+| Completeness        | 85         | Covers the main path; no handling for the limiter's Redis dependency being unavailable. |
+| Regression Risk     | 80         | Isolated to the webhook handler; existing endpoints untouched. |
+| Code Quality        | 90         | Clean, well-named, consistent with existing handler patterns. |
+| Testing             | 60         | Unit tests cover the happy path only; no concurrency or Redis-down test. |
+| Security            | 95         | No new sensitive data handling; rate limiting is itself a security improvement. |
 
 **Overall Score:** 79
 
@@ -113,7 +113,7 @@ in the conversation only; nothing is posted anywhere (§6).
 **Report produced:**
 
 ```markdown
-# 🦦 otterbot - code review
+### 🦦 otterbot - code review
 
 **Add CSV export for merchant transactions**
 
@@ -132,14 +132,14 @@ against whatever spec exists before merging.
 
 ### 📊 Scorecard
 
-| Category | Score | Notes |
-| --- | ---: | --- |
-| Correctness | 90 | CSV generation logic is correct and handles empty result sets. |
-| Completeness | 70 | Missing authorization check (see Critical finding). |
-| Regression Risk | 90 | New endpoint, doesn't touch existing routes. |
-| Code Quality | 85 | Consistent with existing route/controller structure. |
-| Testing | 50 | No tests added for the new endpoint (new file, untracked). |
-| Security | 40 | Missing authorization check is a real data-exposure risk. |
+| Category            | Score      | Notes |
+| ------------------- | ---------: | ----- |
+| Correctness         | 90         | CSV generation logic is correct and handles empty result sets. |
+| Completeness        | 70         | Missing authorization check (see Critical finding). |
+| Regression Risk     | 90         | New endpoint, doesn't touch existing routes. |
+| Code Quality        | 85         | Consistent with existing route/controller structure. |
+| Testing             | 50         | No tests added for the new endpoint (new file, untracked). |
+| Security            | 40         | Missing authorization check is a real data-exposure risk. |
 
 **Overall Score:** 71
 
