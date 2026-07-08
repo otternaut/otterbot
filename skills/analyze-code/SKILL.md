@@ -1,7 +1,7 @@
 ---
 name: analyze-code
-description: Perform a principal-level code review, producing a structured Markdown report with severity-tagged findings and a scorecard. Given a pull/merge request URL, reviews that PR and posts the report as a comment on it. Given no URL, reviews the current local code changes and presents the report in the conversation. Use this whenever the user asks to "review this PR", "review my diff", "analyze this code change", "do a code review", "check this pull request for issues", pastes a pull-request URL and asks for feedback, or wants a merge-readiness assessment. Works with any git hosting provider (GitHub, GitLab, Bitbucket, etc.).
-version: 1.0.0
+description: Perform a principal-level code review, producing a structured Markdown report with severity-tagged findings and a scorecard. Given a pull/merge request URL, reviews that PR and submits the report as a formal review — approving it when the recommendation is Approve or Comment only, requesting changes otherwise. Given no URL, reviews the current local code changes and presents the report in the conversation. Use this whenever the user asks to "review this PR", "review my diff", "analyze this code change", "do a code review", "check this pull request for issues", pastes a pull-request URL and asks for feedback, or wants a merge-readiness assessment. Works with any git hosting provider (GitHub, GitLab, Bitbucket, etc.).
+version: 1.1.0
 ---
 
 # Analyze Code
@@ -22,8 +22,9 @@ matters, not the plumbing.
 Check whether the user's request or the surrounding conversation includes a
 pull/merge request URL (GitHub, GitLab, Bitbucket, or similar).
 
-- **PR URL present → PR review mode.** Review that PR and, at the end, post
-  the report as a comment on it. See §6.
+- **PR URL present → PR review mode.** Review that PR and, at the end,
+  submit the report as a formal review whose verdict (approve vs. changes
+  requested) follows the Merge Recommendation. See §6.
 - **No PR URL → local review mode.** Review the current local code changes
   in this repository and present the report in the conversation. See §6.
 
@@ -225,15 +226,25 @@ verification.
 
 Delivery follows the mode determined in §1:
 
-- **PR review mode:** post the completed report as a single comment on the
-  PR/MR, using whatever tool your environment provides for that host (e.g.
-  a hosting-provider CLI or API). Also show the report in the conversation
-  so the user doesn't have to leave it to read your feedback. Posting is
-  the expected, default action for this mode — no need to ask for
-  confirmation first, since providing a PR URL is the user's signal that
-  they want it reviewed there. If posting fails (no access, no such tool
-  available, auth error), say so and fall back to presenting the report in
-  the conversation.
+- **PR review mode:** submit the completed report as a single formal review
+  on the PR/MR — not just a plain comment — using whatever tool your
+  environment provides for that host (e.g. a hosting-provider CLI or API).
+  Set the review verdict from the **Merge Recommendation** in §5:
+
+  - ✅ **Approve** or 💬 **Comment only** → submit the review as **approved**.
+  - ⚠️ **Request changes** → submit the review as **changes requested**.
+
+  The report Markdown is the body of that review in every case; only the
+  verdict differs. Also show the report in the conversation so the user
+  doesn't have to leave it to read your feedback. Submitting is the
+  expected, default action for this mode — no need to ask for confirmation
+  first, since providing a PR URL is the user's signal that they want it
+  reviewed there. If the host or your access can't attach a verdict (e.g.
+  the tool only supports plain comments, or you'd be reviewing your own PR
+  where self-approval is disallowed), fall back to posting the report as a
+  comment and state the recommendation in the report. If submitting fails
+  entirely (no access, no such tool available, auth error), say so and fall
+  back to presenting the report in the conversation.
 - **Local review mode:** present the report in the conversation only. There
   is no PR to comment on, and nothing should be published anywhere else
   unless the user explicitly asks for that.
@@ -260,8 +271,10 @@ for what a full pass looks like):
       omitted
 - [ ] Scorecard notes and Overall Score actually reflect the findings, not
       a generic/default number
-- [ ] Delivery matches mode: PR mode posts a comment **and** shows the
-      report in-conversation; local mode shows it in-conversation only
+- [ ] Delivery matches mode: PR mode submits a formal review **and** shows
+      the report in-conversation; local mode shows it in-conversation only
+- [ ] PR review verdict matches the Merge Recommendation: Approve or
+      Comment only → approved; Request changes → changes requested (§6)
 - [ ] Any fetch or post failure is stated explicitly, not silently worked
       around
 
@@ -272,8 +285,9 @@ for what a full pass looks like):
 > "review https://github.com/acme/widgets/pull/42"
 
 → Fetch PR #42's title, description, and diff from the host; produce the
-report in §5's format using that title; post it as a comment on PR #42;
-also show it in the conversation.
+report in §5's format using that title; submit it as a formal review on
+PR #42 — approved if the Merge Recommendation is Approve or Comment only,
+changes requested otherwise; also show it in the conversation.
 
 **Local review mode** — no URL, uncommitted changes exist:
 
