@@ -18,9 +18,10 @@ and others — how to perform specific tasks well.
 ---
 
 Each skill is a self-contained directory of Markdown. A single install script
-symlinks every skill into the global skills directory of each supported tool — so
-a skill authored once is available **everywhere**, and edits take effect
-immediately with no reinstall required. ✨
+publishes every skill into the global skills directory of each supported tool —
+so a skill authored once is available **everywhere**. Claude Code is symlinked
+(edits apply live); Codex and Cursor get real copies, because they don't follow
+symlinks when discovering skills. ✨
 
 ## 📚 Available skills
 
@@ -62,15 +63,35 @@ Want to see what would happen first? Preview it with a dry run:
 ./scripts/install --dry-run
 ```
 
-Because skills are **symlinked, not copied**, any edit you make in this repo is
-picked up by every tool immediately — no need to re-run the installer after
-changing a skill. 🔗
+How skills are published differs by tool, because only Claude Code follows
+symlinks when it discovers skills:
+
+| Tool | Published as | Edits apply |
+| --- | --- | --- |
+| Claude Code | 🔗 symlink | immediately |
+| Codex | 📁 real copy | after re-running the installer |
+| Cursor (app) | 📁 real copy | after re-running the installer |
+| Cursor CLI (`cursor-agent`) | 📄 generated rule | after re-running the installer |
+
+So edits to a skill are live instantly in Claude Code, but for the others you
+re-run `./scripts/install` (or `./scripts/install --sync`) to refresh them.
+Every tool also loads skills only at **startup**, so restart Codex, Cursor, or
+any super.engineering session using them to pick up changes.
+
+> 🧩 **Why the fourth row?** The Cursor Agent **CLI** (`cursor-agent`) — what
+> runs when you pick the "cursor" model in super.engineering / Superconductor —
+> has no skills feature; it reads Cursor **rules**. So the installer also runs
+> [`scripts/export-cursor-rules`](scripts/export-cursor-rules), mirroring each
+> skill into a global `~/.cursor/rules/<name>.mdc` that loads on demand by its
+> `description` — the same way a skill would.
 
 The installer is **idempotent and non-destructive**:
 
-- ♻️ Re-running refreshes stale symlinks and leaves correct ones untouched.
-- 🛡️ Real files or directories that are not symlinks are never overwritten —
-  they're skipped with a warning.
+- ♻️ Re-running refreshes stale symlinks and drifted copies, leaving correct
+  entries untouched.
+- 🛡️ A real file or directory the installer didn't create is never overwritten —
+  it's skipped with a warning. Copies it manages carry a `.toolbox-managed`
+  marker so only those are ever refreshed.
 - 📁 Missing target directories are created automatically.
 - 🪝 It points this repo's git at `.githooks` (via `core.hooksPath`) so the
   README skills table stays in sync automatically — see
@@ -80,21 +101,22 @@ Run `./scripts/install --help` for all options.
 
 ## 💡 Using a skill
 
-Once installed, invoke a skill from your agent by name or just by describing the
-task. For example, with `analyze-code`:
-
-```
-/analyze-code https://github.com/acme/widgets/pull/42
-```
-
-…or simply:
+The most portable way to invoke a skill is to **describe the task** — every tool
+matches your request against each skill's `description` and loads the right one:
 
 ```
 review my changes before I open a PR
 ```
 
-The agent matches your request against each skill's `description` and loads the
-right one for you. 🎯
+Claude Code additionally exposes skills as slash commands, so you can name one
+directly:
+
+```
+/analyze-code https://github.com/acme/widgets/pull/42
+```
+
+Codex and Cursor don't surface skills as `/name` commands — describe the task
+instead and the agent picks the skill by its `description`. 🎯
 
 ## 🔄 Keeping docs in sync
 
@@ -121,8 +143,9 @@ You can also run it manually:
 ```
 toolbox/
 ├── scripts/
-│   ├── install          # 🔗 Symlinks skills into your AI tool folders
-│   └── update-readme    # 🔄 Regenerates the skills table from frontmatter
+│   ├── install             # 🔗 Publishes skills into your AI tool folders
+│   ├── export-cursor-rules # 📄 Mirrors skills into Cursor rules for cursor-agent
+│   └── update-readme       # 🔄 Regenerates the skills table from frontmatter
 ├── .githooks/
 │   └── pre-commit       # 🪝 Keeps the README table in sync on commit
 └── skills/

@@ -23,12 +23,14 @@ request. For the full design rationale, read [AGENTS.md](./AGENTS.md).
 ```bash
 git clone https://github.com/otternaut/toolbox.git
 cd toolbox
-./scripts/install --dry-run   # preview what would be linked
+./scripts/install --dry-run   # preview what would be published
 ```
 
-Because skills are symlinked into your tool directories, once you've run
-`./scripts/install` your local edits are live immediately — no reinstall needed
-while iterating.
+Claude Code is symlinked, so once you've run `./scripts/install` your local
+edits are live there immediately while iterating. Codex and Cursor get real
+copies (they don't follow symlinks), so re-run `./scripts/install` (or
+`./scripts/install --sync`) to refresh their copies after an edit, and restart
+the tool to reload skills.
 
 ## Adding a new skill
 
@@ -72,8 +74,11 @@ while iterating.
    `{ id, prompt, expected_output, files }`. Cover the main path and the tricky
    edge cases.
 
-6. **Link it.** Run `./scripts/install` and confirm the new skill is picked up.
-   This also enables the pre-commit hook that keeps the README in sync.
+6. **Publish it.** Run `./scripts/install` and confirm the new skill is picked
+   up. This symlinks it for Claude Code, copies it for Codex and the Cursor app,
+   exports it as a global Cursor rule for the `cursor-agent` CLI (via
+   `scripts/export-cursor-rules`), and enables the pre-commit hook that keeps the
+   README in sync.
 
 7. **Documentation is automatic.** The "Available skills" table in
    [README.md](./README.md) is generated from each skill's `description` by
@@ -98,8 +103,13 @@ while iterating.
 `scripts/install` must remain:
 
 - **Dependency-free** — bash + coreutils only.
-- **Idempotent** — safe to re-run; stale links refreshed, correct ones left be.
-- **Non-destructive** — never clobber a real (non-symlink) file or directory.
+- **Idempotent** — safe to re-run; stale links and drifted copies refreshed,
+  correct entries left be.
+- **Non-destructive** — never clobber a path it didn't create. It only refreshes
+  symlinks it owns and copies carrying the `.toolbox-managed` marker; any other
+  real file or directory is skipped with a warning.
+- **Symlink Claude Code, copy Codex/Cursor** — only Claude Code follows
+  symlinks during skill discovery, so the others must get real directories.
 
 Always validate before committing:
 

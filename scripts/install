@@ -1,19 +1,27 @@
 #!/usr/bin/env bash
 #
-# install — symlink every skill in ./skills into the global config directory
+# install — publish every skill in ./skills into the global config directory
 # of each supported AI tool (Claude, Codex, Cursor).
 #
-# For each skill directory `skills/<name>/`, a symlink is created at:
-#   ~/.claude/skills/<name>  -> <repo>/skills/<name>
-#   ~/.codex/skills/<name>   -> <repo>/skills/<name>
-#   ~/.cursor/skills/<name>  -> <repo>/skills/<name>
+# For each skill directory `skills/<name>/`, an entry is published at:
+#   ~/.claude/skills/<name>  (symlink -> <repo>/skills/<name>)
+#   ~/.codex/skills/<name>   (real copy of <repo>/skills/<name>)
+#   ~/.cursor/skills/<name>  (real copy of <repo>/skills/<name>)
+#
+# Why the split: only Claude Code follows symlinks when it discovers skills, so
+# it gets a symlink and picks up edits live. Codex and Cursor do NOT traverse
+# symlinks during discovery — they need real directories — so those targets get
+# a copy. Re-run this script (or `scripts/install --sync`) after editing a skill
+# to refresh those copies.
 #
 # Target directories are created if missing. Re-running is safe (idempotent):
-# stale symlinks are refreshed, correct ones are left alone, and real files or
-# directories are never clobbered — they are skipped with a warning.
+# stale/wrong entries are refreshed, correct ones are left alone, and real paths
+# this script did not create are never clobbered — they are skipped with a
+# warning. Copied skills carry a `.toolbox-managed` marker so refreshes only
+# ever overwrite copies this script owns.
 #
 # No dependencies beyond bash + coreutils.
-# Usage: ./scripts/install [--dry-run] [-h]
+# Usage: ./scripts/install [--dry-run] [--sync] [-h]
 
 set -euo pipefail
 
@@ -23,11 +31,18 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 SKILLS_SRC="$REPO_ROOT/skills"
 
-# --- destination roots -------------------------------------------------------
+# Marker file dropped into every copied skill so we can tell our copies apart
+# from a real directory the user created (which we must never clobber).
+MARKER=".toolbox-managed"
+
+# --- destination roots + publish mode ----------------------------------------
+# Each entry is "<path>|<mode>" where mode is `symlink` or `copy`. Claude Code
+# follows symlinks (and benefits from live edits); Codex and Cursor do not, so
+# they get real copies.
 TARGETS=(
-  "$HOME/.claude/skills"
-  "$HOME/.codex/skills"
-  "$HOME/.cursor/skills"
+  "$HOME/.claude/skills|symlink"
+  "$HOME/.codex/skills|copy"
+  "$HOME/.cursor/skills|copy"
 )
 
 # --- options -----------------------------------------------------------------
@@ -35,25 +50,28 @@ DRY_RUN=0
 
 usage() {
   cat <<EOF
-install — link this repo's skills into your AI tool folders.
+install — publish this repo's skills into your AI tool folders.
 
 Usage: ./scripts/install [options]
 
 Options:
   --dry-run    Show what would happen without touching the filesystem.
+  --sync       Alias for a normal run; re-copies edited skills into Codex/Cursor.
   -h, --help   Show this help.
 
+Publish model:
+  ~/.claude/skills   symlink (Claude Code follows links; edits apply live)
+  ~/.codex/skills    copy    (Codex does not follow links; re-run to refresh)
+  ~/.cursor/skills   copy    (Cursor does not follow links; re-run to refresh)
+
 Skills are read from: $SKILLS_SRC
-Destinations:
-  ~/.claude/skills
-  ~/.codex/skills
-  ~/.cursor/skills
 EOF
 }
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --dry-run) DRY_RUN=1 ;;
+    --sync)    : ;; # a normal run already refreshes copies; accepted for clarity
     -h|--help) usage; exit 0 ;;
     *) echo "install: unknown option '$1'" >&2; usage >&2; exit 2 ;;
   esac
@@ -74,13 +92,13 @@ n_created=0 n_refreshed=0 n_ok=0 n_skipped=0
 tilde() { case "$1" in "$HOME"/*) printf '~%s' "${1#"$HOME"}";; *) printf '%s' "$1";; esac; }
 
 # link_one <src> <dest>
-# Apply the smart-idempotent policy to a single destination path.
+# Symlink policy: point <dest> at <src>, refreshing a stale link, never
+# clobbering a real path.
 link_one() {
   local src="$1" dest="$2" pretty
   pretty="$(tilde "$dest")"
 
   if [ -L "$dest" ]; then
-    # Existing symlink — compare its target to what we want.
     local current
     current="$(readlink "$dest")"
     if [ "$current" = "$src" ]; then
@@ -88,7 +106,6 @@ link_one() {
       n_ok=$((n_ok + 1))
       return
     fi
-    # Stale/wrong symlink — refresh it.
     if [ "$DRY_RUN" -eq 1 ]; then
       printf '  %s~ %s%s (would refresh -> %s)\n' "$C_YELLOW" "$pretty" "$C_RESET" "$src"
     else
@@ -101,13 +118,11 @@ link_one() {
   fi
 
   if [ -e "$dest" ]; then
-    # A real file or directory lives here — never clobber it.
     printf '  %s! %s%s (skipped: real path exists, not a symlink)\n' "$C_YELLOW" "$pretty" "$C_RESET"
     n_skipped=$((n_skipped + 1))
     return
   fi
 
-  # Nothing there — create the link.
   if [ "$DRY_RUN" -eq 1 ]; then
     printf '  %s+ %s%s (would create -> %s)\n' "$C_GREEN" "$pretty" "$C_RESET" "$src"
   else
@@ -115,6 +130,85 @@ link_one() {
     printf '  %s+ %s%s (created)\n' "$C_GREEN" "$pretty" "$C_RESET"
   fi
   n_created=$((n_created + 1))
+}
+
+# copy_dir <src> <dest>
+# Copy the skill into place and stamp it with our marker. Assumes <dest> does
+# not already exist (callers clear it first).
+copy_dir() {
+  local src="$1" dest="$2"
+  cp -R "$src" "$dest"
+  printf '%s' "$REPO_ROOT" > "$dest/$MARKER"
+}
+
+# copy_one <src> <dest>
+# Copy policy: materialize <src> as a real directory at <dest>. Refresh our own
+# copies (identified by the marker) when the source drifts; upgrade a leftover
+# symlink from an older install; never clobber a real path we did not create.
+copy_one() {
+  local src="$1" dest="$2" pretty
+  pretty="$(tilde "$dest")"
+
+  # Leftover symlink from the old symlink-everywhere model — upgrade to a copy.
+  if [ -L "$dest" ]; then
+    if [ "$DRY_RUN" -eq 1 ]; then
+      printf '  %s~ %s%s (would replace symlink with copy)\n' "$C_YELLOW" "$pretty" "$C_RESET"
+    else
+      rm -f "$dest"
+      copy_dir "$src" "$dest"
+      printf '  %s~ %s%s (symlink -> copy)\n' "$C_YELLOW" "$pretty" "$C_RESET"
+    fi
+    n_refreshed=$((n_refreshed + 1))
+    return
+  fi
+
+  if [ -d "$dest" ]; then
+    if [ ! -e "$dest/$MARKER" ]; then
+      # A real directory we did not create — never clobber it.
+      printf '  %s! %s%s (skipped: real dir exists, not managed by toolbox)\n' "$C_YELLOW" "$pretty" "$C_RESET"
+      n_skipped=$((n_skipped + 1))
+      return
+    fi
+    # One of our copies — refresh only if the source content drifted.
+    if diff -rq --exclude="$MARKER" "$src" "$dest" >/dev/null 2>&1; then
+      printf '  %s= %s%s (ok)\n' "$C_DIM" "$pretty" "$C_RESET"
+      n_ok=$((n_ok + 1))
+      return
+    fi
+    if [ "$DRY_RUN" -eq 1 ]; then
+      printf '  %s~ %s%s (would refresh copy)\n' "$C_YELLOW" "$pretty" "$C_RESET"
+    else
+      rm -rf "$dest"
+      copy_dir "$src" "$dest"
+      printf '  %s~ %s%s (refreshed)\n' "$C_YELLOW" "$pretty" "$C_RESET"
+    fi
+    n_refreshed=$((n_refreshed + 1))
+    return
+  fi
+
+  if [ -e "$dest" ]; then
+    # A real file lives here — never clobber it.
+    printf '  %s! %s%s (skipped: real path exists)\n' "$C_YELLOW" "$pretty" "$C_RESET"
+    n_skipped=$((n_skipped + 1))
+    return
+  fi
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    printf '  %s+ %s%s (would copy)\n' "$C_GREEN" "$pretty" "$C_RESET"
+  else
+    copy_dir "$src" "$dest"
+    printf '  %s+ %s%s (copied)\n' "$C_GREEN" "$pretty" "$C_RESET"
+  fi
+  n_created=$((n_created + 1))
+}
+
+# publish_one <mode> <src> <dest>
+publish_one() {
+  case "$1" in
+    symlink) link_one "$2" "$3" ;;
+    copy)    copy_one "$2" "$3" ;;
+    *) echo "install: unknown publish mode '$1'" >&2; exit 2 ;;
+  esac
 }
 
 # --- discover skills ---------------------------------------------------------
@@ -140,19 +234,40 @@ if [ "${#skills[@]}" -eq 0 ]; then
 fi
 
 [ "$DRY_RUN" -eq 1 ] && echo "${C_DIM}(dry run — no changes will be made)${C_RESET}"
-echo "Linking ${#skills[@]} skill(s) from $(tilde "$SKILLS_SRC")"
+echo "Publishing ${#skills[@]} skill(s) from $(tilde "$SKILLS_SRC")"
 
-# --- link loop ---------------------------------------------------------------
-for target in "${TARGETS[@]}"; do
+# --- publish loop ------------------------------------------------------------
+for entry in "${TARGETS[@]}"; do
+  target="${entry%%|*}"
+  mode="${entry##*|}"
   echo
-  echo "→ $(tilde "$target")"
+  echo "→ $(tilde "$target") (${mode})"
   if [ "$DRY_RUN" -eq 0 ]; then
     mkdir -p "$target"
   fi
   for name in "${skills[@]}"; do
-    link_one "$SKILLS_SRC/$name" "$target/$name"
+    publish_one "$mode" "$SKILLS_SRC/$name" "$target/$name"
   done
 done
+
+# --- cursor rules (for the cursor-agent CLI backend) -------------------------
+# The Cursor Agent CLI (`cursor-agent`) — used when the "cursor" model is picked
+# inside super.engineering / Superconductor — has no Agent Skills feature; it
+# reads Cursor *rules* from a global ~/.cursor/rules/ instead. Mirror each skill
+# into a rule so the same guidance loads on demand under that backend.
+publish_cursor_rules() {
+  local exporter="$SCRIPT_DIR/export-cursor-rules"
+  [ -x "$exporter" ] || return 0
+  echo
+  echo "→ ~/.cursor/rules (cursor-agent CLI)"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    "$exporter" --dry-run | sed -n '/^  /p'
+  else
+    "$exporter" | sed -n '/^  /p'
+  fi
+}
+
+publish_cursor_rules
 
 # --- git hooks ---------------------------------------------------------------
 # Point this repo's git at .githooks so the pre-commit hook keeps README.md's
@@ -185,3 +300,7 @@ setup_git_hooks
 echo
 printf 'Done: %d created, %d refreshed, %d unchanged, %d skipped.\n' \
   "$n_created" "$n_refreshed" "$n_ok" "$n_skipped"
+
+if [ "$n_created" -gt 0 ] || [ "$n_refreshed" -gt 0 ]; then
+  echo "${C_DIM}Restart Codex and Cursor (and any super.engineering session using them) to pick up changes.${C_RESET}"
+fi

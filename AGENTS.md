@@ -13,9 +13,11 @@ to be tool-agnostic so the same directory can be used by Claude Code, Codex,
 Cursor, or any other agent that supports the [Agent Skills](https://code.claude.com/docs/en/skills)
 convention.
 
-The `scripts/install` script symlinks every skill into the global skills
-directory of each supported tool, so a skill authored here is instantly
-available everywhere.
+The `scripts/install` script publishes every skill into the global skills
+directory of each supported tool, so a skill authored here is available
+everywhere. Claude Code is symlinked (it follows links, so edits are live);
+Codex and Cursor get real copies, because they don't traverse symlinks during
+skill discovery.
 
 ## Repository layout
 
@@ -29,7 +31,8 @@ toolbox/
 ├── .githooks/
 │   └── pre-commit         # Regenerates the README skills table on commit
 ├── scripts/
-│   ├── install            # Symlinks skills; enables the git hook
+│   ├── install            # Publishes skills (symlink/copy); exports rules; enables the git hook
+│   ├── export-cursor-rules # Mirrors each skill into a global Cursor rule for cursor-agent
 │   └── update-readme      # Regenerates the README skills table from frontmatter
 └── skills/
     └── <skill-name>/
@@ -88,27 +91,67 @@ Conventions:
 ## Installation model
 
 `scripts/install` is a dependency-free Bash script (bash + coreutils only) that,
-for each `skills/<name>/`, creates a symlink at:
+for each `skills/<name>/`, publishes an entry into every tool's skills
+directory. **The publish mode differs by tool**, because only Claude Code
+follows symlinks when it discovers skills — Codex and Cursor need real
+directories:
 
 ```
-~/.claude/skills/<name>  -> <repo>/skills/<name>
-~/.codex/skills/<name>   -> <repo>/skills/<name>
-~/.cursor/skills/<name>  -> <repo>/skills/<name>
+~/.claude/skills/<name>  ->  <repo>/skills/<name>   (symlink)
+~/.codex/skills/<name>       copy of <repo>/skills/<name>
+~/.cursor/skills/<name>      copy of <repo>/skills/<name>
 ```
+
+This is why the same symlink that works for Claude Code is invisible to Codex
+and Cursor (including when they run as backends inside super.engineering /
+Superconductor) — those tools skip symlinked entries during discovery. Copies
+are stamped with a `.toolbox-managed` marker file so the installer can tell its
+own copies apart from a real directory the user created.
 
 Key properties to preserve when editing it:
 
-- **Idempotent.** Re-running refreshes stale symlinks, leaves correct ones
-  alone, and reports a summary. Never break this.
-- **Non-destructive.** It never clobbers a real file or directory that is not a
-  symlink — those are skipped with a warning.
+- **Idempotent.** Re-running refreshes stale symlinks and drifted copies, leaves
+  correct entries alone, and reports a summary. Never break this.
+- **Non-destructive.** It never clobbers a real file or directory it didn't
+  create — a symlink target it doesn't own, or a directory without the
+  `.toolbox-managed` marker, is skipped with a warning.
 - **`--dry-run`** must always show exactly what would happen without touching the
   filesystem.
 - **Path resolution** is derived from the script's own location (`scripts/` is
   one level below the repo root). If you move the script, update `REPO_ROOT`.
 
-Because the skills are symlinked (not copied), edits in this repo take effect
-immediately in every tool without re-running the installer.
+Because Claude Code is symlinked, edits in this repo take effect immediately
+there. Codex and Cursor use copies, so re-run `scripts/install` (a.k.a.
+`--sync`) to refresh them after editing a skill. All three tools load skills
+only at startup, so restart them (or the super.engineering session using them)
+to pick up changes.
+
+### The cursor-agent CLI reads rules, not skills
+
+One important gap: the **Cursor Agent CLI** (`cursor-agent`) — which is what runs
+when you select the "cursor" model inside super.engineering / Superconductor —
+has **no Agent Skills feature at all**. Skills (`SKILL.md`, `~/.cursor/skills/`)
+are a Cursor *app/IDE* feature. The CLI instead reads Cursor **rules** (`.mdc`
+files), and it does read a **global** `~/.cursor/rules/` directory.
+
+So `scripts/install` also runs `scripts/export-cursor-rules`, which mirrors each
+skill into `~/.cursor/rules/<name>.mdc`:
+
+- The rule's frontmatter carries the skill's `description` with
+  `alwaysApply: false`, so cursor-agent loads it **on demand** by matching the
+  request against the description — the same trigger model skills use, without
+  bloating context.
+- The rule body is the skill's instructions; a header points at
+  `~/.cursor/skills/<name>/` for any `references/…` files.
+- Rules are **generated artifacts** (a transform of `SKILL.md`), so there is no
+  symlink shortcut — re-run `scripts/install` after editing a skill. The
+  exporter is idempotent and only overwrites rules it generated (tagged with a
+  `toolbox-generated-rule` marker); a hand-written `.mdc` is left alone.
+
+This is why "keep the symlink version, it avoids syncs" doesn't hold: symlinks
+never worked for Codex or the Cursor app (they don't traverse links), and the
+cursor-agent backend needs a generated rule regardless — so copies + generated
+rules are the only setup that covers every backend.
 
 ## Generated README skills table (keep it automatic)
 
