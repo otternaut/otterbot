@@ -1,0 +1,29 @@
+{
+  "skill_name": "analyze-code",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "review this PR: https://github.com/acme/widgets/pull/42",
+      "expected_output": "A single Markdown report titled with PR #42's actual title (fetched, not invented), following the §5 template (Summary, Requirements Check, Scorecard, Findings grouped by severity, Testing Notes). The report is posted as a comment on PR #42 via whatever host tool is available, and also shown in the conversation. If PR data can't be fetched, the agent says so and offers to review a pasted diff instead rather than silently doing something else.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "review my local changes before I open a PR",
+      "expected_output": "A single Markdown report following the §5 template, produced from the actual local diff, including any new/untracked files (not just modifications to already-tracked files). The report is shown only in the conversation — nothing is posted or published anywhere.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "can you review the current branch?",
+      "expected_output": "Since there are no uncommitted changes, the agent diffs the current branch against its base/target branch and reviews that, producing the §5 report in the conversation only.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "review what I've got so far",
+      "expected_output": "In a repository with zero commits and no base branch to diff against, the agent falls back to treating every tracked and untracked file in the working tree as the change set, and reviews that — rather than reporting 'no changes found'.",
+      "files": []
+    }
+  ]
+}
