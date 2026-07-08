@@ -121,102 +121,94 @@ section is a better signal than a padded one.
 
 ## 5. Output format
 
-Produce the report in exactly this structure:
+Produce the report in exactly this structure. Keep it clean and scannable:
+plain section headings, the change title on its own line, and each finding
+in its own callout card. Do **not** separate cards with horizontal rules
+(`---`) — the blockquote already sets each finding apart, so the rules only
+add visual noise.
 
 ```markdown
-# 🦦 OtterBot Code Review
+# 🦦 otterbot - code review
 
-## ✨ Summary — <actual PR/change title>
+**<actual PR/change title>**
+
+### ✨ Summary
 
 Briefly state overall quality, merge readiness, and the highest-risk
 concern, if any.
 
-## 📋 Requirements Check
+### 📋 Requirements
 
 State whether the change appears to satisfy the intended business/product
 requirements. Note any ambiguity or missing acceptance criteria.
 
-## 📊 Scorecard
+### 📊 Scorecard
 
 Score each category from 0-100, where 100 means excellent and merge-ready
 with no meaningful concerns.
 
-| Criteria | Score | Notes |
+| Category | Score | Notes |
 | --- | ---: | --- |
 | Correctness | 0-100 | Brief rationale |
 | Completeness | 0-100 | Brief rationale |
 | Regression Risk | 0-100 | Brief rationale |
 | Code Quality | 0-100 | Brief rationale |
 | Testing | 0-100 | Brief rationale |
-| Security & Data Integrity | 0-100 | Brief rationale |
+| Security | 0-100 | Brief rationale |
 
 **Overall Score:** 0-100
 
-**Merge Recommendation:** Choose one: ✅ Approve, ⚠️ Request changes, or
+**Recommendation:** Choose one — ✅ Approve, ⚠️ Request changes, or
 💬 Comment only.
 
 Explain the recommendation in 1-2 concise sentences.
 
-## 🔎 Findings
+### 🔎 Findings
 
-Group findings by severity. Omit empty severity sections unless there are
-no findings at all.
+Group findings by severity, most severe first. Severity headings use the
+exact emoji and labels from §3 (🔴 Critical, 🟠 High, 🟡 Medium, 🔵 Low,
+⚪ Optional). Omit empty severity sections unless there are no findings at
+all.
 
-Use this card format for every finding:
+Present each finding as a blockquote card: a bold one-line issue statement,
+then a tight bullet list, and finally — when you have the source and it makes
+the problem concrete — a short fenced code block quoting the exact lines the
+finding refers to. Tag the code block with the file's language and keep it to
+the few relevant lines. Omit the code block when there's nothing useful to
+show (e.g. a finding about missing code, absent tests, or a design-level
+concern). Every line of the code block, **including its fences**, is
+prefixed with `>` so it stays inside the card. Put a blank line between
+consecutive cards so they render as separate callouts — no horizontal rules:
 
-### 🟠 High
+#### 🟠 High
 
-> **Issue:** Clear, concise statement of the problem.
+> **Clear, concise statement of the problem.**
 >
-> **Location:** `path/to/file.ext`, function/class/section, or changed
-> behavior.
+> - **Location:** `path/to/file.ext`, function/class/section, or changed behavior.
+> - **Why it matters:** The user, system, data, security, or maintenance impact.
+> - **Fix:** The concrete change needed.
 >
-> **Why it matters:** Explain the user, system, data, security, or
-> maintenance impact.
->
-> **Recommended fix:** Describe the concrete change needed.
+> ```ts
+> // the exact lines from the change that the finding refers to
+> const count = await redis.get(key);
+> if (Number(count) >= LIMIT) await redis.set(key, Number(count) + 1);
+> ```
 
----
+> **Another separate finding, stated in one line.**
+>
+> - **Location:** `path/to/other-file.ext`
+> - **Why it matters:** The risk.
+> - **Fix:** The fix.
 
-> **Issue:** Another separate finding.
->
-> **Location:** `path/to/other-file.ext`
->
-> **Why it matters:** Explain the risk.
->
-> **Recommended fix:** Explain the fix.
+#### 🟡 Medium
 
-### 🟡 Medium
+> **Issue stated in one line.**
+>
+> - **Location:** ...
+> - **Why it matters:** ...
+> - **Fix:** ...
 
-> **Issue:** ...
->
-> **Location:** ...
->
-> **Why it matters:** ...
->
-> **Recommended fix:** ...
-
-### 🔵 Low
-
-> **Issue:** ...
->
-> **Location:** ...
->
-> **Why it matters:** ...
->
-> **Recommended fix:** ...
-
-### ⚪ Optional
-
-> **Issue:** ...
->
-> **Location:** ...
->
-> **Why it matters:** ...
->
-> **Recommended fix:** ...
-
-## 🧪 Testing Notes
+### 🧪 Testing Notes
 
 Briefly summarize test coverage, missing cases, and any recommended manual
 verification.
@@ -229,7 +221,7 @@ Delivery follows the mode determined in §1:
 - **PR review mode:** submit the completed report as a single formal review
   on the PR/MR — not just a plain comment — using whatever tool your
   environment provides for that host (e.g. a hosting-provider CLI or API).
-  Set the review verdict from the **Merge Recommendation** in §5:
+  Set the review verdict from the **Recommendation** in §5:
 
   - ✅ **Approve** or 💬 **Comment only** → submit the review as **approved**.
   - ⚠️ **Request changes** → submit the review as **changes requested**.
@@ -261,7 +253,7 @@ for what a full pass looks like):
       mode")
 - [ ] Surrounding context pulled in beyond the raw diff: description,
       linked tickets, existing tests, related code
-- [ ] Actual PR/change title used in the summary line — never invented
+- [ ] Actual PR/change title used as the report's title line — never invented
 - [ ] All six review focus areas considered (§2), even the ones that turn
       up nothing
 - [ ] Every finding has all five fields: Severity, Issue, Location, Why it
