@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
-description: Perform a principal-level code review, producing a structured Markdown report with severity-tagged findings and a scorecard. Given a pull/merge request URL, reviews that PR and submits the report as a formal review — approving it when the recommendation is Approve or Comment Only, requesting changes otherwise. Given no URL, reviews the current local code changes and presents the report in the conversation. Use this whenever the user asks to "review this PR", "review my diff", "analyze this code change", "do a code review", "check this pull request for issues", pastes a pull-request URL and asks for feedback, or wants a merge-readiness assessment. Works with any git hosting provider (GitHub, GitLab, Bitbucket, etc.).
-version: 1.7.8
+description: Perform a principal-level code review, producing a structured Markdown report with severity-tagged findings and a scorecard. Given a pull/merge request URL, reviews that PR and submits the report as a formal review — approving when the recommendation is Approve, commenting neutrally when it is Comment Only, and requesting changes otherwise. Given no URL, reviews the current local code changes and presents the report in the conversation. Use this whenever the user asks to "review this PR", "review my diff", "analyze this code change", "do a code review", "check this pull request for issues", pastes a pull-request URL and asks for feedback, or wants a merge-readiness assessment. Works with any git hosting provider (GitHub, GitLab, Bitbucket, etc.).
+version: 1.7.9
 ---
 
 # Otterbot Review
@@ -230,11 +230,11 @@ Produce the report in exactly this structure. Keep it clean and scannable:
 plain section headings and each finding in its own callout card. Use a
 top-level heading (`##`) for the title so its underline rule visually
 separates it from the rest of the report. Do **not** add horizontal rules
-anywhere else — not between top-level sections (Summary, Requirements,
-Recommendation, collapsed The Otter Council, collapsed Findings, collapsed
-Testing) and not between individual finding cards within Findings — the section
-headings and the blockquote cards already create enough visual separation on
-their own.
+anywhere else — not between top-level sections (Summary, expanded Requirements,
+expanded Recommendation, collapsed The Otter Council, collapsed Findings,
+collapsed Testing) and not between individual finding cards within Findings —
+the section headings and blockquote cards already create enough visual
+separation on their own.
 
 ```markdown
 ## 🦦 OtterBot · Code Review
@@ -243,18 +243,23 @@ Briefly state overall quality, merge readiness, and the highest-risk
 concern, if any. Leave the verdict itself to the Recommendation section —
 the Summary sets up the narrative, not the decision.
 
-### 📋 Requirements
+<details open>
+<summary><h3>📋 Requirements</h3></summary>
 
 State whether the change appears to satisfy the intended business/product
 requirements. Note any ambiguity or missing acceptance criteria.
 
-### ⚠️ Recommendation · Request Changes
+</details>
+<details open>
+<summary><h3>⚠️ Recommendation · Request Changes</h3></summary>
 
 The verdict lives in the heading itself: set the emoji dynamically to match
-the call and name the verdict after a middot — `### ✅ Recommendation · Approve`,
-`### ⚠️ Recommendation · Request Changes`, or `### 💬 Recommendation · Comment
-Only`. This keeps the section identifiable while surfacing the decision in the
-header's own underline rule, with no separate banner line in the body.
+the call and name the verdict after a middot —
+`<summary><h3>✅ Recommendation · Approve</h3></summary>`,
+`<summary><h3>⚠️ Recommendation · Request Changes</h3></summary>`, or
+`<summary><h3>💬 Recommendation · Comment Only</h3></summary>`. This keeps the
+section identifiable while surfacing the decision in the header itself, with no
+separate banner line in the body.
 
 Open the body with the 1-2 sentence explanation of the call. When the verdict
 is ⚠️ Request Changes, create one `#### <emoji> Feedback · <Specialist Name>`
@@ -270,7 +275,7 @@ specialist notes when useful.
 
 Explain the recommendation in 1-2 concise sentences.
 
-#### ✅ Feedback · Correctness Specialist
+#### 🎯 Feedback · Correctness Specialist
 
 - Concurrent requests can bypass the limit, which maps to the atomicity finding. (High)
 
@@ -278,6 +283,7 @@ Explain the recommendation in 1-2 concise sentences.
 
 - Missing concurrency coverage maps to the regression-test gap. (Medium)
 
+</details>
 <details>
 <summary><h3>🦦 The Otter Council</h3></summary>
 
@@ -288,10 +294,9 @@ Present each scorecard item as a plain blockquote card, not a table and not a
 GitHub alert. GitHub alert blockquotes add a visible `Tip`, `Warning`, or
 `Caution` label above the content; do not use them here.
 
-- Start each card with a score-status circle, middot, category emoji, and
-  specialist name.
-- Put `**Score ·** <value>` on its own line, not in a bullet list. Do not add
-  `/ 100`; the score is always assumed to be out of 100.
+- Start each card with the category emoji and specialist name.
+- Put `**Score ·** <indicator> · <value>` on its own line, not in a bullet
+  list. Do not add `/ 100`; the score is always assumed to be out of 100.
 - Put one or more note bullets directly below the score. Do not add a
   **Notes** label in Otter Council cards; the bullets replace the old separate
   **Score Notes** section.
@@ -302,7 +307,7 @@ Plain Markdown cannot reliably control blockquote border color across hosts.
 Use a normal blockquote for every score band rather than trying to force red,
 yellow, or green borders.
 
-Use a score-status circle beside the specialist name:
+Use a score-status circle between `Score` and the value:
 
 - `< 60` → `🔴`
 - `60-80` → `🟡`
@@ -312,42 +317,41 @@ Use a score-status circle beside the specialist name:
 Use category emojis consistently in both Recommendation feedback headings and
 Otter Council cards:
 
-- Correctness → `✅`
+- Correctness → `🎯`
 - Completeness → `🧩`
 - Regression Risk → `🛡️`
 - Code Quality → `🧹`
 - Testing → `🧪`
 - Security → `🔒`
 
-> 🟢 · ✅ **Correctness Specialist**
+> 🎯 **Correctness Specialist**
 >
-> **Score ·** 81-99
+> **Score ·** 🟢 · 81-99
 >
 > - Detailed finding or rationale.
 > - Another relevant observation, when needed.
 
-> 🟡 · 🧪 **Testing Specialist**
+> 🧪 **Testing Specialist**
 >
-> **Score ·** 60-80
->
-> - Detailed finding or rationale.
-
-> 🔴 · 🔒 **Security Specialist**
->
-> **Score ·** <60
+> **Score ·** 🟡 · 60-80
 >
 > - Detailed finding or rationale.
 
-> 🔵 · 🧹 **Code Quality Specialist**
+> 🔒 **Security Specialist**
 >
-> **Score ·** 100
+> **Score ·** 🔴 · <60
+>
+> - Detailed finding or rationale.
+
+> 🧹 **Code Quality Specialist**
+>
+> **Score ·** 🔵 · 100
 >
 > - Detailed finding or rationale.
 
 Do not add a separate **Score Notes** section or an overall score.
 
 </details>
-
 <details>
 <summary><h3>🔎 Findings</h3></summary>
 
@@ -397,7 +401,6 @@ consecutive cards so they render as separate callouts — no horizontal rules:
 > - **Fix:** ...
 
 </details>
-
 <details>
 <summary><h3>🧪 Testing</h3></summary>
 
@@ -440,16 +443,18 @@ Blank line between cards, no horizontal rules.
 
 Delivery follows the mode determined in §1:
 
-- **PR review mode:** submit the completed report as a single formal review
-  on the PR/MR — not just a plain comment — using whatever tool your
-  environment provides for that host (e.g. a hosting-provider CLI or API).
-  Set the review verdict from the **Recommendation** in §6:
+- **PR review mode:** deliver the completed report on the PR/MR using whatever
+  tool your environment provides for that host (e.g. a hosting-provider CLI or
+  API). Use a formal review when the verdict has a formal review state; use a
+  neutral review comment or plain PR comment for 💬 Comment Only. Set the
+  review verdict from the **Recommendation** in §6:
 
-  - ✅ **Approve** or 💬 **Comment Only** → submit the review as **approved**.
+  - ✅ **Approve** → submit the review as **approved**.
+  - 💬 **Comment Only** → submit a neutral review comment or plain PR comment.
   - ⚠️ **Request Changes** → submit the review as **changes requested**.
 
-  The report Markdown is the body of that review in every case; only the
-  verdict differs. Also show the report in the conversation so the user
+  The report Markdown is the body of that delivery in every case; only the
+  delivery state differs. Also show the report in the conversation so the user
   doesn't have to leave it to read your feedback. Submitting is the
   expected, default action for this mode — no need to ask for confirmation
   first, since providing a PR URL is the user's signal that they want it
@@ -494,25 +499,32 @@ for what a full pass looks like):
 - [ ] Output follows the exact §6 structure, with empty severity sections
       omitted, no horizontal rules, and each severity heading tagged with its
       finding count
-- [ ] Recommendation appears before The Otter Council, and any Request Changes
-      recommendation uses one emoji-prefixed `Feedback · <Specialist>`
+- [ ] Requirements and Recommendation are wrapped in expanded-by-default
+      `<details open>` blocks, and Recommendation appears before The Otter
+- [ ] Any Request Changes recommendation uses one emoji-prefixed
+      `Feedback · <Specialist>`
       subsection per relevant specialist, omits specialists without
       recommendation-driving notes, and does not use a generic Notes or
       must-fix list
 - [ ] The Otter Council cards are plain blockquotes with no GitHub alert
-      labels, include score-status and category emojis in the heading, omit the
-      redundant Specialist field, put `Score · <value>` outside bullet lists,
-      omit `/ 100`, use readable spacing, put note bullets directly below the
-      score without a Notes label, and do not include a separate Score Notes
-      section or overall score
+      labels, include category emojis in the heading, omit the redundant
+      Specialist field, put `Score · <indicator> · <value>` outside bullet
+      lists, omit `/ 100`, use readable spacing, put note bullets directly
+      below the score without a Notes label, and do not include a separate
+      Score Notes section or overall score
 - [ ] The Otter Council, Findings, and Testing sections are wrapped in
       collapsed-by-default `<details>` blocks, with no `open` attribute, and
       use `<summary><h3>...</h3></summary>` so collapsed headings match the
       other section headers
-- [ ] Delivery matches mode: PR mode submits a formal review **and** shows
-      the report in-conversation; local mode shows it in-conversation only
-- [ ] PR review verdict matches the final Recommendation: Approve or
-      Comment Only → approved; Request Changes → changes requested (§7)
+- [ ] Spacing between adjacent collapsible sections is tight: close one
+      `</details>` and start the next `<details>` on the following line, with
+      no extra blank line between them
+- [ ] Delivery matches mode: PR mode posts the report to the PR/MR with the
+      correct verdict semantics **and** shows it in-conversation; local mode
+      shows it in-conversation only
+- [ ] PR review verdict matches the final Recommendation: Approve → approved;
+      Comment Only → neutral review comment or plain PR comment; Request
+      Changes → changes requested (§7)
 - [ ] Any fetch or post failure is stated explicitly, not silently worked
       around
 
@@ -524,8 +536,8 @@ for what a full pass looks like):
 
 → Fetch PR #42's title, description, and diff from the host; produce the
 report in §6's format; submit it as a formal review on PR #42 — approved
-if the final Recommendation is Approve or Comment Only, changes requested
-otherwise; also show it in the conversation.
+if the final Recommendation is Approve, neutral if it is Comment Only, and
+changes requested otherwise; also show it in the conversation.
 
 **Local review mode** — no URL, uncommitted changes exist:
 
