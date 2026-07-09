@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Perform a principal-level code review, producing a structured Markdown report with severity-tagged findings and a scorecard. Given a pull/merge request URL, reviews that PR and submits the report as a formal review — approving it when the recommendation is Approve or Comment Only, requesting changes otherwise. Given no URL, reviews the current local code changes and presents the report in the conversation. Use this whenever the user asks to "review this PR", "review my diff", "analyze this code change", "do a code review", "check this pull request for issues", pastes a pull-request URL and asks for feedback, or wants a merge-readiness assessment. Works with any git hosting provider (GitHub, GitLab, Bitbucket, etc.).
-version: 1.6.2
+version: 1.7.0
 ---
 
 # Otterbot Review
@@ -220,7 +220,7 @@ plain section headings and each finding in its own callout card. Use a
 top-level heading (`##`) for the title so its underline rule visually
 separates it from the rest of the report. Do **not** add horizontal rules
 anywhere else — not between top-level sections (Summary, Requirements,
-Scorecard, Recommendation, Findings, Testing) and not between individual finding cards
+The Otter Council, Recommendation, Findings, Testing) and not between individual finding cards
 within Findings — the section headings and the blockquote cards already
 create enough visual separation on their own.
 
@@ -236,39 +236,53 @@ the Summary sets up the narrative, not the decision.
 State whether the change appears to satisfy the intended business/product
 requirements. Note any ambiguity or missing acceptance criteria.
 
-### 📊 Scorecard
+### 🦦 The Otter Council
 
 Score each category from 0-100, where 100 means excellent and merge-ready
 with no meaningful concerns.
 
-Keep the table to just `Category` and `Score` — GitHub's renderer sizes
-table columns by available width, not by source padding, so a wide `Notes`
-cell squeezes the other columns until even short header words wrap
-mid-word. Don't put the rationale in the table; collect it as a bullet list
-under a **Score Notes** label below instead.
+Present each scorecard item as a blockquote card, not a table. Include exactly
+three fields in every card:
 
-| Category            | Score      |
-| ------------------- | ---------: |
-| Correctness         | 0-100      |
-| Completeness        | 0-100      |
-| Regression Risk     | 0-100      |
-| Code Quality        | 0-100      |
-| Testing             | 0-100      |
-| Security            | 0-100      |
+- **Specialist:** the previous scorecard category name with `Specialist`
+  appended.
+- **Score:** the specialist's score as `N / 100`.
+- **Notes:** the specialist's concise rationale, replacing the old separate
+  **Score Notes** section.
 
-Follow the table with the **Overall Score** line (a middot then `N / 100`,
-so the scale is explicit and the style matches elsewhere), then a **Score
-Notes** label and a bullet list — one bullet per category that needs context
-(isn't self-evidently near-perfect). Lead each bullet with the bold category
-name so it ties back to the table. Skip categories that don't need comment.
+Use GitHub alert blockquotes to create a visible left border by score band:
 
-**Overall Score** · 0-100 / 100
+- `< 60` → `> [!CAUTION]` (red border)
+- `60-80` → `> [!WARNING]` (yellow border)
+- `> 80` → `> [!TIP]` (green border)
 
-**Score Notes**
+Use a category-specific emoji beside the specialist name, e.g.
+`✅ Correctness Specialist`, `🧩 Completeness Specialist`,
+`🛡️ Regression Risk Specialist`, `🧹 Code Quality Specialist`,
+`🧪 Testing Specialist`, and `🔒 Security Specialist`.
 
-- **Correctness:** Brief rationale.
-- **Testing:** Brief rationale.
-- **Security:** Brief rationale.
+> [!TIP]
+> ✅ **Correctness Specialist**
+>
+> - **Specialist:** Correctness Specialist
+> - **Score:** 0-100 / 100
+> - **Notes:** Brief rationale.
+
+> [!WARNING]
+> 🧪 **Testing Specialist**
+>
+> - **Specialist:** Testing Specialist
+> - **Score:** 0-100 / 100
+> - **Notes:** Brief rationale.
+
+> [!CAUTION]
+> 🔒 **Security Specialist**
+>
+> - **Specialist:** Security Specialist
+> - **Score:** 0-100 / 100
+> - **Notes:** Brief rationale.
+
+Do not add a separate **Score Notes** section or an overall score.
 
 ### ⚠️ Recommendation · Request Changes
 
@@ -430,8 +444,9 @@ for what a full pass looks like):
 - [ ] Output follows the exact §6 structure, with empty severity sections
       omitted, no horizontal rules, and each severity heading tagged with its
       finding count
-- [ ] Scorecard notes and Overall Score actually reflect the findings, not
-      a generic/default number
+- [ ] The Otter Council cards include Specialist, Score, and Notes; use the
+      correct score-band alert border; and do not include a separate Score
+      Notes section or overall score
 - [ ] Delivery matches mode: PR mode submits a formal review **and** shows
       the report in-conversation; local mode shows it in-conversation only
 - [ ] PR review verdict matches the final Recommendation: Approve or

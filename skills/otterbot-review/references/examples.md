@@ -30,24 +30,49 @@ Ticket PAY-881 asks for "no more than 50 requests/minute per merchant." The
 implementation matches that at the code level, but see the High finding
 below — under load, the actual enforced rate can exceed the limit.
 
-### 📊 Scorecard
+### 🦦 The Otter Council
 
-| Category            | Score      |
-| ------------------- | ---------: |
-| Correctness         | 65         |
-| Completeness        | 85         |
-| Regression Risk     | 80         |
-| Code Quality        | 90         |
-| Testing             | 60         |
-| Security            | 95         |
+> [!WARNING]
+> ✅ **Correctness Specialist**
+>
+> - **Specialist:** Correctness Specialist
+> - **Score:** 65 / 100
+> - **Notes:** Rate limiter has a race condition under concurrent requests.
 
-**Overall Score** · 79 / 100
+> [!TIP]
+> 🧩 **Completeness Specialist**
+>
+> - **Specialist:** Completeness Specialist
+> - **Score:** 85 / 100
+> - **Notes:** Covers the main path; no handling for the limiter's Redis dependency being unavailable.
 
-**Score Notes**
+> [!WARNING]
+> 🛡️ **Regression Risk Specialist**
+>
+> - **Specialist:** Regression Risk Specialist
+> - **Score:** 80 / 100
+> - **Notes:** Limited blast radius, but Redis dependency behavior needs a decision before merge.
 
-- **Correctness:** Rate limiter has a race condition under concurrent requests.
-- **Completeness:** Covers the main path; no handling for the limiter's Redis dependency being unavailable.
-- **Testing:** Unit tests cover the happy path only; no concurrency or Redis-down test.
+> [!TIP]
+> 🧹 **Code Quality Specialist**
+>
+> - **Specialist:** Code Quality Specialist
+> - **Score:** 90 / 100
+> - **Notes:** Implementation is readable and follows local structure.
+
+> [!WARNING]
+> 🧪 **Testing Specialist**
+>
+> - **Specialist:** Testing Specialist
+> - **Score:** 60 / 100
+> - **Notes:** Unit tests cover the happy path only; no concurrency or Redis-down test.
+
+> [!TIP]
+> 🔒 **Security Specialist**
+>
+> - **Specialist:** Security Specialist
+> - **Score:** 95 / 100
+> - **Notes:** No authorization or sensitive-data concerns found in this change.
 
 ### ⚠️ Recommendation · Request Changes
 
@@ -146,24 +171,49 @@ this appears to implement a merchant-facing "export transactions" feature.
 Can't confirm acceptance criteria without a ticket — worth double-checking
 against whatever spec exists before merging.
 
-### 📊 Scorecard
+### 🦦 The Otter Council
 
-| Category            | Score      |
-| ------------------- | ---------: |
-| Correctness         | 90         |
-| Completeness        | 70         |
-| Regression Risk     | 90         |
-| Code Quality        | 85         |
-| Testing             | 50         |
-| Security            | 40         |
+> [!TIP]
+> ✅ **Correctness Specialist**
+>
+> - **Specialist:** Correctness Specialist
+> - **Score:** 90 / 100
+> - **Notes:** Export logic is straightforward and appears to return the intended data.
 
-**Overall Score** · 71 / 100
+> [!WARNING]
+> 🧩 **Completeness Specialist**
+>
+> - **Specialist:** Completeness Specialist
+> - **Score:** 70 / 100
+> - **Notes:** Missing authorization check blocks a complete implementation.
 
-**Score Notes**
+> [!TIP]
+> 🛡️ **Regression Risk Specialist**
+>
+> - **Specialist:** Regression Risk Specialist
+> - **Score:** 90 / 100
+> - **Notes:** New endpoint is isolated, but the security flaw affects exposed data.
 
-- **Completeness:** Missing authorization check (see Critical finding).
-- **Testing:** No tests added for the new endpoint (new file, untracked).
-- **Security:** Missing authorization check is a real data-exposure risk.
+> [!TIP]
+> 🧹 **Code Quality Specialist**
+>
+> - **Specialist:** Code Quality Specialist
+> - **Score:** 85 / 100
+> - **Notes:** Code is simple and follows the surrounding handler style.
+
+> [!CAUTION]
+> 🧪 **Testing Specialist**
+>
+> - **Specialist:** Testing Specialist
+> - **Score:** 50 / 100
+> - **Notes:** No tests added for the new endpoint (new file, untracked).
+
+> [!CAUTION]
+> 🔒 **Security Specialist**
+>
+> - **Specialist:** Security Specialist
+> - **Score:** 40 / 100
+> - **Notes:** Missing authorization check is a real data-exposure risk.
 
 ### ⚠️ Recommendation · Request Changes
 
