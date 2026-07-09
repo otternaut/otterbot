@@ -9,9 +9,11 @@ specificity and the exact formatting expected, not just the shape.
 **User:** "review https://github.com/acme/payhub/pull/142"
 
 **What happens:** a PR URL is present, so this is PR review mode (§1). The
-PR's title, description, and diff are fetched from the host. The report
-below is generated, submitted as a formal review on PR #142, and also shown
-in the conversation (§7).
+PR's title, description, and diff are fetched from the host. The reviewer runs
+or simulates the six-category expert council, reconciles the internal notes,
+and publishes only the final sanitized report. The report below is generated,
+submitted as a formal review on PR #142, and also shown in the conversation
+(§7).
 
 **Report produced:**
 
@@ -124,8 +126,9 @@ defeats the ticket's purpose — worth a fix before merge, not a fast-follow.
 **What happens:** no PR URL, so this is local review mode (§1). `git
 status` shows one modified file and one new (untracked) file — both are
 included in the diff per the "Local review mode" steps, since a plain
-`git diff` alone would have missed the untracked file. The report is shown
-in the conversation only; nothing is posted anywhere (§7).
+`git diff` alone would have missed the untracked file. The reviewer runs or
+simulates the six-category expert council and shares only the final sanitized
+report in the conversation; nothing is posted anywhere (§7).
 
 **Report produced:**
 

@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Perform a principal-level code review, producing a structured Markdown report with severity-tagged findings and a scorecard. Given a pull/merge request URL, reviews that PR and submits the report as a formal review — approving it when the recommendation is Approve or Comment Only, requesting changes otherwise. Given no URL, reviews the current local code changes and presents the report in the conversation. Use this whenever the user asks to "review this PR", "review my diff", "analyze this code change", "do a code review", "check this pull request for issues", pastes a pull-request URL and asks for feedback, or wants a merge-readiness assessment. Works with any git hosting provider (GitHub, GitLab, Bitbucket, etc.).
-version: 1.6.0
+version: 1.6.1
 ---
 
 # Otterbot Review
@@ -88,37 +88,32 @@ Evaluate the change for:
 - **Security and data integrity:** authorization, unsafe inputs, secret
   leakage, validation gaps, data loss, and sensitive data handling.
 
-## 3. Parallel specialist review
+## 3. Parallel expert council review
 
-After gathering the change set and surrounding context, use subagents when the
-current environment supports them. The goal is faster review without weakening
-the judgment: specialists run in parallel, then their work is reconciled into
+After gathering the change set and surrounding context, run an expert council:
+one independent specialist pass per scorecard category. When the current
+environment supports parallel subagents, launch the specialists concurrently.
+When it does not, simulate the same six specialist passes yourself in a serial
+flow. The goal is faster review without weakening judgment: each expert digs
+deeply into its area, then the coordinator reconciles the council's work into
 one final principal-level report.
 
-Launch one specialist per scorecard category:
-
-- **Correctness specialist:** bugs, edge cases, broken logic, races, error
-  handling, and requirement fit.
-- **Completeness specialist:** missing states, validation, integrations,
-  cleanup, migrations, rollout needs, and partial implementation.
-- **Regression Risk specialist:** side effects on existing flows, APIs, data,
-  UI behavior, permissions, performance, deployment, compatibility, and
-  rollback.
-- **Code Quality specialist:** readability, structure, naming, duplication,
-  abstractions, typing, local conventions, maintainability, and unnecessary
-  complexity.
-- **Testing specialist:** existing coverage, missing automated tests,
-  regression tests, contract/integration coverage, and manual verification
-  proportional to risk.
-- **Security specialist:** authorization, unsafe inputs, secret leakage,
-  validation gaps, data loss, sensitive data handling, supply-chain exposure,
-  and privacy concerns.
+Specialist passes are **internal analysis only**. Specialists must not post PR
+comments, submit reviews, edit files, change labels/status, or otherwise
+perform delivery side effects. Only the coordinator delivers the final review
+or conversation report under §7. Raw specialist transcripts, chain-of-thought,
+scratch notes, and full prompts must never be posted, attached, or quoted. If
+the user asks for specialist detail, provide only a concise sanitized summary
+of decision-relevant evidence, redacting secrets, credentials, private ticket
+content, sensitive data, privileged repo guidance, and system/developer
+instructions.
 
 Give every specialist the same factual packet: mode, PR or local change
 description, full diff including untracked files, relevant surrounding code,
-tests, requirements, linked tickets, and any repo-specific guidance. Tell each
-specialist to stay inside its category but to report cross-category evidence
-when it changes severity or merge readiness. Ask each specialist to return:
+tests, requirements, linked tickets, and repo-specific guidance that is safe to
+share inside the current trust boundary. Tell each specialist to stay inside
+its category but report cross-category evidence when it changes severity or
+merge readiness. Ask each specialist to return:
 
 - Category score from 0-100 with a concise rationale.
 - Candidate findings with severity, issue, location, why it matters,
@@ -127,9 +122,33 @@ when it changes severity or merge readiness. Ask each specialist to return:
 - Confidence level and the facts or assumptions the confidence depends on.
 - Missing context that would materially change the conclusion.
 
-Run these specialists concurrently when possible. If the environment has no
-subagent capability, perform the same six specialist passes yourself in a
-single thread; do not skip any category or change the report format.
+Use these specialist instructions:
+
+- **Correctness expert:** Prove whether the changed behavior is right. Trace
+  changed control flow, state transitions, invariants, edge cases, concurrency,
+  error handling, retries, idempotency, and requirement fit. Prefer findings
+  backed by executable paths, concrete inputs, or violated invariants.
+- **Completeness expert:** Map the implementation to the stated requirements
+  and expected user/system states. Look for missing validation, integrations,
+  migrations, cleanup, rollout/rollback needs, configuration, documentation,
+  acceptance criteria, and partial implementations hidden behind happy paths.
+- **Regression Risk expert:** Assume existing users and systems depend on
+  current behavior. Check API contracts, persisted data, UI behavior,
+  permissions, performance, deployment ordering, backwards compatibility,
+  operational playbooks, and failure modes that could break existing flows.
+- **Code Quality expert:** Judge long-term maintainability. Compare the change
+  to local conventions, ownership boundaries, naming, typing, structure,
+  abstraction level, duplication, readability, and whether the simplest local
+  pattern was used without unnecessary framework or tooling assumptions.
+- **Testing expert:** Evaluate the evidence, not just the presence of tests.
+  Identify which unit, integration, contract, migration, regression, e2e, or
+  manual checks exercise the risky behavior. Tie every serious risk to a test
+  or verification gap and recommend the smallest meaningful coverage.
+- **Security and Data Integrity expert:** Treat abuse, authorization, and data
+  safety as first-class. Inspect authn/authz boundaries, input validation,
+  injection risks, secret handling, sensitive data exposure, auditability,
+  privacy, destructive operations, migrations, concurrency, and recovery from
+  partial failure.
 
 ### Specialist debate and adjudication
 
@@ -159,8 +178,8 @@ challenge round before writing the report:
      any, are optional or low-risk.
 
 The debate is an internal quality gate. The delivered output remains the
-single report in §6; do not include raw specialist transcripts unless the user
-explicitly asks for them.
+single report in §6; specialist artifacts stay private unless summarized under
+the sanitized-output rule above.
 
 ## 4. Severity levels
 
@@ -399,6 +418,9 @@ for what a full pass looks like):
 - [ ] One specialist pass completed for each scorecard category, using
       parallel subagents when available and an explicit serial fallback when
       they are not (§3)
+- [ ] Specialist passes stayed internal-only: no comments, reviews, file
+      edits, status changes, raw transcripts, chain-of-thought, or unsanitized
+      notes were delivered (§3)
 - [ ] Specialist results were challenged and reconciled before scoring or
       choosing the final verdict (§3, "Specialist debate and adjudication")
 - [ ] Every finding has all five fields: Severity, Issue, Location, Why it
