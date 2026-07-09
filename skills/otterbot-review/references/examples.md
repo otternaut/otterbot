@@ -9,7 +9,8 @@ specificity and the exact formatting expected, not just the shape.
 **User:** "review https://github.com/acme/payhub/pull/142"
 
 **What happens:** a PR URL is present, so this is PR review mode (§1). The
-PR's title, description, and diff are fetched from the host. The reviewer runs
+PR's title, description, linked Jira or Linear ticket when present, and diff
+are fetched from the host. The reviewer runs
 or simulates the seven-category expert council, reconciles the internal notes,
 and publishes only the final sanitized report. The report below is generated,
 submitted as a formal review on PR #142, and also shown in the conversation
@@ -49,8 +50,8 @@ defeats the ticket's purpose — worth a fix before merge, not a fast-follow.
 >
 > **Score ·** 🟡 70
 >
-> - Ticket PAY-881 asks for no more than 50 requests/minute per merchant.
-> - The implementation aims at the right requirement, but concurrent traffic can exceed the intended limit.
+> - Jira ticket PAY-881 asks for no more than 50 requests/minute per merchant.
+> - Product intent is clear and the technical approach is close, but concurrent traffic can exceed the intended limit.
 
 > 🎯 **Correctness Specialist**
 >
@@ -198,8 +199,8 @@ merge on its own; everything else here is minor.
 >
 > **Score ·** 🟡 65
 >
-> - No ticket was linked, so acceptance criteria are inferred from the branch name and diff.
-> - A merchant export feature implies merchant-scoped data access, which the implementation does not enforce.
+> - No Jira or Linear ticket was linked, so acceptance criteria are inferred from the branch name and diff.
+> - The product requirement for merchant-scoped exports implies a technical authorization requirement, which the implementation does not enforce.
 
 > 🎯 **Correctness Specialist**
 >
