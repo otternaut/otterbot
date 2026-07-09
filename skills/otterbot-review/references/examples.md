@@ -19,32 +19,24 @@ submitted as a formal review on PR #142, and also shown in the conversation
 **Report produced:**
 
 ```markdown
-## 🦦 Otter Review Board
+## 🦦 Otter Review Council
+
+#### 📝 Summary
 
 Solid, focused change that adds a token-bucket limiter in front of the
 webhook endpoint. Mergeable after the missing-lock issue below is fixed —
 under concurrent requests the limiter can currently be bypassed.
 
-<details open>
-<summary><h3>⚠️ Recommendation · Request Changes</h3></summary>
+#### ⚠️ Recommendation · Request Changes
 
 The race condition means the rate limit isn't reliably enforced, which
 defeats the ticket's purpose — worth a fix before merge, not a fast-follow.
 
-#### 📋 Feedback · Requirements Specialist
+- 📋 **Requirements Specialist:** Concurrent requests can exceed the stated 50 requests/minute merchant limit, so the implementation does not satisfy the core ticket requirement. (High)
+- 🎯 **Correctness Specialist:** Concurrent requests can bypass the intended merchant limit, which maps to the atomicity finding. (High)
+- 🧪 **Testing Specialist:** Missing concurrency coverage maps to the regression-test gap for the same failure mode. (Medium)
 
-- Concurrent requests can exceed the stated 50 requests/minute merchant limit, so the implementation does not satisfy the core ticket requirement. (High)
-
-#### 🎯 Feedback · Correctness Specialist
-
-- Concurrent requests can bypass the intended merchant limit, which maps to the atomicity finding. (High)
-
-#### 🧪 Feedback · Testing Specialist
-
-- Missing concurrency coverage maps to the regression-test gap for the same failure mode. (Medium)
-
-</details><details open>
-<summary><h3>🦦 Specialist Scores</h3></summary>
+#### 🦦 Specialist Scores
 
 > 📋 **Requirements Specialist · 🟡 70**
 >
@@ -82,48 +74,13 @@ defeats the ticket's purpose — worth a fix before merge, not a fast-follow.
 > - No authorization or sensitive-data concerns found in this change.
 > - The limiter does not appear to expose secrets or user data.
 
-</details><details>
-<summary><h3>🔎 Findings</h3></summary>
+#### 🔎 Findings Overview
 
-#### 🟠 High · 1 Issue
+- 🟠 **High · 1 Issue:** Non-atomic rate-limit update in `src/webhooks/rateLimiter.ts`; posted inline on `checkRateLimit()`.
+- 🟡 **Medium · 1 Issue:** Redis-down behavior is undefined; posted inline on the rate-limit call site.
+- 🔵 **Low · 1 Issue:** Limit constant should move to shared config; posted inline on the constant declaration.
 
-> **The read-check-increment sequence in `checkRateLimit()` isn't atomic, so concurrent requests from the same merchant can all read the same counter value and all pass the check.**
-> - **Location:** `src/webhooks/rateLimiter.ts`, `checkRateLimit()`
-> - **Why it matters:** Under real traffic (the exact scenario this change exists to handle), the limiter can be bypassed, silently defeating the ticket's requirement.
-> - **Fix:** Use an atomic Redis operation (`INCR` + `EXPIRE`, or a Lua script) instead of separate GET/SET calls.
->
-> ```ts
-> const count = Number(await redis.get(key)) || 0;
-> if (count >= LIMIT) return false;
-> await redis.set(key, count + 1, 'EX', 60); // gap between get and set
-> return true;
-> ```
-
-#### 🟡 Medium · 1 Issue
-
-> **No fallback behavior when Redis is unreachable — the handler currently throws, which would 500 all webhook traffic.**
-> - **Location:** `src/webhooks/rateLimiter.ts`, `checkRateLimit()`
-> - **Why it matters:** A transient Redis blip would take down payment webhook processing entirely, which is a worse outcome than a temporarily unenforced rate limit.
-> - **Fix:** Fail open (allow the request, log a warning) on Redis errors, with an alert so the team notices.
->
-> ```ts
-> const allowed = await checkRateLimit(merchantId); // throws if Redis is down
-> if (!allowed) return res.status(429).end();
-> ```
-
-#### 🔵 Low · 1 Issue
-
-> **Magic number `50` for the rate limit is inlined directly in the handler.**
-> - **Location:** `src/webhooks/rateLimiter.ts:23`
-> - **Why it matters:** Makes it easy to miss when tuning the limit later, and inconsistent with how other limits are configured elsewhere in the repo.
-> - **Fix:** Pull from the existing `config/limits.ts`, matching the pattern used for the API rate limiter.
->
-> ```ts
-> const LIMIT = 50;
-> ```
-
-</details><details>
-<summary><h3>🧪 Testing</h3></summary>
+#### 🧪 Testing
 
 > **Existing coverage.**
 > - `rateLimiter.test.ts` covers a single request under the limit and a single request over it.
@@ -136,8 +93,45 @@ defeats the ticket's purpose — worth a fix before merge, not a fast-follow.
 > **Recommended manual verification.**
 > - Load-test the endpoint with concurrent requests from a single merchant to confirm the limiter holds once the race is fixed.
 > - Manually break the Redis connection in staging to observe current failure behavior before deciding on a fallback.
+```
 
-</details>
+**Inline comments posted:**
+
+`src/webhooks/rateLimiter.ts`, `checkRateLimit()`:
+
+```markdown
+> **The read-check-increment sequence in `checkRateLimit()` isn't atomic, so concurrent requests from the same merchant can all read the same counter value and all pass the check.**
+>
+> - **Severity:** 🟠 High
+> - **Why it matters:** Under real traffic (the exact scenario this change exists to handle), the limiter can be bypassed, silently defeating the ticket's requirement.
+> - **Fix:** Use an atomic Redis operation (`INCR` + `EXPIRE`, or a Lua script) instead of separate GET/SET calls.
+>
+> ```ts
+> const count = Number(await redis.get(key)) || 0;
+> if (count >= LIMIT) return false;
+> await redis.set(key, count + 1, 'EX', 60); // gap between get and set
+> return true;
+> ```
+```
+
+`src/webhooks/rateLimiter.ts`, rate-limit call site:
+
+```markdown
+> **No fallback behavior when Redis is unreachable — the handler currently throws, which would 500 all webhook traffic.**
+>
+> - **Severity:** 🟡 Medium
+> - **Why it matters:** A transient Redis blip would take down payment webhook processing entirely, which is a worse outcome than a temporarily unenforced rate limit.
+> - **Fix:** Fail open (allow the request, log a warning) on Redis errors, with an alert so the team notices.
+```
+
+`src/webhooks/rateLimiter.ts`, limit constant:
+
+```markdown
+> **Magic number `50` for the rate limit is inlined directly in the handler.**
+>
+> - **Severity:** 🔵 Low
+> - **Why it matters:** Makes it easy to miss when tuning the limit later, and inconsistent with how other limits are configured elsewhere in the repo.
+> - **Fix:** Pull from the existing `config/limits.ts`, matching the pattern used for the API rate limiter.
 ```
 
 ## Example 2: Local review mode
@@ -154,32 +148,24 @@ report in the conversation; nothing is posted anywhere (§7).
 **Report produced:**
 
 ```markdown
-## 🦦 Otter Review Board
+## 🦦 Otter Review Council
+
+#### 📝 Summary
 
 Small, well-scoped addition. One real gap: the new export endpoint has no
 authorization check, so any authenticated user could export any merchant's
 transactions.
 
-<details open>
-<summary><h3>⚠️ Recommendation · Request Changes</h3></summary>
+#### ⚠️ Recommendation · Request Changes
 
 The missing authorization check is a data-exposure issue and should block
 merge on its own; everything else here is minor.
 
-#### 🔒 Feedback · Security Specialist
+- 🔒 **Security Specialist:** Merchants could potentially export another merchant's transactions, which maps directly to the Critical data-exposure finding. (Critical)
+- 📋 **Requirements Specialist:** A merchant-facing export feature cannot meet the implied data-access requirement without merchant ownership checks. (Critical)
+- 🧩 **Completeness Specialist:** The missing authorization check blocks a complete implementation and supports the same merge gate. (Critical)
 
-- Merchants could potentially export another merchant's transactions, which maps directly to the Critical data-exposure finding. (Critical)
-
-#### 📋 Feedback · Requirements Specialist
-
-- A merchant-facing export feature cannot meet the implied data-access requirement without merchant ownership checks. (Critical)
-
-#### 🧩 Feedback · Completeness Specialist
-
-- The missing authorization check blocks a complete implementation and supports the same merge gate. (Critical)
-
-</details><details open>
-<summary><h3>🦦 Specialist Scores</h3></summary>
+#### 🦦 Specialist Scores
 
 > 📋 **Requirements Specialist · 🟡 65**
 >
@@ -216,10 +202,9 @@ merge on its own; everything else here is minor.
 > - Missing authorization check is a real data-exposure risk.
 > - A merchant could potentially export another merchant's transactions.
 
-</details><details>
-<summary><h3>🔎 Findings</h3></summary>
+#### 🔎 Findings Overview
 
-#### 🔴 Critical · 1 Issue
+🔴 **Critical · 1 Issue**
 
 > **`GET /merchants/:id/export` doesn't verify the requesting user has access to `:id` — it only checks that the user is authenticated, not that they belong to that merchant.**
 > - **Location:** `src/routes/exportController.ts` (new file, untracked)
@@ -233,15 +218,14 @@ merge on its own; everything else here is minor.
 > });
 > ```
 
-#### 🔵 Low · 1 Issue
+🔵 **Low · 1 Issue**
 
 > **No tests for the new endpoint.** (No code block — there's nothing to quote for a missing test.)
 > - **Location:** `src/routes/exportController.ts` (new file, untracked)
 > - **Why it matters:** Nothing currently guards against a regression here, and the missing-auth issue above is exactly the kind of thing a test would have caught.
 > - **Fix:** Add a test asserting a user from merchant A gets a 403 when requesting merchant B's export.
 
-</details><details>
-<summary><h3>🧪 Testing</h3></summary>
+#### 🧪 Testing
 
 > **Existing coverage.**
 > - No automated tests exist for the new export endpoint (`exportController.ts` is untracked with no accompanying test file).
@@ -253,8 +237,6 @@ merge on its own; everything else here is minor.
 
 > **Recommended manual verification.**
 > - Manually hit the endpoint as a user from merchant A requesting merchant B's `:id` to confirm the fix actually blocks it before merge.
-
-</details>
 ```
 
 Note how the missing-untracked-file bug this skill was fixed for shows up

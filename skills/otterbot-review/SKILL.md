@@ -1,15 +1,16 @@
 ---
 name: otterbot-review
-description: Perform a principal-level code review, producing a structured Markdown report with severity-tagged findings and Specialist Scores. Given a pull/merge request URL, reviews that PR and delivers the report with the correct verdict semantics — approving when the recommendation is Ship It!, commenting neutrally when it is Comment Only, and requesting changes otherwise. Given no URL, reviews the current local code changes and presents the report in the conversation. Use this whenever the user asks to "review this PR", "review my diff", "analyze this code change", "do a code review", "check this pull request for issues", pastes a pull-request URL and asks for feedback, or wants a merge-readiness assessment. Works with any git hosting provider (GitHub, GitLab, Bitbucket, etc.).
-version: 1.7.16
+description: Perform a principal-level code review, producing a structured Review Council post with Specialist Scores and inline source-specific findings. Given a pull/merge request URL, reviews that PR and delivers the report with the correct verdict semantics — approving when the recommendation is Ship It!, commenting neutrally when it is Comment Only, and requesting changes otherwise. Given no URL, reviews the current local code changes and presents the report in the conversation. Use this whenever the user asks to "review this PR", "review my diff", "analyze this code change", "do a code review", "check this pull request for issues", pastes a pull-request URL and asks for feedback, or wants a merge-readiness assessment. Works with any git hosting provider (GitHub, GitLab, Bitbucket, etc.).
+version: 1.8.1
 ---
 
 # Otterbot Review
 
 Review a code change like a senior engineering manager and principal-level
-reviewer would: friendly, concise, and high-signal. The output is a single
-Markdown report, not a back-and-forth — read the change once, form a complete
-judgment, and write it up.
+reviewer would: friendly, concise, and high-signal. The output is one main
+Review Council post plus inline comments for source-specific findings when the
+host supports them — read the change once, form a complete judgment, and write
+it up.
 
 This skill is intentionally agnostic about *how* you read the change and
 *where* the report ends up. Use whatever tools you have available in the
@@ -250,66 +251,56 @@ Avoid vague comments like "clean this up" unless the impact and fix are
 clear. Don't invent findings to fill out every severity bucket — an empty
 section is a better signal than a padded one.
 
+When the review target supports inline comments, deliver each source-specific
+finding as an inline comment on the most relevant changed line or range. Use
+the same finding fields and card format there, so the detailed feedback lives
+next to the affected code. Keep findings that have no precise code location
+(for example, missing tests, missing behavior, or design-level issues) in the
+main Review Council post.
+
 ## 6. Output format
 
 Produce the report in exactly this structure. Keep it clean and scannable:
-plain section headings and each finding in its own callout card. Use a
+plain `####` section headings and compact blockquote cards. Use a
 top-level heading (`##`) for the title so its underline rule visually
 separates it from the rest of the report. Do **not** add horizontal rules
-anywhere else — not between top-level sections (Summary, expanded
-Recommendation, expanded Specialist Scores, collapsed Findings, collapsed
-Testing) and not between individual finding cards within Findings —
-the section headings and blockquote cards already create enough visual
-separation on their own.
+anywhere else; the section headings and blockquote cards already create enough
+visual separation on their own.
 
 ```markdown
-## 🦦 Otter Review Board
+## 🦦 Otter Review Council
+
+#### 📝 Summary
 
 Briefly state overall quality, merge readiness, and the highest-risk
 concern, if any. Leave the verdict itself to the Recommendation section —
 the Summary sets up the narrative, not the decision.
 
-<details open>
-<summary><h3>⚠️ Recommendation · Request Changes</h3></summary>
+#### ⚠️ Recommendation · Request Changes
 
 The verdict lives in the heading itself: set the emoji dynamically to match
 the call and name the verdict after a middot —
-`<summary><h3>🚢 Recommendation · Ship It!</h3></summary>`,
-`<summary><h3>⚠️ Recommendation · Request Changes</h3></summary>`, or
-`<summary><h3>💬 Recommendation · Comment Only</h3></summary>`. This keeps the
-section identifiable while surfacing the decision in the header itself, with no
-separate banner line in the body.
+`#### 🚢 Recommendation · Ship It!`,
+`#### ⚠️ Recommendation · Request Changes`, or
+`#### 💬 Recommendation · Comment Only`. This keeps the section identifiable
+while surfacing the decision in the header itself, with no separate banner line
+in the body.
 
 Open the body with the 1-2 sentence explanation of the call. When the verdict
-is ⚠️ Request Changes, create one `#### <emoji> Feedback · <Specialist Name>`
-subsection per specialist whose notes drive the recommendation,
-with a bullet list beneath that specialist. Do not add a separate **Notes**
-label above those specialist feedback subsections. Each bullet should summarize
-the specialist note being relied on and end with the severity of the finding it
-maps to, e.g. `(High)`. Omit specialists that do not have
-recommendation-driving notes. Do not use a generic must-fix list.
-For 🚢 Ship It! or 💬 Comment Only, omit those specialist feedback subsections
-unless there are specific non-blocking notes worth preserving. Optionally add a
-**Follow-ups** label with non-blocking suggestions worth doing later, tied to
-specialist notes when useful.
+is ⚠️ Request Changes, add concise feedback bullets beneath it, grouped by the
+specialists whose notes drive the recommendation. Do not add nested feedback
+subsections or a generic must-fix list; the Recommendation should read as one
+section. Each bullet should summarize the specialist note being relied on and
+end with the severity of the finding it maps to, e.g. `(High)`. Omit
+specialists that do not have recommendation-driving notes. For 🚢 Ship It! or
+💬 Comment Only, omit feedback bullets unless there are specific non-blocking
+notes worth preserving.
 
-Explain the recommendation in 1-2 concise, friendly sentences. Be direct about
-merge readiness, but keep the tone collaborative and easy to scan.
+- 📋 **Requirements Specialist:** The implementation misses a stated acceptance criterion. (High)
+- 🎯 **Correctness Specialist:** Concurrent requests can bypass the limit, which maps to the atomicity finding. (High)
+- 🧪 **Testing Specialist:** Missing concurrency coverage maps to the regression-test gap. (Medium)
 
-#### 📋 Feedback · Requirements Specialist
-
-- The implementation misses a stated acceptance criterion. (High)
-
-#### 🎯 Feedback · Correctness Specialist
-
-- Concurrent requests can bypass the limit, which maps to the atomicity finding. (High)
-
-#### 🧪 Feedback · Testing Specialist
-
-- Missing concurrency coverage maps to the regression-test gap. (Medium)
-
-</details><details open>
-<summary><h3>🦦 Specialist Scores</h3></summary>
+#### 🦦 Specialist Scores
 
 Score each category from 0-100, where 100 means excellent and merge-ready
 with no meaningful concerns.
@@ -386,58 +377,25 @@ Specialist Scores cards:
 
 Do not add a separate **Score Notes** section or an overall score.
 
-</details><details>
-<summary><h3>🔎 Findings</h3></summary>
+#### 🔎 Findings Overview
 
-Group findings by severity, most severe first. Severity headings use the
-exact emoji and labels from §4 (🔴 Critical, 🟠 High, 🟡 Medium, 🔵 Low,
-⚪ Optional) followed by a middot and the count of findings in that
-section, e.g. `#### 🟠 High · 2 Issues`. Use singular "Issue" for a count
-of exactly one, e.g. `#### 🟡 Medium · 1 Issue`. Omit empty severity
-sections unless there are no findings at all.
+Give a reduced overview of findings in the main post, grouped by severity,
+most severe first. Use the exact emoji and labels from §4 (🔴 Critical,
+🟠 High, 🟡 Medium, 🔵 Low, ⚪ Optional) followed by a middot and the count of
+findings in that severity, e.g. `🟠 High · 2 Issues`. Use singular "Issue" for
+a count of exactly one. Omit empty severities unless there are no findings at
+all.
 
-Present each finding as a blockquote card: a bold one-line issue statement,
-then a tight bullet list, and finally — when you have the source and it makes
-the problem concrete — a short fenced code block quoting the exact lines the
-finding refers to, after redacting secrets and sensitive content. Tag the code
-block with the file's language and keep it to the few relevant lines. Omit the
-code block when there's nothing useful or safe to show (e.g. a finding about
-missing code, absent tests, a design-level concern, or a changed line that
-contains a secret, credential, private ticket text, customer data, or sensitive
-payload). Every line of the code block, **including its fences**, is prefixed
-with `>` so it stays inside the card. Put a blank line between
-consecutive cards so they render as separate callouts — no horizontal rules:
+When detailed findings were posted inline, summarize each one in a single
+bullet and point to the inline comment's location. When inline comments are not
+available, or when a finding has no precise line to attach to, include the full
+finding card here using the Inline finding comment format below.
 
-#### 🟠 High · 2 Issues
+- 🟠 **High · 1 Issue:** Atomicity issue in `src/webhooks/rateLimiter.ts`; posted inline on `checkRateLimit()`.
+- 🟡 **Medium · 1 Issue:** Redis-down behavior is undefined; posted inline on the rate-limit call site.
+- 🔵 **Low · 1 Issue:** Limit constant should move to shared config; posted inline on the constant declaration.
 
-> **Clear, concise statement of the problem.**
->
-> - **Location:** `path/to/file.ext`, function/class/section, or changed behavior.
-> - **Why it matters:** The user, system, data, security, or maintenance impact.
-> - **Fix:** The concrete change needed.
->
-> ```ts
-> // the exact lines from the change that the finding refers to
-> const count = await redis.get(key);
-> if (Number(count) >= LIMIT) await redis.set(key, Number(count) + 1);
-> ```
-
-> **Another separate finding, stated in one line.**
->
-> - **Location:** `path/to/other-file.ext`
-> - **Why it matters:** The risk.
-> - **Fix:** The fix.
-
-#### 🟡 Medium · 1 Issue
-
-> **Issue stated in one line.**
->
-> - **Location:** ...
-> - **Why it matters:** ...
-> - **Fix:** ...
-
-</details><details>
-<summary><h3>🧪 Testing</h3></summary>
+#### 🧪 Testing
 
 Give a thorough, specific picture of testing — not a one-line note. Cover,
 as applicable:
@@ -470,35 +428,64 @@ Blank line between cards, no horizontal rules.
 >
 > - Load-test the endpoint with concurrent requests from a single merchant to confirm the limiter holds once the race is fixed.
 > - Manually break the Redis connection in staging to observe current failure behavior before deciding on a fallback.
-
-</details>
 ```
+
+### Inline finding comment format
+
+Use this format for each source-specific inline comment. Attach it to the
+smallest changed line range that makes the issue clear. Do not post specialist
+comments directly; the coordinator posts these inline comments after
+reconciliation.
+
+```markdown
+> **Clear, concise statement of the problem.**
+>
+> - **Severity:** 🟠 High
+> - **Why it matters:** The user, system, data, security, or maintenance impact.
+> - **Fix:** The concrete change needed.
+>
+> ```ts
+> // the exact lines from the change that the finding refers to
+> const count = await redis.get(key);
+> if (Number(count) >= LIMIT) await redis.set(key, Number(count) + 1);
+> ```
+```
+
+Omit the code block when there's nothing useful or safe to show, such as a
+finding about missing code, absent tests, a design-level concern, or changed
+lines containing a secret, credential, private ticket text, customer data, or
+sensitive payload. Redact sensitive content rather than quoting it verbatim.
 
 ## 7. Delivering the review
 
 Delivery follows the mode determined in §1:
 
-- **PR review mode:** deliver the completed report on the PR/MR using whatever
-  tool your environment provides for that host (e.g. a hosting-provider CLI or
-  API). Use a formal review when the verdict has a formal review state; use a
-  neutral review comment or plain PR comment for 💬 Comment Only. Set the
-  review verdict from the **Recommendation** in §6:
+- **PR review mode:** deliver the main Review Council post on the PR/MR using
+  whatever tool your environment provides for that host (e.g. a
+  hosting-provider CLI or API). Use a formal review when the verdict has a
+  formal review state; use a neutral review comment or plain PR comment for 💬
+  Comment Only. Set the review verdict from the **Recommendation** in §6:
 
   - 🚢 **Ship It!** → submit the review as **approved**.
   - 💬 **Comment Only** → submit a neutral review comment or plain PR comment.
   - ⚠️ **Request Changes** → submit the review as **changes requested**.
 
-  The report Markdown is the body of that delivery in every case; only the
-  delivery state differs. Also show the report in the conversation so the user
-  doesn't have to leave it to read your feedback. Submitting is the
-  expected, default action for this mode — no need to ask for confirmation
-  first, since providing a PR URL is the user's signal that they want it
-  reviewed there. If the host or your access can't attach a verdict (e.g.
-  the tool only supports plain comments, or you'd be reviewing your own PR
-  where self-approval is disallowed), fall back to posting the report as a
-  comment and state the recommendation in the report. If submitting fails
-  entirely (no access, no such tool available, auth error), say so and fall
-  back to presenting the report in the conversation.
+  The main post Markdown is the body of that delivery in every case; only the
+  delivery state differs. When the host supports inline review comments, post
+  detailed source-specific findings as inline comments on the affected changed
+  lines, then reference those inline comments from the main post's Findings
+  Overview. If inline comments are unavailable, include the detailed finding
+  cards in the main post instead. Also show the main post and a concise list of
+  inline comments in the conversation so the user doesn't have to leave it to
+  read your feedback. Submitting is the expected, default action for this mode
+  — no need to ask for confirmation first, since providing a PR URL is the
+  user's signal that they want it reviewed there. If the host or your access
+  can't attach a verdict (e.g. the tool only supports plain comments, or you'd
+  be reviewing your own PR where self-approval is disallowed), fall back to
+  posting the main Review Council post as a comment and state the recommendation
+  in the report. If submitting or inline commenting fails entirely (no access,
+  no such tool available, auth error), say so and fall back to presenting the
+  report in the conversation.
 - **Local review mode:** present the report in the conversation only. There
   is no PR to comment on, and nothing should be published anywhere else
   unless the user explicitly asks for that.
@@ -534,17 +521,22 @@ for what a full pass looks like):
 - [ ] Public report quotes redact secrets, credentials, private ticket text,
       customer data, and sensitive payloads rather than repeating them verbatim
 - [ ] No findings invented just to fill an empty severity bucket
-- [ ] Output follows the exact §6 structure, with empty severity sections
-      omitted, no horizontal rules, and each severity heading tagged with its
-      finding count
-- [ ] Recommendation is wrapped in an expanded-by-default `<details open>`
-      block and appears before Specialist Scores; requirements are represented
-      by the scored Requirements Specialist card, not a standalone section
-- [ ] Any Request Changes recommendation uses one emoji-prefixed
-      `Feedback · <Specialist>`
-      subsection per relevant specialist, omits specialists without
-      recommendation-driving notes, and does not use a generic Notes or
-      must-fix list
+- [ ] Output follows the exact §6 structure, with `#### 📝 Summary` above the
+      opening paragraph, a `#### <emoji> Recommendation · <verdict>` heading
+      immediately below the Summary, no horizontal rules, and compact
+      `####` sections throughout the main post
+- [ ] Requirements are represented by the scored Requirements Specialist card,
+      not a standalone section
+- [ ] Any Request Changes recommendation uses concise emoji-prefixed feedback
+      bullets for relevant specialists, omits specialists without
+      recommendation-driving notes, and does not use nested feedback
+      subsections, a generic Notes section, or a must-fix list
+- [ ] Source-specific findings are posted as inline comments when the host
+      supports inline comments; the main post keeps only a reduced Findings
+      Overview that groups findings by severity and points to inline locations
+- [ ] Findings without precise line locations, or findings in environments
+      without inline comment support, use the full finding card format in the
+      main post
 - [ ] Specialist Scores cards are plain blockquotes with no GitHub alert
       labels, include exactly one card for each of the seven categories, include
       category emojis in the heading, omit the redundant Specialist field, put the
@@ -552,17 +544,10 @@ for what a full pass looks like):
       note bullets directly below the heading without a Notes label, and do not
       include a standalone Score line, separate Score Notes section, or overall
       score
-- [ ] Specialist Scores is wrapped in an expanded-by-default `<details open>`
-      block, while Findings and Testing are wrapped in collapsed-by-default
-      `<details>` blocks with no `open` attribute, and
-      use `<summary><h3>...</h3></summary>` so collapsed headings match the
-      other section headers
-- [ ] Spacing between adjacent collapsible sections is tight: close one
-      `</details>` and start the next `<details>` immediately on the same line,
-      with no newline or blank line between them
-- [ ] Delivery matches mode: PR mode posts the report to the PR/MR with the
-      correct verdict semantics **and** shows it in-conversation; local mode
-      shows it in-conversation only
+- [ ] Delivery matches mode: PR mode posts the main Review Council post to the
+      PR/MR with the correct verdict semantics, posts inline comments when
+      available, **and** shows the main post plus a concise inline-comment
+      summary in-conversation; local mode shows it in-conversation only
 - [ ] PR review verdict matches the final Recommendation: Ship It! → approved;
       Comment Only → neutral review comment or plain PR comment; Request
       Changes → changes requested (§7)
@@ -575,10 +560,12 @@ for what a full pass looks like):
 
 > "review https://github.com/acme/widgets/pull/42"
 
-→ Fetch PR #42's title, description, and diff from the host; produce the
-report in §6's format; deliver it on PR #42 as an approved review when the
-final Recommendation is Ship It!, as a neutral comment when it is Comment Only,
-and as changes requested otherwise; also show it in the conversation.
+→ Fetch PR #42's title, description, and diff from the host; produce the main
+Review Council post in §6's format; deliver it on PR #42 as an approved review
+when the final Recommendation is Ship It!, as a neutral comment when it is
+Comment Only, and as changes requested otherwise; post source-specific findings
+as inline comments when supported; also show the main post and inline-comment
+summary in the conversation.
 
 **Local review mode** — no URL, uncommitted changes exist:
 
