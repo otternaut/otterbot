@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Perform a principal-level code review, producing a structured Review Council post with Specialist Scores and inline source-specific findings. Given a pull/merge request URL, reviews that PR and delivers the report with the correct verdict semantics — approving when the recommendation is Ship It!, commenting neutrally when it is Comment Only, and requesting changes otherwise. Given no URL, reviews the current local code changes and presents the report in the conversation. Use this whenever the user asks to "review this PR", "review my diff", "analyze this code change", "do a code review", "check this pull request for issues", pastes a pull-request URL and asks for feedback, or wants a merge-readiness assessment. Works with any git hosting provider (GitHub, GitLab, Bitbucket, etc.).
-version: 1.8.1
+version: 1.9.0
 ---
 
 # Otterbot Review
@@ -17,6 +17,12 @@ This skill is intentionally agnostic about *how* you read the change and
 current environment (CLI, API access, provided file contents, pasted diffs,
 etc.) rather than assuming a specific one — the review process below is what
 matters, not the plumbing.
+
+When running inside super.engineering, the in-app review comments are a
+delivery surface. Use the documented `sc worktree ...` commands for
+super.engineering-managed state, including `sc worktree status --json` for the
+target/base branch and `sc worktree review-add ...` for review comments. Do not
+infer the target branch from git defaults or the worktree directory name.
 
 ## 1. Determine the mode
 
@@ -57,7 +63,8 @@ Review the full local change set, not just tracked-file edits:
    files as additions (e.g. `git diff --no-index /dev/null <file>` per
    file, or stage them with `git add -N` before running `git diff`).
 2. If there are no uncommitted changes, diff the current branch against its
-   base/target branch instead.
+   base/target branch instead. In super.engineering, read that branch with
+   `sc worktree status --json` and trust it over git defaults.
 3. If neither applies — e.g. a repository with no commits yet and nothing
    uncommitted, or a base branch that doesn't exist — treat every tracked
    and untracked file in the working tree as the change set.
@@ -460,6 +467,18 @@ sensitive payload. Redact sensitive content rather than quoting it verbatim.
 
 Delivery follows the mode determined in §1:
 
+- **super.engineering review surface:** when running inside super.engineering
+  and in-app review comments are available, post the final review there with
+  `sc worktree review-add ...` using the `otterbot-review` provider. The
+  coordinator must first post one main Review Council comment whose body is
+  the complete §6 Markdown report exactly as generated. Do not replace this
+  main comment with a summary, a verdict-only note, or only inline findings.
+  After the main Review Council comment succeeds, post each source-specific
+  finding as its own inline code comment on the smallest relevant changed line
+  range. The visible order must be the full Markdown Review Council comment
+  first, then the inline code comments underneath it. If the main comment
+  cannot be posted, state the failure and present the report in the
+  conversation; do not post inline comments alone.
 - **PR review mode:** deliver the main Review Council post on the PR/MR using
   whatever tool your environment provides for that host (e.g. a
   hosting-provider CLI or API). Use a formal review when the verdict has a
@@ -548,6 +567,10 @@ for what a full pass looks like):
       PR/MR with the correct verdict semantics, posts inline comments when
       available, **and** shows the main post plus a concise inline-comment
       summary in-conversation; local mode shows it in-conversation only
+- [ ] In super.engineering, in-app review delivery posts the complete
+      Review Council Markdown as the first `otterbot-review` comment, then
+      posts source-specific inline code comments underneath it; inline comments
+      are never posted by themselves when the main Markdown comment fails
 - [ ] PR review verdict matches the final Recommendation: Ship It! → approved;
       Comment Only → neutral review comment or plain PR comment; Request
       Changes → changes requested (§7)
