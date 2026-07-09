@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
-description: Perform a principal-level code review, producing a structured Review Council post with Specialist Scores and inline source-specific findings. Given a pull/merge request URL, reviews that PR and delivers the report with the correct verdict semantics — approving when the recommendation is Ship It!, commenting neutrally when it is Comment Only, and requesting changes otherwise. Given no URL, reviews the current local code changes and presents the report in the conversation. Use this whenever the user asks to "review this PR", "review my diff", "analyze this code change", "do a code review", "check this pull request for issues", pastes a pull-request URL and asks for feedback, or wants a merge-readiness assessment. Works with any git hosting provider (GitHub, GitLab, Bitbucket, etc.).
-version: 1.12.0
+description: Perform a principal-level code review, producing a structured Review Council post with Specialist Scores and inline source-specific findings. Given a pull/merge request URL, reviews that PR and delivers the report with the correct verdict semantics — approving when the verdict is Ship It! or Comment Only, and requesting changes otherwise. Given no URL, reviews the current local code changes and presents the report in the conversation. Use this whenever the user asks to "review this PR", "review my diff", "analyze this code change", "do a code review", "check this pull request for issues", pastes a pull-request URL and asks for feedback, or wants a merge-readiness assessment. Works with any git hosting provider (GitHub, GitLab, Bitbucket, etc.).
+version: 1.13.0
 ---
 
 # Otterbot Review
@@ -32,9 +32,9 @@ Check whether the user's request or the surrounding conversation includes a
 pull/merge request URL (GitHub, GitLab, Bitbucket, or similar).
 
 - **PR URL present → PR review mode.** Review that PR and, at the end,
-  deliver the report using the final **Recommendation** semantics in §7:
-  🚢 **Ship It!** as an approved review, 💬 **Comment Only** as a neutral
-  review comment or plain PR comment, and ⚠️ **Request Changes** as a
+  deliver the report using the final **Verdict** semantics in §7:
+  🚢 **Ship It!** and 💬 **Comment Only** as approved reviews, and
+  ⚠️ **Request Changes** as a
   changes-requested review.
 - **No PR URL → local review mode.** Review the current local code changes
   in this repository and present the report in the conversation. See §7.
@@ -153,7 +153,7 @@ return:
 - Category score from 0-100 with a concise rationale.
 - Candidate findings with severity, issue, location, why it matters,
   recommended fix, and evidence.
-- Merge-readiness recommendation for that category, with the specialist notes
+- Merge-readiness verdict for that category, with the specialist notes
   that support it.
 - Confidence level and the facts or assumptions the confidence depends on.
 - Missing context that would materially change the conclusion.
@@ -270,7 +270,7 @@ main Review Council post.
 ## 6. Output format
 
 Produce the report in exactly this structure. Keep it clean and scannable:
-plain `####` section headings for Summary and Recommendation, then collapsible
+plain `####` section headings for Summary and Verdict, then collapsible
 `<details>` sections for Specialist Scores, Findings Overview, and Testing.
 Use a top-level heading (`##`) for the title so its underline rule visually
 separates it from the rest of the report. Do **not** add horizontal rules
@@ -283,42 +283,23 @@ already create enough visual separation on their own.
 #### 📝 Summary
 
 Briefly state overall quality, merge readiness, and the highest-risk
-concern, if any. Leave the verdict itself to the Recommendation section —
+concern, if any. Leave the verdict itself to the Verdict section —
 the Summary sets up the narrative, not the decision.
 
-#### ⚠️ Recommendation · Request Changes
+#### ⚠️ Verdict · Request Changes
 
 The verdict lives in the heading itself: set the emoji dynamically to match
 the call and name the verdict after a middot —
-`#### 🚢 Recommendation · Ship It!`,
-`#### ⚠️ Recommendation · Request Changes`, or
-`#### 💬 Recommendation · Comment Only`. This keeps the section identifiable
+`#### 🚢 Verdict · Ship It!`,
+`#### ⚠️ Verdict · Request Changes`, or
+`#### 💬 Verdict · Comment Only`. This keeps the section identifiable
 while surfacing the decision in the header itself, with no separate banner line
 in the body.
 
-Open the body with the 1-2 sentence explanation of the call. After that, add
-one specialist notes subsection for each specialist that has recommendation-
-driving or decision-relevant notes. Omit specialists with no notes. This is
-required for every verdict, including 🚢 Ship It! and 💬 Comment Only when
-there are notes worth preserving.
-
-Each subsection is a `#####` heading using the category emoji and specialist
-name, followed by a flat bullet list of that specialist's notes. Each bullet
-should summarize one note and end with the severity of the finding it maps to
-when applicable, e.g. `(High)`. Do not collapse multiple specialists into one
-generic bullet list, and do not add a generic must-fix section.
-
-##### 📋 Requirements Specialist
-
-- The implementation misses a stated acceptance criterion. (High)
-
-##### 🎯 Correctness Specialist
-
-- Concurrent requests can bypass the limit, which maps to the atomicity finding. (High)
-
-##### 🧪 Testing Specialist
-
-- Missing concurrency coverage maps to the regression-test gap. (Medium)
+Open the body with only the 1-2 sentence explanation of the call. Do not add
+specialist notes, specialist feedback subsections, or a generic must-fix list
+under Verdict; fold any decision-relevant specialist rationale into the
+Specialist Scores cards below so the top-level decision stays short.
 
 <details>
 <summary>🦦 <strong>Specialist Scores</strong></summary>
@@ -355,8 +336,7 @@ Use a score-status circle between the specialist name and the value:
 - `81-99` → `🟢`
 - `100` → `🔵`
 
-Use category emojis consistently in both Recommendation feedback headings and
-Specialist Scores cards:
+Use category emojis consistently in Specialist Scores cards:
 
 - Requirements → `📋`
 - Correctness → `🎯`
@@ -529,12 +509,11 @@ Delivery follows the mode determined in §1:
   response, local note, super.engineering in-app comment, or other side surface
   as sufficient delivery for PR mode.
 
-  Use a formal review when the verdict has a formal review state; use a neutral
-  review comment or plain PR comment for 💬 Comment Only. Set the review verdict
-  from the **Recommendation** in §6:
+  Use a formal review state for each verdict. Set the review verdict from the
+  **Verdict** in §6:
 
   - 🚢 **Ship It!** → submit the review as **approved**.
-  - 💬 **Comment Only** → submit a neutral review comment or plain PR comment.
+  - 💬 **Comment Only** → submit the review as **approved**.
   - ⚠️ **Request Changes** → submit the review as **changes requested**.
 
   The main post Markdown is the body of that delivery in every case; only the
@@ -547,12 +526,12 @@ Delivery follows the mode determined in §1:
   the user's signal that they want it reviewed there.
 
   After posting, verify the host accepted the review/comment and, when possible,
-  that the PR/MR review decision reflects the Recommendation. Then show the
+  that the PR/MR review decision reflects the Verdict. Then show the
   review URL, final verdict, and a concise inline-comment summary in the
   conversation. If the host or your access can't attach a verdict (e.g. the tool
   only supports plain comments, or you'd be reviewing your own PR where
   self-approval is disallowed), still post the main Review Council post as a
-  PR/MR comment and state the recommendation in the report. If the PR/MR cannot
+  PR/MR comment and state the verdict in the report. If the PR/MR cannot
   be posted to at all (no access, no such tool available, auth error), state the
   posting failure explicitly and ask for access or a pasted diff; do not present
   the review as complete or as delivered.
@@ -600,16 +579,15 @@ for what a full pass looks like):
       customer data, and sensitive payloads rather than repeating them verbatim
 - [ ] No findings invented just to fill an empty severity bucket
 - [ ] Output follows the exact §6 structure, with `#### 📝 Summary` above the
-      opening paragraph, a `#### <emoji> Recommendation · <verdict>` heading
+      opening paragraph, a `#### <emoji> Verdict · <verdict>` heading
       immediately below the Summary, no horizontal rules, and collapsible
       `<details>` sections for Specialist Scores, Findings Overview, and
       Testing
 - [ ] Requirements are represented by the scored Requirements Specialist card,
       not a standalone section
-- [ ] The Recommendation section uses one `#####` specialist notes subsection
-      per specialist with decision-relevant notes, each with a flat bullet list;
-      specialists with no notes are omitted, and multiple specialists are never
-      collapsed into one generic bullet list
+- [ ] The Verdict section is short: only the verdict heading and a 1-2 sentence
+      explanation, with specialist rationale folded into Specialist Scores
+      instead of separate specialist subsections or feedback bullets
 - [ ] Source-specific findings are posted as inline comments when the host
       supports inline comments; the collapsible Findings Overview keeps only a
       reduced findings list with one severity section per finding type,
@@ -637,9 +615,8 @@ for what a full pass looks like):
       posts the complete Review Council Markdown as the first
       `otterbot-review` comment, then posts source-specific inline code
       comments underneath it
-- [ ] PR review verdict matches the final Recommendation: Ship It! → approved;
-      Comment Only → neutral review comment or plain PR comment; Request
-      Changes → changes requested (§7)
+- [ ] PR review verdict matches the final Verdict: Ship It! → approved;
+      Comment Only → approved; Request Changes → changes requested (§7)
 - [ ] Any fetch or post failure is stated explicitly, not silently worked
       around
 
@@ -651,8 +628,8 @@ for what a full pass looks like):
 
 → Fetch PR #42's title, description, and diff from the host; produce the main
 Review Council post in §6's format; deliver it on PR #42 as an approved review
-when the final Recommendation is Ship It!, as a neutral comment when it is
-Comment Only, and as changes requested otherwise; post source-specific findings
+when the final Verdict is Ship It! or Comment Only, and as changes requested
+otherwise; post source-specific findings
 as inline comments when supported; also show the main post and inline-comment
 summary in the conversation.
 

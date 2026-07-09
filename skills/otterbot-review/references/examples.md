@@ -27,14 +27,10 @@ Solid, focused change that adds a token-bucket limiter in front of the
 webhook endpoint. Mergeable after the missing-lock issue below is fixed —
 under concurrent requests the limiter can currently be bypassed.
 
-#### ⚠️ Recommendation · Request Changes
+#### ⚠️ Verdict · Request Changes
 
 The race condition means the rate limit isn't reliably enforced, which
 defeats the ticket's purpose — worth a fix before merge, not a fast-follow.
-
-- 📋 **Requirements Specialist:** Concurrent requests can exceed the stated 50 requests/minute merchant limit, so the implementation does not satisfy the core ticket requirement. (High)
-- 🎯 **Correctness Specialist:** Concurrent requests can bypass the intended merchant limit, which maps to the atomicity finding. (High)
-- 🧪 **Testing Specialist:** Missing concurrency coverage maps to the regression-test gap for the same failure mode. (Medium)
 
 <details>
 <summary>🦦 <strong>Specialist Scores</strong></summary>
@@ -186,14 +182,10 @@ Small, well-scoped addition. One real gap: the new export endpoint has no
 authorization check, so any authenticated user could export any merchant's
 transactions.
 
-#### ⚠️ Recommendation · Request Changes
+#### ⚠️ Verdict · Request Changes
 
 The missing authorization check is a data-exposure issue and should block
 merge on its own; everything else here is minor.
-
-- 🔒 **Security Specialist:** Merchants could potentially export another merchant's transactions, which maps directly to the Critical data-exposure finding. (Critical)
-- 📋 **Requirements Specialist:** A merchant-facing export feature cannot meet the implied data-access requirement without merchant ownership checks. (Critical)
-- 🧩 **Completeness Specialist:** The missing authorization check blocks a complete implementation and supports the same merge gate. (Critical)
 
 <details>
 <summary>🦦 <strong>Specialist Scores</strong></summary>
