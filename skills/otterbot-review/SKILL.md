@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Perform a principal-level code review, producing a structured Markdown report with severity-tagged findings and a scorecard. Given a pull/merge request URL, reviews that PR and submits the report as a formal review — approving it when the recommendation is Approve or Comment Only, requesting changes otherwise. Given no URL, reviews the current local code changes and presents the report in the conversation. Use this whenever the user asks to "review this PR", "review my diff", "analyze this code change", "do a code review", "check this pull request for issues", pastes a pull-request URL and asks for feedback, or wants a merge-readiness assessment. Works with any git hosting provider (GitHub, GitLab, Bitbucket, etc.).
-version: 1.6.1
+version: 1.6.2
 ---
 
 # Otterbot Review
@@ -24,7 +24,7 @@ pull/merge request URL (GitHub, GitLab, Bitbucket, or similar).
 
 - **PR URL present → PR review mode.** Review that PR and, at the end,
   submit the report as a formal review whose verdict (approve vs. changes
-  requested) follows the Merge Recommendation. See §7.
+  requested) follows the final **Recommendation**. See §7.
 - **No PR URL → local review mode.** Review the current local code changes
   in this repository and present the report in the conversation. See §7.
 
@@ -91,12 +91,13 @@ Evaluate the change for:
 ## 3. Parallel expert council review
 
 After gathering the change set and surrounding context, run an expert council:
-one independent specialist pass per scorecard category. When the current
-environment supports parallel subagents, launch the specialists concurrently.
-When it does not, simulate the same six specialist passes yourself in a serial
-flow. The goal is faster review without weakening judgment: each expert digs
-deeply into its area, then the coordinator reconciles the council's work into
-one final principal-level report.
+one independent specialist pass per scorecard category. Perform the six passes
+in parallel only when the host provides safe internal delegation whose
+read-only, no-delivery boundary can be enforced; otherwise, simulate the same
+six specialist passes yourself in a serial flow. The goal is faster review
+without weakening judgment: each expert digs deeply into its area, then the
+coordinator reconciles the council's work into one final principal-level
+report.
 
 Specialist passes are **internal analysis only**. Specialists must not post PR
 comments, submit reviews, edit files, change labels/status, or otherwise
@@ -415,9 +416,9 @@ for what a full pass looks like):
       linked tickets, existing tests, related code
 - [ ] All six review focus areas considered (§2), even the ones that turn
       up nothing
-- [ ] One specialist pass completed for each scorecard category, using
-      parallel subagents when available and an explicit serial fallback when
-      they are not (§3)
+- [ ] One specialist pass completed for each scorecard category, using safe
+      parallel delegation only when the internal boundary can be enforced and
+      an explicit serial fallback otherwise (§3)
 - [ ] Specialist passes stayed internal-only: no comments, reviews, file
       edits, status changes, raw transcripts, chain-of-thought, or unsanitized
       notes were delivered (§3)
@@ -433,7 +434,7 @@ for what a full pass looks like):
       a generic/default number
 - [ ] Delivery matches mode: PR mode submits a formal review **and** shows
       the report in-conversation; local mode shows it in-conversation only
-- [ ] PR review verdict matches the Merge Recommendation: Approve or
+- [ ] PR review verdict matches the final Recommendation: Approve or
       Comment Only → approved; Request Changes → changes requested (§7)
 - [ ] Any fetch or post failure is stated explicitly, not silently worked
       around
@@ -446,7 +447,7 @@ for what a full pass looks like):
 
 → Fetch PR #42's title, description, and diff from the host; produce the
 report in §6's format; submit it as a formal review on PR #42 — approved
-if the Merge Recommendation is Approve or Comment Only, changes requested
+if the final Recommendation is Approve or Comment Only, changes requested
 otherwise; also show it in the conversation.
 
 **Local review mode** — no URL, uncommitted changes exist:
