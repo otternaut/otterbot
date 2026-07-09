@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
-description: Perform a principal-level code review, producing a structured Markdown report with severity-tagged findings and Otter Council specialist scores. Given a pull/merge request URL, reviews that PR and delivers the report with the correct verdict semantics — approving when the recommendation is Ship It!, commenting neutrally when it is Comment Only, and requesting changes otherwise. Given no URL, reviews the current local code changes and presents the report in the conversation. Use this whenever the user asks to "review this PR", "review my diff", "analyze this code change", "do a code review", "check this pull request for issues", pastes a pull-request URL and asks for feedback, or wants a merge-readiness assessment. Works with any git hosting provider (GitHub, GitLab, Bitbucket, etc.).
-version: 1.7.13
+description: Perform a principal-level code review, producing a structured Markdown report with severity-tagged findings and Specialist Scores. Given a pull/merge request URL, reviews that PR and delivers the report with the correct verdict semantics — approving when the recommendation is Ship It!, commenting neutrally when it is Comment Only, and requesting changes otherwise. Given no URL, reviews the current local code changes and presents the report in the conversation. Use this whenever the user asks to "review this PR", "review my diff", "analyze this code change", "do a code review", "check this pull request for issues", pastes a pull-request URL and asks for feedback, or wants a merge-readiness assessment. Works with any git hosting provider (GitHub, GitLab, Bitbucket, etc.).
+version: 1.7.16
 ---
 
 # Otterbot Review
@@ -96,7 +96,7 @@ Evaluate the change for:
 ## 3. Parallel expert council review
 
 After gathering the change set and surrounding context, run an expert council:
-one independent specialist pass per Otter Council category. Perform the seven
+one independent specialist pass per Specialist Scores category. Perform the seven
 passes in parallel only when the host provides safe internal delegation whose
 read-only, no-delivery boundary can be enforced; otherwise, simulate the same
 seven specialist passes yourself in a serial flow. The goal is faster review
@@ -257,13 +257,13 @@ plain section headings and each finding in its own callout card. Use a
 top-level heading (`##`) for the title so its underline rule visually
 separates it from the rest of the report. Do **not** add horizontal rules
 anywhere else — not between top-level sections (Summary, expanded
-Recommendation, collapsed The Otter Council, collapsed Findings, collapsed
+Recommendation, expanded Specialist Scores, collapsed Findings, collapsed
 Testing) and not between individual finding cards within Findings —
 the section headings and blockquote cards already create enough visual
 separation on their own.
 
 ```markdown
-## 🦦 OtterBot · Code Review
+## 🦦 Otter Review Board
 
 Briefly state overall quality, merge readiness, and the highest-risk
 concern, if any. Leave the verdict itself to the Recommendation section —
@@ -282,7 +282,7 @@ separate banner line in the body.
 
 Open the body with the 1-2 sentence explanation of the call. When the verdict
 is ⚠️ Request Changes, create one `#### <emoji> Feedback · <Specialist Name>`
-subsection per Otter Council specialist whose notes drive the recommendation,
+subsection per specialist whose notes drive the recommendation,
 with a bullet list beneath that specialist. Do not add a separate **Notes**
 label above those specialist feedback subsections. Each bullet should summarize
 the specialist note being relied on and end with the severity of the finding it
@@ -308,33 +308,33 @@ merge readiness, but keep the tone collaborative and easy to scan.
 
 - Missing concurrency coverage maps to the regression-test gap. (Medium)
 
-</details><details>
-<summary><h3>🦦 The Otter Council</h3></summary>
+</details><details open>
+<summary><h3>🦦 Specialist Scores</h3></summary>
 
 Score each category from 0-100, where 100 means excellent and merge-ready
 with no meaningful concerns.
 
-Present each Otter Council item as a plain blockquote card, not a table and
-not a GitHub alert. GitHub alert blockquotes add a visible `Tip`, `Warning`, or
+Present each specialist score as a plain blockquote card, not a table and not
+a GitHub alert. GitHub alert blockquotes add a visible `Tip`, `Warning`, or
 `Caution` label above the content; do not use them here.
 
-- Include exactly one card for each of the seven Otter Council categories:
+- Include exactly one card for each of the seven Specialist Scores categories:
   Requirements, Correctness, Completeness, Regression Risk, Code Quality,
   Testing, and Security. Do not use a separate Requirements section.
-- Start each card with the category emoji and specialist name.
-- Put `**Score ·** <indicator> <value>` on its own line, not in a bullet
-  list. Do not add `/ 100`; the score is always assumed to be out of 100.
-- Put one or more note bullets directly below the score. Do not add a
-  **Notes** label in Otter Council cards; the bullets replace the old separate
-  **Score Notes** section.
-- Keep cards readable: include blank blockquote spacer lines between the
-  specialist name, score, and note bullets.
+- Start each card with the category emoji, specialist name, score-status
+  indicator, and score on one line: `📋 **Requirements Specialist · 🟢 92**`.
+  Do not add `/ 100`; the score is always assumed to be out of 100.
+- Put one or more note bullets directly below the heading. Do not add a
+  standalone `Score ·` line or a **Notes** label; the heading carries the score
+  and the bullets replace the old separate **Score Notes** section.
+- Keep cards compact: include one blank blockquote spacer line between the
+  heading and note bullets.
 
 Plain Markdown cannot reliably control blockquote border color across hosts.
 Use a normal blockquote for every score band rather than trying to force red,
 yellow, or green borders.
 
-Use a score-status circle between `Score` and the value:
+Use a score-status circle between the specialist name and the value:
 
 - `< 60` → `🔴`
 - `60-80` → `🟡`
@@ -342,7 +342,7 @@ Use a score-status circle between `Score` and the value:
 - `100` → `🔵`
 
 Use category emojis consistently in both Recommendation feedback headings and
-Otter Council cards:
+Specialist Scores cards:
 
 - Requirements → `📋`
 - Correctness → `🎯`
@@ -352,49 +352,35 @@ Otter Council cards:
 - Testing → `🧪`
 - Security → `🔒`
 
-> 📋 **Requirements Specialist**
->
-> **Score ·** 🟢 92
+> 📋 **Requirements Specialist · 🟢 92**
 >
 > - Product and technical requirements are satisfied, including any linked Jira or Linear acceptance criteria.
 > - Ambiguity or acceptance-criteria notes, when needed.
 
-> 🎯 **Correctness Specialist**
->
-> **Score ·** 🟢 90
+> 🎯 **Correctness Specialist · 🟢 90**
 >
 > - Detailed correctness rationale.
 > - Another relevant observation, when needed.
 
-> 🧩 **Completeness Specialist**
->
-> **Score ·** 🟢 88
+> 🧩 **Completeness Specialist · 🟢 88**
 >
 > - Detailed completeness rationale.
 > - Missing states, integration points, or cleanup notes, when needed.
 
-> 🛡️ **Regression Risk Specialist**
->
-> **Score ·** 🟡 78
+> 🛡️ **Regression Risk Specialist · 🟡 78**
 >
 > - Detailed compatibility, rollout, or behavior-change rationale.
 > - Existing-flow risk notes, when needed.
 
-> 🧹 **Code Quality Specialist**
->
-> **Score ·** 🔵 100
+> 🧹 **Code Quality Specialist · 🔵 100**
 >
 > - Detailed maintainability rationale.
 
-> 🧪 **Testing Specialist**
->
-> **Score ·** 🟡 72
+> 🧪 **Testing Specialist · 🟡 72**
 >
 > - Detailed test evidence and coverage-gap rationale.
 
-> 🔒 **Security Specialist**
->
-> **Score ·** 🔴 45
+> 🔒 **Security Specialist · 🔴 45**
 >
 > - Detailed security or data-integrity rationale with secrets and sensitive data redacted.
 
@@ -532,7 +518,7 @@ for what a full pass looks like):
       related code
 - [ ] All seven review focus areas considered (§2), even the ones that turn
       up nothing
-- [ ] One specialist pass completed for each Otter Council category, using safe
+- [ ] One specialist pass completed for each Specialist Scores category, using safe
       parallel delegation only when the internal boundary can be enforced and
       an explicit serial fallback otherwise (§3)
 - [ ] Specialist passes stayed internal-only: no comments, reviews, file
@@ -552,22 +538,23 @@ for what a full pass looks like):
       omitted, no horizontal rules, and each severity heading tagged with its
       finding count
 - [ ] Recommendation is wrapped in an expanded-by-default `<details open>`
-      block and appears before The Otter Council; requirements are represented
+      block and appears before Specialist Scores; requirements are represented
       by the scored Requirements Specialist card, not a standalone section
 - [ ] Any Request Changes recommendation uses one emoji-prefixed
       `Feedback · <Specialist>`
       subsection per relevant specialist, omits specialists without
       recommendation-driving notes, and does not use a generic Notes or
       must-fix list
-- [ ] The Otter Council cards are plain blockquotes with no GitHub alert
+- [ ] Specialist Scores cards are plain blockquotes with no GitHub alert
       labels, include exactly one card for each of the seven categories, include
-      category emojis in the heading, omit the redundant Specialist field, put
-      `Score · <indicator> <value>` outside bullet lists, omit `/ 100`, use
-      readable spacing, put note bullets directly below the score without a
-      Notes label, and do not include a separate Score Notes section or overall
+      category emojis in the heading, omit the redundant Specialist field, put the
+      score indicator and value beside the specialist name, omit `/ 100`, put
+      note bullets directly below the heading without a Notes label, and do not
+      include a standalone Score line, separate Score Notes section, or overall
       score
-- [ ] The Otter Council, Findings, and Testing sections are wrapped in
-      collapsed-by-default `<details>` blocks, with no `open` attribute, and
+- [ ] Specialist Scores is wrapped in an expanded-by-default `<details open>`
+      block, while Findings and Testing are wrapped in collapsed-by-default
+      `<details>` blocks with no `open` attribute, and
       use `<summary><h3>...</h3></summary>` so collapsed headings match the
       other section headers
 - [ ] Spacing between adjacent collapsible sections is tight: close one

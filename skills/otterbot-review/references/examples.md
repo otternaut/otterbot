@@ -19,7 +19,7 @@ submitted as a formal review on PR #142, and also shown in the conversation
 **Report produced:**
 
 ```markdown
-## 🦦 OtterBot · Code Review
+## 🦦 Otter Review Board
 
 Solid, focused change that adds a token-bucket limiter in front of the
 webhook endpoint. Mergeable after the missing-lock issue below is fixed —
@@ -43,55 +43,41 @@ defeats the ticket's purpose — worth a fix before merge, not a fast-follow.
 
 - Missing concurrency coverage maps to the regression-test gap for the same failure mode. (Medium)
 
-</details><details>
-<summary><h3>🦦 The Otter Council</h3></summary>
+</details><details open>
+<summary><h3>🦦 Specialist Scores</h3></summary>
 
-> 📋 **Requirements Specialist**
->
-> **Score ·** 🟡 70
+> 📋 **Requirements Specialist · 🟡 70**
 >
 > - Jira ticket PAY-881 asks for no more than 50 requests/minute per merchant.
 > - Product intent is clear and the technical approach is close, but concurrent traffic can exceed the intended limit.
 
-> 🎯 **Correctness Specialist**
->
-> **Score ·** 🟡 65
+> 🎯 **Correctness Specialist · 🟡 65**
 >
 > - Rate limiter has a race condition under concurrent requests.
 > - The issue directly affects the core requirement because concurrent traffic can exceed the intended merchant limit.
 
-> 🧩 **Completeness Specialist**
->
-> **Score ·** 🟢 85
+> 🧩 **Completeness Specialist · 🟢 85**
 >
 > - Covers the main rate-limiting path.
 > - Redis-unavailable behavior is not defined, so the operational failure mode still needs a decision.
 
-> 🛡️ **Regression Risk Specialist**
->
-> **Score ·** 🟡 80
+> 🛡️ **Regression Risk Specialist · 🟡 80**
 >
 > - Limited blast radius because the change is scoped to webhook rate limiting.
 > - Redis dependency behavior should be resolved before merge to avoid surprising webhook failures.
 
-> 🧹 **Code Quality Specialist**
->
-> **Score ·** 🟢 90
+> 🧹 **Code Quality Specialist · 🟢 90**
 >
 > - Implementation is readable and follows local structure.
 > - The remaining concerns are behavioral rather than structural.
 
-> 🧪 **Testing Specialist**
->
-> **Score ·** 🟡 60
+> 🧪 **Testing Specialist · 🟡 60**
 >
 > - Unit tests cover the happy path only.
 > - No concurrency test exercises the race condition.
 > - No Redis-down test documents the intended fallback behavior.
 
-> 🔒 **Security Specialist**
->
-> **Score ·** 🟢 95
+> 🔒 **Security Specialist · 🟢 95**
 >
 > - No authorization or sensitive-data concerns found in this change.
 > - The limiter does not appear to expose secrets or user data.
@@ -168,7 +154,7 @@ report in the conversation; nothing is posted anywhere (§7).
 **Report produced:**
 
 ```markdown
-## 🦦 OtterBot · Code Review
+## 🦦 Otter Review Board
 
 Small, well-scoped addition. One real gap: the new export endpoint has no
 authorization check, so any authenticated user could export any merchant's
@@ -192,54 +178,40 @@ merge on its own; everything else here is minor.
 
 - The missing authorization check blocks a complete implementation and supports the same merge gate. (Critical)
 
-</details><details>
-<summary><h3>🦦 The Otter Council</h3></summary>
+</details><details open>
+<summary><h3>🦦 Specialist Scores</h3></summary>
 
-> 📋 **Requirements Specialist**
->
-> **Score ·** 🟡 65
+> 📋 **Requirements Specialist · 🟡 65**
 >
 > - No Jira or Linear ticket was linked, so acceptance criteria are inferred from the branch name and diff.
 > - The product requirement for merchant-scoped exports implies a technical authorization requirement, which the implementation does not enforce.
 
-> 🎯 **Correctness Specialist**
->
-> **Score ·** 🟢 90
+> 🎯 **Correctness Specialist · 🟢 90**
 >
 > - Export logic is straightforward and appears to return the intended data.
 > - No obvious data-shaping or pagination bug is visible from the changed code.
 
-> 🧩 **Completeness Specialist**
->
-> **Score ·** 🟡 70
+> 🧩 **Completeness Specialist · 🟡 70**
 >
 > - Missing authorization check blocks a complete implementation.
 > - Acceptance criteria are unclear without a linked ticket or spec.
 
-> 🛡️ **Regression Risk Specialist**
->
-> **Score ·** 🟢 90
+> 🛡️ **Regression Risk Specialist · 🟢 90**
 >
 > - New endpoint is isolated from existing flows.
 > - The security flaw affects exposed data even though it is not a broad regression.
 
-> 🧹 **Code Quality Specialist**
->
-> **Score ·** 🟢 85
+> 🧹 **Code Quality Specialist · 🟢 85**
 >
 > - Code is simple and follows the surrounding handler style.
 > - The implementation would benefit from colocated authorization handling matching adjacent endpoints.
 
-> 🧪 **Testing Specialist**
->
-> **Score ·** 🔴 50
+> 🧪 **Testing Specialist · 🔴 50**
 >
 > - No tests added for the new endpoint.
 > - No authorization regression test exists for cross-merchant access.
 
-> 🔒 **Security Specialist**
->
-> **Score ·** 🔴 40
+> 🔒 **Security Specialist · 🔴 40**
 >
 > - Missing authorization check is a real data-exposure risk.
 > - A merchant could potentially export another merchant's transactions.
