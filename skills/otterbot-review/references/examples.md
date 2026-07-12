@@ -12,11 +12,12 @@ specificity and the exact formatting expected, not just the shape.
 PR's title ("Add webhook rate limiting"), description, linked Jira or Linear
 ticket when present, current active review-thread state, and diff are fetched
 from the host. Prior comments are used only to avoid duplicate active feedback,
-not as material to review. The reviewer runs
-or simulates the seven-category expert council, reconciles the internal notes,
-and publishes only the final sanitized report. The report below is generated,
-submitted as a formal review on PR #142, and also shown in the conversation
-(§7).
+not as material to review. The reviewer runs or simulates the seven core
+specialists plus the Reliability & Operability and Performance & Scalability
+specialists activated by the external Redis dependency and traffic-sensitive
+request path. It reconciles the internal notes and publishes only the final
+sanitized report. The report below is generated, submitted as a formal review
+on PR #142, and also shown in the conversation (§7).
 
 **Report produced:**
 
@@ -39,41 +40,52 @@ defeats the ticket's purpose — worth a fix before merge, not a fast-follow.
 
 <br>
 
-> 📋 **Requirements Specialist · 🟡 70**
+> 📋 **Product Intent & Acceptance Specialist · 🟡 70**
 >
 > - Jira ticket PAY-881 asks for no more than 50 requests/minute per merchant.
-> - Product intent is clear and the technical approach is close, but concurrent traffic can exceed the intended limit.
+> - Product intent is clear, but concurrent traffic can exceed the intended limit.
 
-> 🎯 **Correctness Specialist · 🟡 65**
+> 🎯 **Functional Correctness & State Specialist · 🟡 65**
 >
 > - Rate limiter has a race condition under concurrent requests.
 > - The issue directly affects the core requirement because concurrent traffic can exceed the intended merchant limit.
 
-> 🧩 **Completeness Specialist · 🟢 85**
+> 🔗 **Integration & Contract Completeness Specialist · 🟢 85**
 >
-> - Covers the main rate-limiting path.
-> - Redis-unavailable behavior is not defined, so the operational failure mode still needs a decision.
+> - The endpoint is connected to the limiter and the Redis integration is present.
+> - The Redis failure contract is not defined, so consumers cannot rely on a documented fallback.
 
-> 🛡️ **Regression Risk Specialist · 🟡 80**
+> 🛡️ **Compatibility & Regression Specialist · 🟡 80**
 >
 > - Limited blast radius because the change is scoped to webhook rate limiting.
 > - Redis dependency behavior should be resolved before merge to avoid surprising webhook failures.
 
-> 🧹 **Code Quality Specialist · 🟢 90**
+> 🏗️ **Architecture & Maintainability Specialist · 🟢 90**
 >
 > - Implementation is readable and follows local structure.
 > - The remaining concerns are behavioral rather than structural.
 
-> 🧪 **Testing Specialist · 🟡 60**
+> 🧪 **Verification & Test Quality Specialist · 🟡 60**
 >
 > - Unit tests cover the happy path only.
 > - No concurrency test exercises the race condition.
 > - No Redis-down test documents the intended fallback behavior.
 
-> 🔒 **Security Specialist · 🟢 95**
+> 🔒 **Security & Privacy Specialist · 🟢 95**
 >
 > - No authorization or sensitive-data concerns found in this change.
 > - The limiter does not appear to expose secrets or user data.
+
+> 📡 **Reliability & Operability Specialist · 🔴 55**
+>
+> - Activated because: webhook handling now depends on Redis during every request.
+> - Redis-unavailable behavior is undefined, so a transient dependency failure can return 500 for all webhook traffic.
+> - No logging or alerting evidence shows operators can diagnose that failure.
+
+> ⚡ **Performance & Scalability Specialist · 🟡 75**
+>
+> - Activated because: the change adds Redis I/O and concurrency-sensitive rate limiting to a production traffic path.
+> - No load evidence shows the limiter maintains acceptable latency or enforces the threshold under concurrent requests.
 
 </details>
 
@@ -170,12 +182,13 @@ defeats the ticket's purpose — worth a fix before merge, not a fast-follow.
 status` shows one modified file and one new (untracked) file — both are
 included in the diff per the "Local review mode" steps, since a plain
 `git diff` alone would have missed the untracked file. The reviewer runs or
-simulates the seven-category expert council and shares only the final sanitized
-report in the conversation; nothing is posted anywhere (§7).
+simulates the seven core specialists plus Data Integrity & Persistence because
+the endpoint reads durable transaction records. It shares only the final
+sanitized report in the conversation; nothing is posted anywhere (§7).
 
 **Report produced:**
 
-```markdown
+````markdown
 #### 📝 Summary
 
 Small, well-scoped addition. One real gap: the new export endpoint has no
@@ -192,40 +205,46 @@ merge on its own; everything else here is minor.
 
 <br>
 
-> 📋 **Requirements Specialist · 🟡 65**
+> 📋 **Product Intent & Acceptance Specialist · 🟡 65**
 >
 > - No Jira or Linear ticket was linked, so acceptance criteria are inferred from the branch name and diff.
 > - The product requirement for merchant-scoped exports implies a technical authorization requirement, which the implementation does not enforce.
 
-> 🎯 **Correctness Specialist · 🟢 90**
+> 🎯 **Functional Correctness & State Specialist · 🟢 90**
 >
 > - Export logic is straightforward and appears to return the intended data.
 > - No obvious data-shaping or pagination bug is visible from the changed code.
 
-> 🧩 **Completeness Specialist · 🟡 70**
+> 🔗 **Integration & Contract Completeness Specialist · 🟡 70**
 >
-> - Missing authorization check blocks a complete implementation.
-> - Acceptance criteria are unclear without a linked ticket or spec.
+> - The route is registered and the CSV conversion path is connected.
+> - The route does not integrate the merchant-ownership guard used by adjacent endpoints.
 
-> 🛡️ **Regression Risk Specialist · 🟢 90**
+> 🛡️ **Compatibility & Regression Specialist · 🟢 90**
 >
 > - New endpoint is isolated from existing flows.
 > - The security flaw affects exposed data even though it is not a broad regression.
 
-> 🧹 **Code Quality Specialist · 🟢 85**
+> 🏗️ **Architecture & Maintainability Specialist · 🟢 85**
 >
 > - Code is simple and follows the surrounding handler style.
 > - The implementation would benefit from colocated authorization handling matching adjacent endpoints.
 
-> 🧪 **Testing Specialist · 🔴 50**
+> 🧪 **Verification & Test Quality Specialist · 🔴 50**
 >
 > - No tests added for the new endpoint.
 > - No authorization regression test exists for cross-merchant access.
 
-> 🔒 **Security Specialist · 🔴 40**
+> 🔒 **Security & Privacy Specialist · 🔴 40**
 >
 > - Missing authorization check is a real data-exposure risk.
 > - A merchant could potentially export another merchant's transactions.
+
+> 🗄️ **Data Integrity & Persistence Specialist · 🟢 85**
+>
+> - Activated because: the endpoint reads durable merchant transaction records and serializes them into an export.
+> - The change does not mutate records, so loss, duplication, and rollback risks are low.
+> - Export completeness for large or empty transaction sets remains unproven because pagination behavior is not specified.
 
 </details>
 
@@ -237,20 +256,22 @@ merge on its own; everything else here is minor.
 🔴 **Critical - 1 Issue**
 
 > **`GET /merchants/:id/export` doesn't verify the requesting user has access to `:id` — it only checks that the user is authenticated, not that they belong to that merchant.**
+>
 > - **Location:** `src/routes/exportController.ts` (new file, untracked)
 > - **Why it matters:** Any authenticated user can export any other merchant's full transaction history by changing the `:id` in the URL — a direct data-exposure issue.
 > - **Fix:** Add the same merchant-ownership check used in `src/routes/transactionsController.ts:getTransactions()` before generating the export.
 >
 > ```ts
-> router.get('/merchants/:id/export', requireAuth, async (req, res) => {
+> router.get("/merchants/:id/export", requireAuth, async (req, res) => {
 >   const rows = await getTransactions(req.params.id); // no ownership check on :id
->   res.type('text/csv').send(toCsv(rows));
+>   res.type("text/csv").send(toCsv(rows));
 > });
 > ```
 
 🔵 **Low - 1 Issue**
 
 > **No tests for the new endpoint.** (No code block — there's nothing to quote for a missing test.)
+>
 > - **Location:** `src/routes/exportController.ts` (new file, untracked)
 > - **Why it matters:** Nothing currently guards against a regression here, and the missing-auth issue above is exactly the kind of thing a test would have caught.
 > - **Fix:** Add a test asserting a user from merchant A gets a 403 when requesting merchant B's export.
@@ -289,7 +310,7 @@ merge on its own; everything else here is minor.
 > - Manually hit the endpoint as a user from merchant A requesting merchant B's `:id` to confirm the fix actually blocks it before merge.
 
 </details>
-```
+````
 
 Note how the missing-untracked-file bug this skill was fixed for shows up
 directly in this example: `exportController.ts` is a **new, untracked**
