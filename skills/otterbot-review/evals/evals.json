@@ -48,6 +48,12 @@
       "prompt": "inside super.engineering, review this worktree with otterbot-review and leave review comments",
       "expected_output": "The agent reads super.engineering-managed target/base state with `sc worktree status --json` rather than inferring it from git defaults or the worktree directory name, and reads current in-app review comments with `sc worktree review-list --json` for deduplication only. It produces the complete §6 Review Council Markdown report without reviewing prior comments or re-raising resolved/hidden/outdated/inactive feedback, then posts that full report first as an `otterbot-review` in-app review comment using `sc worktree review-add ...`; it does not post only a summary, verdict-only note, or inline comments by themselves. Only after the main Markdown comment succeeds does the coordinator post source-specific findings as separate inline code comments underneath it, using the same provider and the smallest relevant changed line ranges, and without duplicating the referenced code block under `Fix`. If the main Review Council comment cannot be posted, it states the failure and presents the report in the conversation instead of posting inline comments alone.",
       "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "review this change like a nitpicky principal architect and only approve if you have extremely high confidence",
+      "expected_output": "The agent performs the normal otterbot-review workflow with an adversarial principal-architect posture. Before approving, it gathers surrounding context beyond the raw diff, builds a failure model, and has each specialist attempt concrete counterexamples for its category. Specialist Scores are strict: high scores require inspected evidence, unresolved realistic counterexamples lower the score, and confidence-limiting assumptions are stated in the score bullets. The coordinator runs the challenge/adjudication round plus a final red-team pass that asks how this change could cause a production incident, data problem, support escalation, security report, or rollback after merge. The final verdict is Ship It! only when requirements, important edge cases, failure paths, regression risk, security/data integrity, and testing evidence leave no reasonable worry; otherwise it uses Comment Only or Request Changes according to the severity rules.",
+      "files": []
     }
   ]
 }
