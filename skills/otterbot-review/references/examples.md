@@ -1,6 +1,7 @@
 # Worked examples
 
-Two complete, end-to-end examples of this skill's output — one per mode.
+Three complete, end-to-end examples of this skill's output — an initial PR
+review, a PR re-review, and a local review.
 These are illustrative (the PR/repo don't exist); they show the level of
 specificity and the exact formatting expected, not just the shape.
 
@@ -22,6 +23,8 @@ on PR #142, and also shown in the conversation (§7).
 **Report produced:**
 
 ```markdown
+<!-- otterbot-review: council; head: 8b2c6e1d4a9f7c3b5e0d1a8c6f2b9e4d7a3c1f0e -->
+
 #### 🦦 Council Review &middot; Add webhook rate limiting
 
 #### 📝 Summary
@@ -147,6 +150,8 @@ defeats the ticket's purpose — worth a fix before merge, not a fast-follow.
 `src/webhooks/rateLimiter.ts`, `checkRateLimit()`:
 
 ```markdown
+<!-- otterbot-finding: rate-limiter-atomicity -->
+
 > **The read-check-increment sequence in `checkRateLimit()` isn't atomic, so concurrent requests from the same merchant can all read the same counter value and all pass the check.**
 >
 > - **Severity:** 🟠 High
@@ -157,6 +162,8 @@ defeats the ticket's purpose — worth a fix before merge, not a fast-follow.
 `src/webhooks/rateLimiter.ts`, rate-limit call site:
 
 ```markdown
+<!-- otterbot-finding: redis-failure-contract -->
+
 > **No fallback behavior when Redis is unreachable — the handler currently throws, which would 500 all webhook traffic.**
 >
 > - **Severity:** 🟡 Medium
@@ -167,6 +174,8 @@ defeats the ticket's purpose — worth a fix before merge, not a fast-follow.
 `src/webhooks/rateLimiter.ts`, limit constant:
 
 ```markdown
+<!-- otterbot-finding: rate-limit-config -->
+
 > **Magic number `50` for the rate limit is inlined directly in the handler.**
 >
 > - **Severity:** 🔵 Low
@@ -174,7 +183,155 @@ defeats the ticket's purpose — worth a fix before merge, not a fast-follow.
 > - **Fix:** Pull from the existing `config/limits.ts`, matching the pattern used for the API rate limiter.
 ```
 
-## Example 2: Local review mode
+## Example 2: PR re-review mode
+
+**User:** "re-review https://github.com/acme/payhub/pull/142"
+
+**What happens:** the same PR URL has an attributable Otterbot Council review
+with the `<!-- otterbot-review: council -->` marker. The agent fetches the
+current PR state, including the commits since the first review, full current
+diff, active threads, and tests. It then runs the complete specialist council
+again — it does not merely inspect the prior comments. The atomic update and
+its concurrency test now directly address the original High finding, so the
+agent resolves its own inline thread. Redis failure handling is still
+unverified, and a new missing metric is found. The host cannot edit the
+submitted review, so the agent posts exactly one re-review comment that links
+to and supersedes it. It also submits a new Comment Only formal review so the
+earlier Request Changes decision no longer represents the current revision.
+
+**Report produced:**
+
+```markdown
+<!-- otterbot-review: council; head: d7f4a9c2e8b1d6f0a3c5e7b9d1f2a4c6e8b0d3f5 -->
+
+#### 🦦 Council Review &middot; Add webhook rate limiting
+
+#### 📝 Summary
+
+The original atomicity blocker is fixed and covered by a concurrent-request
+test. The remaining Redis observability gap and new metric omission are
+non-blocking, so this revision is mergeable with recorded follow-up work.
+
+#### 💬 Verdict · Comment Only
+
+This is a re-review of the Request Changes review from 2026-07-12T14:20:00Z:
+the High atomicity finding is resolved, while the remaining Medium and new Low
+findings do not block a safe merge.
+
+<details>
+<summary>🦦 <strong>Specialist Scores</strong></summary>
+
+<br>
+
+> 📋 **Product Intent & Acceptance Specialist · 🟢 92**
+>
+> - The revised implementation now enforces the 50 requests/minute requirement under concurrent traffic.
+
+> 🎯 **Functional Correctness & State Specialist · 🟢 90**
+>
+> - The atomic Redis operation removes the prior check-then-set race.
+> - The parallel-request test exercises the counterexample from the original review.
+
+> 🔗 **Integration & Contract Completeness Specialist · 🟢 85**
+>
+> - The limiter remains connected to the webhook path and its Redis contract is unchanged.
+
+> 🛡️ **Compatibility & Regression Specialist · 🟢 88**
+>
+> - The scoped limiter does not alter unrelated webhook routes.
+
+> 🏗️ **Architecture & Maintainability Specialist · 🟢 90**
+>
+> - The atomic operation is localized and follows the existing Redis helper pattern.
+
+> 🧪 **Verification & Test Quality Specialist · 🟢 88**
+>
+> - The added concurrency test directly covers the original blocking scenario.
+> - Redis-unavailable behavior remains untested.
+
+> 🔒 **Security & Privacy Specialist · 🟢 95**
+>
+> - No authorization, sensitive-data, or secret-handling regression found.
+
+> 📡 **Reliability & Operability Specialist · 🟡 76**
+>
+> - Activated because: webhook handling still depends on Redis during every request.
+> - The implementation logs Redis failures but does not emit the rate-limit fallback metric.
+
+> ⚡ **Performance & Scalability Specialist · 🟢 84**
+>
+> - Activated because: the request path performs Redis I/O under concurrent production traffic.
+> - The atomic operation removes race retries; staging load evidence is still recommended.
+
+</details>
+
+<details>
+<summary>🔎 <strong>Findings Overview</strong></summary>
+
+<br>
+
+> - ~~High: Non-atomic rate-limit update in `src/webhooks/rateLimiter.ts`.~~ **Resolved:** replaced by an atomic Redis operation and verified by the new concurrent-request test; original inline thread resolved.
+
+🟡 **Medium - 1 Issue**
+
+> - Redis-down behavior remains untested; original inline comment updated with this re-review status.
+
+🔵 **Low - 1 Issue**
+
+> - New in this re-review: the fail-open fallback has no metric, so operators cannot quantify how often protection is bypassed; posted inline on the fallback branch.
+
+</details>
+
+<details>
+<summary>🧪 <strong>Testing</strong></summary>
+
+<br>
+
+> **Result · Passed.**
+>
+> - `rateLimiter.test.ts` passed, including the new parallel-request test that permits no more than 50 requests in the window.
+> - Redis-unavailable behavior was inspected but not executed in this re-review.
+
+> **Risk analysis.**
+>
+> - The original merge blocker is now directly tested.
+> - The remaining Medium finding is a verification gap, not evidence of an unsafe fallback implementation.
+
+> **Recommended verification.**
+>
+> - Add a Redis-error test that asserts the chosen fail-open response, warning log, and fallback metric.
+> - Load-test the endpoint in staging before the next traffic increase.
+
+</details>
+
+<details>
+<summary>🕰️ <strong>Review History</strong></summary>
+
+<br>
+
+> **Original review · 2026-07-12T14:20:00Z · Request Changes**
+>
+> - Review: https://github.com/acme/payhub/pull/142#pullrequestreview-100
+> - Head: `8b2c6e1d4a9f7c3b5e0d1a8c6f2b9e4d7a3c1f0e`.
+> - Findings: 1 High atomicity issue, 1 Medium Redis-down gap, 1 Low configuration suggestion.
+> - Status: Superseded by re-review at 2026-07-14T15:45:00Z.
+
+> **Re-review · 2026-07-14T15:45:00Z · Comment Only**
+>
+> - Review: https://github.com/acme/payhub/pull/142#issuecomment-200; supersedes the original because editing the submitted review was unavailable.
+> - Head: `d7f4a9c2e8b1d6f0a3c5e7b9d1f2a4c6e8b0d3f5`.
+> - Findings: 1 resolved, 1 active, 0 no-longer-applicable, and 1 newly discovered.
+> - Status: Mergeable; no blocking findings remain.
+
+</details>
+```
+
+The agent replies to and resolves only the original High inline thread, because
+it owns that thread and the concurrent test directly verifies the fix. It
+updates the still-active Medium thread, and posts the new Low finding inline
+with a reference to the original review.
+
+## Example 3: Local review mode
 
 **User:** "review my changes before I open a PR"
 
