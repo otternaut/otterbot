@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "otterbot-review-orchestrator https://github.com/acme/widgets",
-      "expected_output": "The coordinator captures one UTC run time and a fixed 14-day cutoff, fully paginates candidate PRs and labels, and includes only PRs with state OPEN, isDraft false, reviewDecision REVIEW_REQUIRED, no case-insensitive exact stale label, updatedAt strictly after the cutoff, and no attributable Otterbot review already covering the current effective revision. It compares the newest reviewed and current heads using full SHAs plus tree OIDs or conclusive compare metadata, and fails closed when change cannot be verified. Each eligible PR that still passes preflight receives one distinct fresh-context subagent; the worker rechecks eligibility and otterbot-review's changed-revision gate before analysis and delivery. The concise, non-collapsible report is titled `🦦 Review Orchestrator · owner/repo`, starts with a plain-language outcome, then shows a `📊 Review Summary` and `📋 Results` with brief linked PR cards. Delivered cards use Otterbot's exact verdict headings—🚢 Ship It!, 💬 Comment Only, or ⚠️ Request Changes—rather than a generic delivered status. The report lists only nonzero exclusion reasons and final statuses, and includes only the fields relevant to each PR's terminal status.",
+      "expected_output": "The coordinator captures one UTC run time and a fixed 14-day cutoff, fully paginates candidate PRs and labels, and includes only PRs with state OPEN, isDraft false, reviewDecision REVIEW_REQUIRED, no case-insensitive exact stale label, updatedAt strictly after the cutoff, and no attributable Otterbot review already covering the current effective revision. It compares the newest reviewed and current heads using full SHAs plus tree OIDs or conclusive compare metadata, and fails closed when change cannot be verified. It visibly announces sweep start after access verification, the validated snapshot, each host-confirmed worker launch, each terminal transition, and a lifecycle-based heartbeat at least every 30 seconds while work is queued or running. Each eligible PR that still passes preflight receives one distinct fresh-context subagent; the worker rechecks eligibility and otterbot-review's changed-revision gate before analysis and delivery. The concise, non-collapsible final report is titled `🦦 Review Orchestrator · owner/repo`, starts with a plain-language outcome, then shows a `📊 Review Summary` and `📋 Results` with brief linked PR cards. Delivered cards use Otterbot's exact verdict headings—🚢 Ship It!, 💬 Comment Only, or ⚠️ Request Changes—rather than a generic delivered status. The report lists only nonzero exclusion reasons and final statuses, and includes only the fields relevant to each PR's terminal status.",
       "files": []
     },
     {
@@ -173,6 +173,18 @@
       "id": 29,
       "prompt": "sweep https://github.com/acme/widgets; PR #7 receives Request Changes with one high and one medium inline finding, and PR #8 is skipped after its review decision becomes APPROVED",
       "expected_output": "The console output is a concise, non-collapsible report titled `🦦 Review Orchestrator · owner/repo`. Its plain-language outcome is followed by a `📊 Review Summary` with only nonzero exclusion reasons and final statuses, then brief linked PR cards. PR #7's card is headed `⚠️ Request Changes` and shows the review link, sanitized high/medium finding summary, outcome, and verification summary. PR #8's Skipped card shows only the changed-eligibility reason. A Follow-up section identifies the author action for #7 and explains that #8 needs no review.",
+      "files": []
+    },
+    {
+      "id": 30,
+      "prompt": "review eligible PRs in https://github.com/acme/widgets; two workers are running for over a minute without completing",
+      "expected_output": "The user-visible response first confirms the sweep started and the full eligibility snapshot. It confirms a worker only after the host acknowledges its creation, then, while either job remains running or queued, emits a progress heartbeat at least every 30 seconds under `Review Orchestrator &middot; 🦦 Heartbeat &middot; owner/repo`. The heartbeat reports elapsed time and actual eligible, started, remaining, running, queued, and terminal-status counts, and may list only PR numbers for active work. It explicitly says there has been no terminal update when that is true; it does not expose worker prompts, raw output, findings, titles, or infer an unobserved review stage from elapsed time.",
+      "files": []
+    },
+    {
+      "id": 31,
+      "prompt": "review eligible PRs in https://github.com/acme/widgets; PR #44 is queued but the host rejects worker creation",
+      "expected_output": "The coordinator never reports PR #44 as started or running. Its next user-visible lifecycle update records the worker-creation failure and terminal Failed status with current counts. Other queued or running jobs continue independently, and later heartbeats continue until all jobs are terminal.",
       "files": []
     }
   ]
