@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "otterbot-review-orchestrator https://github.com/acme/widgets",
-      "expected_output": "The coordinator captures one UTC run time and a fixed 14-day cutoff, fully paginates candidate PRs and labels, and includes only PRs with state OPEN, isDraft false, reviewDecision REVIEW_REQUIRED, no case-insensitive exact stale label, updatedAt strictly after the cutoff, and no attributable Otterbot review already covering the current effective revision. It compares the newest reviewed and current heads using full SHAs plus tree OIDs or conclusive compare metadata, and fails closed when change cannot be verified. Each eligible PR that still passes preflight receives one distinct fresh-context subagent; the worker rechecks eligibility and otterbot-review's changed-revision gate before analysis and delivery. Results are separate and verified, while initial exclusions appear only in aggregate audit counts.",
+      "expected_output": "The coordinator captures one UTC run time and a fixed 14-day cutoff, fully paginates candidate PRs and labels, and includes only PRs with state OPEN, isDraft false, reviewDecision REVIEW_REQUIRED, no case-insensitive exact stale label, updatedAt strictly after the cutoff, and no attributable Otterbot review already covering the current effective revision. It compares the newest reviewed and current heads using full SHAs plus tree OIDs or conclusive compare metadata, and fails closed when change cannot be verified. Each eligible PR that still passes preflight receives one distinct fresh-context subagent; the worker rechecks eligibility and otterbot-review's changed-revision gate before analysis and delivery. The friendly, non-collapsible console report has an outcome sentence, run details, queue audit, and separate verified PR results with sanitized finding, verification, and applicable re-review-lifecycle summaries; initial exclusions appear only in aggregate audit counts.",
       "files": []
     },
     {
@@ -167,6 +167,12 @@
       "id": 28,
       "prompt": "two PRs are eligible at snapshot, but both receive an Otterbot review at the same head before coordinator preflight",
       "expected_output": "Preflight re-fetches the newest attributable review metadata, marks both PRs No Review Needed with their existing review references, and starts zero workers. The coordinator renders the two terminal no-review-needed results, states that no pull requests require another Otterbot review, and exits immediately without waiting for workers or performing delivery.",
+      "files": []
+    },
+    {
+      "id": 29,
+      "prompt": "sweep https://github.com/acme/widgets; PR #7 receives Request Changes with one high and one medium inline finding, and PR #8 is skipped after its review decision becomes APPROVED",
+      "expected_output": "The console output is a friendly, non-collapsible sweep report with emoji headings for the outcome, run details, queue audit, and pull-request results. PR #7's verified Delivered block shows the Request Changes verdict, review reference, sanitized high/medium finding count, concise outcome and testing/verification summary, and any applicable re-review lifecycle facts. PR #8's Skipped block gives the changed eligibility reason without inventing findings, testing, or a verdict. A Follow-up section identifies the author action for #7 and explains that #8 needs no review.",
       "files": []
     }
   ]

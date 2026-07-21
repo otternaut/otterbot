@@ -1,7 +1,7 @@
 ---
 name: otterbot-review-orchestrator
 description: Orchestrates independent Otterbot reviews only for fresh, changed, non-draft GitHub pull requests whose current review decision is REVIEW_REQUIRED. Requires a GitHub repository URL, fully paginates the repository's PR queue, excludes closed, merged, draft, approved, changes-requested, stale, and already-reviewed unchanged PRs, then creates one fresh context-isolated subagent per eligible PR; each worker must run otterbot-review for exactly that PR and deliver its own host review. Exits immediately when no PR needs review. Use when the user invokes `otterbot-review-orchestrator REPO_URL` or `otterbot-review-pipeline REPO_URL`, asks to review eligible PRs in a repository, requests a repository-wide PR review sweep, or automates Otterbot reviews for a GitHub review-required queue.
-version: 2.1.0
+version: 2.2.0
 ---
 
 # Otterbot Review Orchestrator
@@ -178,12 +178,23 @@ attributable Otterbot review already covers this effective revision, return No
 Review Needed with the existing review reference and do not post, edit, reply,
 resolve, minimize, dismiss, or otherwise deliver anything.
 
-Return only a concise completion envelope with: PR number and URL, current
-head SHA, status (Delivered, No Review Needed, Skipped, Failed, or Uncertain),
-verdict when delivered, delivered or existing review URL/ID, inline-finding
-count, and a sanitized error or note when needed. Do not return private
-reasoning, raw specialist transcripts, credentials, or the full Council
-report.
+Return only a concise completion envelope. Include the PR number and URL,
+current head SHA, status (Delivered, No Review Needed, Skipped, Failed, or
+Uncertain), verdict when delivered, and the delivered or existing review URL/ID.
+For a delivered review, also include:
+
+- inline-finding count and a sanitized severity/count summary;
+- a one- or two-sentence sanitized outcome summary, including the main reason
+  for Request Changes when applicable;
+- a concise testing or verification summary, including material gaps;
+- re-review lifecycle facts when applicable: active, new, resolved, and no
+  longer applicable findings; resolved threads; minimized comments; and whether
+  a prior formal review was dismissed or remains visible.
+
+For a non-delivered result, include the failed gate, existing-review reference,
+or actionable sanitized failure/uncertainty note. Do not return private
+reasoning, raw specialist transcripts, credentials, full finding text, or the
+full Council report.
 ```
 
 The instruction to run `otterbot-review` is mandatory after eligibility is
@@ -223,43 +234,78 @@ worker is reviewing, the worker's `otterbot-review` freshness and
 changed-revision rules control the restart, followed by another eligibility
 check before delivery.
 
-## 5. Render individual results
+## 5. Render a clear sweep report
 
 Wait until every eligible snapshot job reaches a terminal status. Render
-worker results in PR-number order, one block per PR. Never combine findings,
-average scores, or derive a repository-wide merge verdict. Do not render a
-review-result block for candidates excluded by the initial snapshot gate;
-report only their aggregate audit counts. Do render an individual `Skipped`
-block for an eligible snapshot PR that fails the later preflight.
+worker results in PR-number order, one clear block per PR. Make the console
+report easy to scan: use the headings and emojis below, but do not use
+collapsible `<details>` sections. Never combine findings, average scores, or
+derive a repository-wide merge verdict. Do not render a review-result block for
+candidates excluded by the initial snapshot gate; report only their aggregate
+audit counts. Do render an individual `Skipped` block for an eligible snapshot
+PR that fails later preflight.
 
-Use this shape:
+Start with a brief, plain-language outcome sentence. For example, say that the
+sweep completed with reviews posted, that no PR needs review, or that some jobs
+need attention. Name failed or uncertain jobs in that sentence when present;
+do not make users infer them from counters.
+
+Use this shape, omitting fields that are unavailable or do not apply:
 
 ```markdown
-### Otterbot review sweep · <owner>/<repo>
+## 🦦 Otterbot Review Sweep · <owner>/<repo>
 
-Run start: <run-start-utc> · Stale cutoff: <stale-cutoff-utc>
-Candidates: <count> · Eligible at snapshot: <count> · Workers started: <count>
-Excluded: closed/merged <count> · draft <count> · review not required <count> ·
-stale label <count> · inactive 14+ days <count> · unchanged <count> ·
-change unverified <count>
-Delivered: <count> · No review needed after snapshot: <count> ·
-Skipped after snapshot: <count> · Failed: <count> · Uncertain: <count>
+<A short, friendly outcome sentence.>
 
-#### PR #<number> · <title>
+### ⏱️ Run details
 
-- PR: <canonical-pr-url>
-- Status: <Delivered | No Review Needed | Skipped | Failed | Uncertain>
-- Head: `<full-head-sha>` or `Unavailable`
-- Verdict: <Ship It! | Comment Only | Request Changes | Not produced>
-- Review: <delivered-or-existing-review-url-or-id> or `Not delivered`
-- Inline findings: <count or Unknown>
-- Note: <sanitized failure, skip reason, or uncertainty; omit when unnecessary>
+- Started: <run-start-utc>
+- Stale cutoff: <stale-cutoff-utc> (14 days)
+- Candidates checked: <count>
+- Eligible at snapshot: <count> · Workers started: <count>
+
+### 🔎 Queue audit
+
+- Excluded before review: closed/merged <count> · draft <count> · review not
+  required <count> · stale label <count> · inactive 14+ days <count> ·
+  unchanged <count> · change unverified <count>
+- Final job status: ✅ delivered <count> · ⏭️ no review needed <count> ·
+  ⏸️ skipped <count> · ❌ failed <count> · ⚠️ uncertain <count>
+- Delivered verdicts: 🚢 Ship It! <count> · 💬 Comment Only <count> ·
+  ⚠️ Request Changes <count>
+
+### 📋 Pull request results
+
+#### <status-emoji> PR #<number> · <title>
+
+- **Status:** <Delivered | No Review Needed | Skipped | Failed | Uncertain>
+- **Pull request:** <canonical-pr-url>
+- **Reviewed head:** `<full-head-sha>` or `Unavailable`
+- **Verdict:** <🚢 Ship It! | 💬 Comment Only | ⚠️ Request Changes | Not produced>
+- **Review:** <delivered-or-existing-review-url-or-id> or `Not delivered`
+- **Findings:** <inline count>; <sanitized severity/count summary>
+- **Outcome:** <sanitized one- or two-sentence result summary>
+- **Testing & verification:** <sanitized test/verification summary or material gap>
+- **Re-review updates:** <active/new/resolved/no-longer-applicable counts,
+  resolved threads, minimized comments, and dismissal outcome; omit for an
+  initial review or when no lifecycle action occurred>
+- **Needs attention:** <actionable sanitized skip, failure, or uncertainty note;
+  omit when unnecessary>
 ```
 
-For failures and skips, preserve the exact PR identity and give a concise
-actionable reason without credentials, private repository content, or raw tool
-output. Never claim a review, verdict, or inline comment was delivered unless
-the worker or read-only reconciliation verified it on GitHub.
+Use `✅`, `⏭️`, `⏸️`, `❌`, and `⚠️` for Delivered, No Review Needed, Skipped,
+Failed, and Uncertain respectively. For failures and skips, preserve the exact
+PR identity and give a concise actionable reason without credentials, private
+repository content, or raw tool output. Do not invent an outcome, testing, or
+lifecycle summary when the worker could not complete the review. Never claim a
+review, verdict, thread action, or inline comment was delivered unless the
+worker or read-only reconciliation verified it on GitHub.
+
+After the PR blocks, add `### 🧭 Follow-up` only when action remains. Summarize
+which PRs need an author response, which jobs should be retried on the next run,
+and why. For an all-clear sweep, instead add one closing sentence confirming
+that every started job reached a verified terminal result. This section informs
+the user; it must not become a repository-wide merge recommendation.
 
 ## Completion checklist
 
@@ -290,6 +336,12 @@ Before finishing, confirm:
       waiting for workers or invoking `otterbot-review`.
 - [ ] Every claimed delivery was verified and every started job was rendered
       separately in deterministic PR-number order.
+- [ ] The console report used friendly, non-collapsible sections with a clear
+      outcome sentence, queue audit, individual PR results, and follow-up when
+      needed.
+- [ ] Delivered PR summaries included only sanitized outcome, finding,
+      verification, and applicable re-review-lifecycle facts; failed or
+      incomplete jobs did not receive invented review details.
 
 ## Examples and evals
 
