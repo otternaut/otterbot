@@ -1,7 +1,7 @@
 ---
 name: otterbot-review-orchestrator
 description: Orchestrates independent Otterbot reviews only for fresh, changed, non-draft GitHub pull requests whose current review decision is REVIEW_REQUIRED. Requires a GitHub repository URL, fully paginates the repository's PR queue, excludes closed, merged, draft, approved, changes-requested, stale, and already-reviewed unchanged PRs, then creates one fresh context-isolated subagent per eligible PR; each worker must run otterbot-review for exactly that PR and deliver its own host review. Exits immediately when no PR needs review. Use when the user invokes `otterbot-review-orchestrator REPO_URL` or `otterbot-review-pipeline REPO_URL`, asks to review eligible PRs in a repository, requests a repository-wide PR review sweep, or automates Otterbot reviews for a GitHub review-required queue.
-version: 2.5.4
+version: 2.6.4
 ---
 
 # Otterbot Review Orchestrator
@@ -213,7 +213,80 @@ Keep worker contexts and outputs isolated:
   `otterbot-review` freshness, re-review, verdict, inline-comment, and delivery
   rules after passing the stricter eligibility gate above.
 
-## 4. Monitor without cross-contamination
+## 4. Show live progress and monitor without cross-contamination
+
+Make orchestration visibly observable. A user must be able to tell that this
+skill is running, that eligibility discovery completed, and that isolated
+workers actually started; this is especially important on hosts that expose a
+skill as a rule and otherwise defer the final answer until all worker calls
+finish.
+
+Write the following updates to the active user-visible response stream as the
+events happen. Do not reserve them for the final report or hide them in tool
+logs, reasoning, or worker prompts. These are operational status only, never
+review findings or repository-authored text. Use PR numbers, counts, elapsed
+time, and fixed status words; do not include PR titles, descriptions, diffs,
+comments, findings, credentials, or raw worker output.
+
+1. **Sweep started.** Immediately after target access is verified, announce
+   `Starting Otterbot review sweep for <owner>/<repo>. Discovering eligible pull
+   requests…`. This confirms that the orchestrator, rather than an opaque host
+   fallback, has begun its work.
+2. **Snapshot validated.** Immediately after the full eligibility snapshot is
+   complete, announce its checked, eligible, and excluded counts. If eligible
+   work exists, state that each eligible PR will receive a separate isolated
+   worker after preflight. For a zero-job run, emit this update before the
+   existing final zero-job report.
+3. **Worker launch confirmed.** Immediately after each successful fresh-worker
+   creation—not when it is merely queued—announce
+   `Worker started for PR #<number> (<started> started; <running> running;
+   <queued> queued).` Only say `started` after the host has returned a worker
+   identity or equivalent positive launch acknowledgement. If creation fails,
+   report the affected PR as `Failed` in the next live update and never claim a
+   worker ran.
+4. **Terminal transition.** When a worker or preflight reaches a terminal
+   status, announce a compact update naming the PR number and the verified
+   status: `Delivered`, `No Review Needed`, `Skipped`, `Failed`, or
+   `Uncertain`. A delivery update requires the same verified review evidence as
+   the final report.
+5. **Heartbeat.** While any work is queued or running, give a fresh progress
+   update at least every 30 seconds, and also whenever a launch or terminal
+   transition changes the counts. Do not wait for a silent worker call to
+   return before emitting a due heartbeat. Include elapsed time plus these
+   current counts: eligible, started, remaining, running, queued, and terminal
+   results by status. `Remaining` is the actual count of queued plus running
+   jobs. When useful, include the sorted PR numbers currently running and the
+   next queued PR numbers, but never infer a worker's review stage from elapsed
+   time. If no new lifecycle event occurred, say that explicitly, for example:
+   `Still waiting on active workers; no terminal updates since the previous
+   check.`
+
+Use this compact shape for the snapshot, transition, and heartbeat updates;
+omit only zero-valued terminal statuses:
+
+```markdown
+### Review Orchestrator &middot; 🦦 Heartbeat &middot; <owner>/<repo>
+
+<Timestamp or elapsed-time sentence.>
+
+- **Eligible:** <count>
+- **Workers:** <started> started · <running> running · <queued> queued
+- **Remaining:** <running-plus-queued>
+- **Terminal:** <status>: <count> (one bullet or clause per nonzero status)
+- **Active PRs:** #<number>, #<number> (when nonempty)
+- **Next queued:** #<number>, #<number> (when nonempty)
+```
+
+Use that heading exactly for every live update; it distinguishes operational
+heartbeats from the final `🦦 Review Orchestrator · <owner>/<repo>` report.
+For the snapshot update, also include `Checked` and `Excluded` counts. For a
+launch or terminal transition, put the event sentence before the bullets. The
+latest lifecycle state must be based on actual host worker handles and returned
+completion envelopes, not an assumption that a spawned worker is still running
+or has finished. Keep the coordinator responsive enough to publish the due
+heartbeats while it awaits workers. A host that cannot expose interim output
+must state that limitation immediately, then emit every available lifecycle
+update as soon as the host permits; it must not silently simulate progress.
 
 Track each job by PR number and worker identity. Continue scheduling queued
 jobs as earlier workers finish. One worker's failure must not cancel, block, or
@@ -350,6 +423,13 @@ Before finishing, confirm:
       when workers had to be queued.
 - [ ] Every worker was instructed to run `otterbot-review` for exactly one
       canonical PR URL.
+- [ ] The user-visible stream confirmed sweep start, full snapshot validation,
+      and every successfully created worker; no queued or failed creation was
+      represented as a running worker.
+- [ ] While work was queued or running, lifecycle-based progress updates were
+      emitted at least every 30 seconds and on every launch or terminal
+      transition, with current started/remaining/running/queued/terminal
+      counts.
 - [ ] No PR content or sibling result was copied into another worker context.
 - [ ] The coordinator performed no review analysis or delivery itself.
 - [ ] Every started job reached Delivered, No Review Needed, Skipped, Failed,

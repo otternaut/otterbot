@@ -58,6 +58,48 @@ Address PR #7's two findings and add the regression test, then rerun the sweep.
 The coordinator does not reproduce Council reports, compare scores, or make a
 combined merge recommendation.
 
+### Live progress seen during the sweep
+
+Before the final report above, the user sees status updates in the active
+response stream. These confirm actual orchestrator lifecycle events; they are
+not delayed until all review workers have completed.
+
+```markdown
+Starting Otterbot review sweep for acme/widgets. Discovering eligible pull
+requests…
+
+### Review Orchestrator &middot; 🦦 Heartbeat &middot; acme/widgets
+
+Snapshot validated after 8s. Each eligible PR will receive a separate isolated
+worker after preflight.
+
+- **Checked:** 7 pull requests
+- **Eligible:** 2
+- **Excluded:** 5
+- **Workers:** 0 started · 0 running · 2 queued
+- **Remaining:** 2
+
+### Review Orchestrator &middot; 🦦 Heartbeat &middot; acme/widgets
+
+Worker started for PR #7 (1 started; 1 running; 1 queued).
+
+- **Eligible:** 2
+- **Workers:** 1 started · 1 running · 1 queued
+- **Remaining:** 2
+- **Active PRs:** #7
+- **Next queued:** #104
+
+### Review Orchestrator &middot; 🦦 Heartbeat &middot; acme/widgets
+
+45s elapsed. Still waiting on active workers; no terminal updates since the
+previous check.
+
+- **Eligible:** 2
+- **Workers:** 2 started · 2 running · 0 queued
+- **Remaining:** 2
+- **Active PRs:** #7, #104
+```
+
 ## Example 2: A skip and a failed worker
 
 **User:**
@@ -145,3 +187,13 @@ configured remotes, or branch names, and does not create workers. It responds:
 
 > Provide one GitHub repository URL, for example
 > `https://github.com/acme/widgets`.
+
+## Example 5: A host cannot stream interim output
+
+If a host cannot show a response until its worker API returns, the coordinator
+does not pretend it is streaming. It promptly says that the host will surface
+the recorded lifecycle events when it next permits output, then emits the
+sweep-start, snapshot, worker-launch, terminal, and elapsed-time status updates
+in chronological order before the final report. The report remains the source
+of final results; the recorded updates make the actual worker launches and
+runtime visible rather than leaving the sweep looking idle.
