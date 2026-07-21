@@ -82,7 +82,7 @@
     {
       "id": 14,
       "prompt": "re-review https://github.com/acme/widgets/pull/42 after the author pushed fixes",
-      "expected_output": "Because a PR URL is present, the agent first identifies any attributable prior Otterbot Council review for this exact provider and PR using agent authorship plus the `<!-- otterbot-review: council -->` marker or a verified legacy Council heading. It then runs the full current specialist-council process over the current PR data; it does not treat an earlier finding as still valid merely because it was previously reported. It maps each prior Otterbot finding to active, Resolved, or No longer applicable based on direct current evidence, does not duplicate active feedback, and allows genuinely new findings. On GitHub it posts and verifies a new visible generation, recreates active findings with their stable IDs, then runs `gh api graphql` `minimizeComment` with `classifier: OUTDATED` for every attributable prior Otterbot comment and verifies each is hidden. On another host, the original report and its own inline findings are updated in place when supported; otherwise, the agent posts exactly one timestamped root report that says it supersedes and links to the original. The report explicitly identifies itself as a re-review, gives an updated verdict justified by previous findings that were fixed, persisted, or newly found, strikes resolved/no-longer-applicable findings instead of deleting them, and adds the emoji History section immediately after Testing with timestamped original and re-review cards containing review references, verdicts, findings summaries, and statuses.",
+      "expected_output": "Because a PR URL is present, the agent first identifies the newest attributable prior Otterbot Council review for this exact provider and PR, extracts its reviewed head SHA, and proves that the author's pushed fixes create a non-empty effective content diff from that head to the current head. Only then does it run the full current specialist-council process over the current PR data; it does not treat an earlier finding as still valid merely because it was previously reported. It maps each prior Otterbot finding to active, Resolved, or No longer applicable based on direct current evidence, does not duplicate active feedback, and allows genuinely new findings. On GitHub it posts and verifies a new visible generation, recreates active findings with their stable IDs, then applies the required prior-generation lifecycle. On another host, the original report and its own inline findings are updated in place when supported; otherwise, the agent posts exactly one timestamped root report that says it supersedes and links to the original. The report explicitly identifies itself as a re-review, gives an updated verdict justified by previous findings that were fixed, persisted, or newly found, strikes resolved/no-longer-applicable findings instead of deleting them, and adds the emoji History section immediately after Testing with timestamped original and re-review cards containing review references, verdicts, findings summaries, and statuses.",
       "files": []
     },
     {
@@ -93,7 +93,7 @@
     },
     {
       "id": 16,
-      "prompt": "inside super.engineering, re-review https://github.com/acme/widgets/pull/42 and update the prior Otterbot comments",
+      "prompt": "inside super.engineering, re-review https://github.com/acme/widgets/pull/42 after a new code commit and update the prior Otterbot comments",
       "expected_output": "The host-provider review remains the mandatory PR delivery target. For the supplemental super.engineering surface, the agent lists in-app comments and identifies every attributable prior-generation comment whose provider is `otterbot-review`, including Council roots, inline findings, and replies. It preserves their metadata and cumulative History, then archives every one with `sc worktree review-reply <comment_id> --provider otterbot-review --resolve`; this marks the old in-app generation as superseded and does not imply that its findings were fixed. After confirming all old Otterbot comments are resolved, it creates exactly one new root comment containing the complete current Council report and cumulative chronological History. It then recreates only current active source-specific findings as inline comments, retaining stable finding IDs for continued issues. It never posts the new Council report as a reply to an old root, leaves no prior-generation Otterbot comment active, and never alters another provider's or author's comment. If archival or new-root delivery fails, it reports the failure and does not claim that only the newest generation is visible.",
       "files": []
     },
@@ -129,14 +129,38 @@
     },
     {
       "id": 22,
-      "prompt": "re-review https://github.com/acme/widgets/pull/42; write the Council report to a temporary file before submitting it",
+      "prompt": "re-review https://github.com/acme/widgets/pull/42 after a changed code commit; write the Council report to a temporary file before submitting it",
       "expected_output": "The agent serializes the complete report content into the host review/comment body; it never submits a filename, an `@path` token, or another file reference as the body. It fetches the created or updated review and verifies that its body begins with the Otterbot marker and contains the Council heading, Summary, and Verdict. When it has to submit a superseding formal review, it dismisses the prior attributable formal review after the new review is verified when the host supports dismissal and permission allows it, then verifies that dismissal. If either correction or dismissal is unavailable, it reports that limitation instead of claiming the old review is hidden or the report was delivered correctly.",
       "files": []
     },
     {
       "id": 23,
-      "prompt": "re-review https://github.com/acme/widgets/pull/42 and make sure only the newest Otterbot review comments remain visible",
+      "prompt": "re-review https://github.com/acme/widgets/pull/42 after a changed code commit and make sure only the newest Otterbot review comments remain visible",
       "expected_output": "The agent treats the re-review as a new visible GitHub generation. It collects GraphQL node IDs only for attributable prior Otterbot IssueComments and PullRequestReviewComments, delivers and verifies the new Council review and current inline findings first, and recreates any continued finding with its stable `otterbot-finding` ID. It then actually runs `gh api graphql` with the `minimizeComment` mutation and `classifier: OUTDATED` once for every collected prior Council root, inline finding, and Otterbot reply. It verifies every response reports `isMinimized: true` and `minimizedReason: \"OUTDATED\"`, refetches the PR discussion, and reports any comment that could not be hidden instead of claiming success. It never minimizes another author's comment. Any obsolete PullRequestReview state is dismissed separately because a formal review is not a minimizable comment; thread resolution or dismissal never substitutes for minimizing the old comments.",
+      "files": []
+    },
+    {
+      "id": 24,
+      "prompt": "re-review https://github.com/acme/widgets/pull/42, but no commits have changed since the last Otterbot review",
+      "expected_output": "The agent identifies the newest attributable Otterbot Council review and compares its full reviewed head SHA with the current full head SHA. Because they match, it exits successfully before fetching or inspecting the diff, running tests or specialists, or mutating any review, comment, thread, or formal review state. It returns only a concise no-review-needed result containing the existing review URL/ID and SHA. It creates no new Council generation, verdict, inline finding, History entry, reply, resolution, minimization, or dismissal.",
+      "files": []
+    },
+    {
+      "id": 25,
+      "prompt": "re-review https://github.com/acme/widgets/pull/42 after a force-push changed the head SHA but not any file content",
+      "expected_output": "The agent sees different full head SHAs, obtains read-only compare evidence, and verifies that the effective file-content diff is empty. A SHA change alone is not sufficient, so it exits without analysis or delivery, identifies both SHAs and the existing review reference, and creates no duplicate Otterbot review.",
+      "files": []
+    },
+    {
+      "id": 26,
+      "prompt": "re-review https://github.com/acme/widgets/pull/42; a prior legacy Otterbot review exists but its reviewed head cannot be determined",
+      "expected_output": "The agent fails closed because it cannot prove which revision the prior attributable review covered. It does not inspect the diff or post, edit, resolve, minimize, dismiss, or reply to anything. It reports the unverifiable prior revision and existing review reference rather than risking a duplicate review.",
+      "files": []
+    },
+    {
+      "id": 27,
+      "prompt": "re-review https://github.com/acme/widgets/pull/42 after a commit changed src/billing.ts",
+      "expected_output": "The agent identifies the newest attributable reviewed head, verifies that the current head differs, and obtains compare evidence proving a non-empty effective content change in src/billing.ts. Only after that proof does it fetch and inspect the full PR context, run the complete council, and execute the normal re-review delivery and freshness lifecycle.",
       "files": []
     }
   ]
