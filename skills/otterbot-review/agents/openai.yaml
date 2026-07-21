@@ -1,0 +1,4 @@
+interface:
+  display_name: "Otterbot Review"
+  short_description: "Adversarial principal-architect code review"
+  default_prompt: "Use $otterbot-review to perform a merge-readiness review of this pull request: PR_URL."

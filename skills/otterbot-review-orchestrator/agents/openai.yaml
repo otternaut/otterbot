@@ -1,0 +1,4 @@
+interface:
+  display_name: "Otterbot Review Orchestrator"
+  short_description: "Review changed PRs that require review"
+  default_prompt: "Use $otterbot-review-orchestrator to review changed, fresh, non-draft pull requests currently requiring review in this GitHub repository: REPO_URL."

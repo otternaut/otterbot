@@ -1,7 +1,7 @@
 # Worked examples
 
-Three complete, end-to-end examples of this skill's output — an initial PR
-review, a PR re-review, and a local review.
+Four end-to-end examples of this skill's behavior — an initial PR review, an
+unchanged-PR no-op, a changed-PR re-review, and a local review.
 These are illustrative (the PR/repo don't exist); they show the level of
 specificity and the exact formatting expected, not just the shape.
 
@@ -183,7 +183,31 @@ defeats the ticket's purpose — worth a fix before merge, not a fast-follow.
 > - **Fix:** Pull from the existing `config/limits.ts`, matching the pattern used for the API rate limiter.
 ```
 
-## Example 2: PR re-review mode
+## Example 2: Unchanged PR no-op
+
+**User:** "re-review https://github.com/acme/payhub/pull/142"
+
+**What happens:** the newest attributable Otterbot Council marker records head
+`8b2c6e1d4a9f7c3b5e0d1a8c6f2b9e4d7a3c1f0e`, and the PR's current full head
+SHA is the same value. The agent exits before fetching or inspecting the diff,
+running specialists or tests, or mutating any review, comment, thread, or
+formal review state. It returns only:
+
+```text
+No review needed — unchanged since
+https://github.com/acme/payhub/pull/142#pullrequestreview-100 at
+8b2c6e1d4a9f7c3b5e0d1a8c6f2b9e4d7a3c1f0e.
+```
+
+No new Council report, inline finding, History entry, approval, changes
+request, reply, resolution, minimization, or dismissal is created.
+
+If the current SHA differed only because the commits were rebased while the
+effective file-content comparison was empty, the result would still be a
+no-op and would identify both compared SHAs. If the prior head or comparison
+could not be verified, the agent would fail closed and post nothing.
+
+## Example 3: PR re-review mode
 
 **User:** "re-review https://github.com/acme/payhub/pull/142"
 
@@ -347,7 +371,7 @@ Council root containing the cumulative History above, then recreates the active
 Medium and Low findings as current-generation inline comments. The fixed High
 finding remains in History but does not get a new inline thread.
 
-## Example 3: Local review mode
+## Example 4: Local review mode
 
 **User:** "review my changes before I open a PR"
 

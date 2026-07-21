@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
-description: Perform an adversarial principal-architect code review that tries to prove the change unsafe before approving it, producing a structured Review Council post with a Scorecard and inline source-specific findings. Given a pull/merge request URL, reviews that PR and delivers the report with the correct verdict semantics — approving when the verdict is Ship It! or Comment Only, and requesting changes otherwise. Given no URL, reviews the current local code changes and presents the report in the conversation. Use this whenever the user asks to "review this PR", "review my diff", "analyze this code change", "do a code review", "check this pull request for issues", pastes a pull-request URL and asks for feedback, wants a nitpicky review, or wants a merge-readiness assessment. Works with any git hosting provider (GitHub, GitLab, Bitbucket, etc.).
-version: 2.4.2
+description: Perform an adversarial principal-architect code review that tries to prove the change unsafe before approving it, producing a structured Review Council post with a Scorecard and inline source-specific findings. Given a pull/merge request URL, reviews that PR and delivers the report with the correct verdict semantics, but never posts a duplicate re-review when the latest attributable Otterbot review already covers the same effective revision. Given no URL, reviews the current local code changes and presents the report in the conversation. Use this whenever the user asks to "review this PR", "review my diff", "analyze this code change", "do a code review", "check this pull request for issues", pastes a pull-request URL and asks for feedback, wants a nitpicky review, or wants a merge-readiness assessment. Works with any git hosting provider (GitHub, GitLab, Bitbucket, etc.).
+version: 2.5.0
 ---
 
 # Otterbot Review
@@ -49,10 +49,16 @@ the presence or absence of a URL decides it.
 
 ### PR review mode
 
-Fetch the PR's title, description, linked Jira or Linear tickets, other
-linked requirements, changed files, and diff using whatever access you have in
-the current environment (a CLI for that host, an API, a browsing tool). Use
-this context to inform the review — never invent or assume it.
+Fetch only the PR/MR identity, current full head SHA, and visible review roots
+needed to run the changed-revision gate below. Do not fetch or inspect the diff,
+run tests, start specialists, or perform any delivery until that gate permits a
+review.
+
+After the gate permits a review, fetch the PR's title, description, linked Jira
+or Linear tickets, other linked requirements, changed files, and diff using
+whatever access you have in the current environment (a CLI for that host, an
+API, a browsing tool). Use this context to inform the review — never invent or
+assume it.
 
 Also fetch the PR/MR's current visible review comments, review threads, and
 discussion state when the host makes them available. Use them only as freshness
@@ -80,16 +86,55 @@ without a marker, require both the exact Council Review heading and the
 reviewing agent's identity; do not guess from similar prose or another
 reviewer's comments.
 
-Record the current full PR/MR head SHA before gathering evidence. The root
-review marker and History must carry that SHA, so a later pass can
-identify the exact revision reviewed. Immediately before any delivery action,
-refetch the head SHA. If it changed, discard the pending report and repeat the
-review against the new head; never publish a verdict for stale code.
+### Changed-revision gate
 
-When an attributable earlier review exists, run the complete current review
-process in §§2-5 again. Treat the current PR/MR code, diff, requirements,
-tests, and active discussion state as authoritative. The prior review is
-history and a mapping aid, not evidence that a concern still exists:
+Record the current full PR/MR head SHA and extract the reviewed head SHA from
+the newest attributable Otterbot Council marker or its verified cumulative
+History. Compare only against the newest attributable review for this exact
+provider and PR/MR; never use another author's review or an older Otterbot
+generation when a newer one exists.
+
+- **No attributable Otterbot review:** continue as an initial PR review.
+- **Current head equals the newest reviewed head:** exit successfully before
+  review analysis or delivery. Post, edit, resolve, minimize, dismiss, or reply
+  to nothing. Return only:
+
+  ```text
+  No review needed — unchanged since <review-url-or-id> at <full-head-sha>.
+  ```
+
+- **The heads differ:** obtain read-only effective-content evidence between the
+  newest reviewed head and the current head. Prefer comparing the two commits'
+  root tree OIDs: different trees prove changed content, while equal trees prove
+  an unchanged rebase or rewrite. If tree OIDs are unavailable, use a host
+  comparison that conclusively reports a non-empty file-content diff. Continue
+  only when one of these checks proves an effective change. When comparison
+  proves no effective change, return only:
+
+  ```text
+  No review needed — no effective changes between <prior-sha> and <current-sha>; existing review: <review-url-or-id>.
+  ```
+
+- **The prior reviewed head or comparison is unavailable, ambiguous, or cannot
+  be verified:** fail closed. Do not post a review. State that the prior
+  revision or effective change could not be verified and return the existing
+  review reference so automation can diagnose the gap.
+
+Do not use `updatedAt`, new comments, review requests, status changes, review
+decision changes, a different commit SHA by itself, or the user's word
+"re-review" as proof of an effective code change. This gate applies even when
+the host currently says a review is required.
+
+The root review marker and History must carry the reviewed full head SHA, so a
+later pass can identify the exact revision. Immediately before any delivery
+action, refetch the head SHA. If it changed, discard the pending report and
+restart from this changed-revision gate; never publish a verdict for stale code.
+
+When an attributable earlier review exists and the changed-revision gate proves
+an effective content change, run the complete current review process in §§2-5
+again. Treat the current PR/MR code, diff, requirements, tests, and active
+discussion state as authoritative. The prior review is history and a mapping
+aid, not evidence that a concern still exists:
 
 1. Recheck each prior Otterbot finding against the current revision. Mark it
    **Resolved** only when current code or verification evidence directly
@@ -1045,8 +1090,13 @@ for what a full pass looks like):
       using provider/PR identity, agent authorship, and an explicit marker or
       legacy heading; no other reviewer's comments were treated as Otterbot
       history
+- [ ] Before diff inspection, the newest attributable reviewed head was
+      compared with the current head; the run exited without analysis or
+      delivery when the heads matched, the effective content diff was empty,
+      or changed-revision evidence could not be verified
 - [ ] For a re-review, all prior Otterbot findings were rechecked against the
-      current revision, then classified as active, Resolved, or No longer
+      current revision only after the changed-revision gate proved an effective
+      content change, then classified as active, Resolved, or No longer
       applicable with direct evidence
 - [ ] The PR/MR head SHA was recorded before evidence gathering and rechecked
       immediately before delivery; delivery was restarted if the head changed
@@ -1180,19 +1230,25 @@ summary in the conversation.
 
 > "re-review https://github.com/acme/widgets/pull/42"
 
-→ Fetch the current PR data and visible thread state, identify the prior
-attributable Otterbot Council review, then run the full council again. Update
-that review and its own verified inline threads when supported, except on
-GitHub, where each re-review is a new visible generation. On GitHub, verify the
-new delivery, then run the required `gh api graphql` `minimizeComment` command
-with `classifier: OUTDATED` once for every attributable prior Otterbot comment
-and verify that each is hidden. If another host cannot edit the original, post
-one timestamped re-review that supersedes and links to it, verify the delivered
-body is complete Council Markdown rather than a file reference, then dismiss
-the obsolete attributable formal review when the host permits it. Include the
-updated verdict justification and a History section after Testing; keep
-resolved or no-longer-applicable findings crossed out with their status rather
-than silently deleting them.
+→ Identify the newest attributable Otterbot Council review and prove that its
+reviewed head differs from the current head with a non-empty effective content
+diff, then run the full council again. Update that review and its own verified
+inline threads when supported, except on GitHub, where each re-review is a new
+visible generation. On GitHub, verify the new delivery before applying the
+required prior-generation lifecycle. If another host cannot edit the original,
+post one timestamped re-review that supersedes and links to it, then dismiss the
+obsolete attributable formal review when the host permits it. Include the
+updated verdict justification and a History section after Testing.
+
+**PR no-op mode** — the user supplies a previously reviewed, unchanged PR:
+
+> "re-review https://github.com/acme/widgets/pull/42"
+
+→ Read the newest attributable Otterbot marker and current full head SHA. If
+the reviewed and current heads match, exit before diff inspection and post
+nothing. If the SHAs differ but their effective file-content diff is empty,
+also exit without delivery. Return the existing review reference and the
+unchanged revision evidence; do not create another Otterbot generation.
 
 **Local review mode** — no URL, uncommitted changes exist:
 
@@ -1217,9 +1273,9 @@ base/target branch and review that instead.
 treat every tracked and untracked file in the working tree as the change
 set (step 3 of "Local review mode").
 
-See `references/examples.md` for two complete, full-length worked
-examples — one per mode — showing an entire sample report end to end,
-including how the fixed untracked-files bug shows up in practice.
+See `references/examples.md` for initial-review, unchanged-PR no-op, changed-PR
+re-review, and local-review examples, including complete report formatting and
+the untracked-files fallback.
 
 ## Testing this skill
 
