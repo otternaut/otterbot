@@ -29,32 +29,58 @@ excluded PR enters a review context.
 **Coordinator result:**
 
 ```markdown
-### Otterbot review sweep · acme/widgets
+## 🦦 Otterbot Review Sweep · acme/widgets
 
-Run start: 2026-07-20T15:00:00Z · Stale cutoff: 2026-07-06T15:00:00Z
-Candidates: 7 · Eligible at snapshot: 2 · Workers started: 2
-Excluded: closed/merged 0 · draft 1 · review not required 1 · stale label 1 ·
-inactive 14+ days 1 · unchanged 1 · change unverified 0
-Delivered: 2 · No review needed after snapshot: 0 · Skipped after snapshot: 0 ·
-Failed: 0 · Uncertain: 0
+Two reviews were posted and verified. PR #7 needs changes; PR #104 received
+Otterbot's Ship It! verdict.
 
-#### PR #7 · Fix duplicate webhook delivery
+### ⏱️ Run details
 
-- PR: https://github.com/acme/widgets/pull/7
-- Status: Delivered
-- Head: `47a031bd7b20a9f7a91d60dc123e22ef59074999`
-- Verdict: Request Changes
-- Review: https://github.com/acme/widgets/pull/7#pullrequestreview-501
-- Inline findings: 2
+- Started: 2026-07-20T15:00:00Z
+- Stale cutoff: 2026-07-06T15:00:00Z (14 days)
+- Candidates checked: 7
+- Eligible at snapshot: 2 · Workers started: 2
 
-#### PR #104 · Remove legacy retry worker
+### 🔎 Queue audit
 
-- PR: https://github.com/acme/widgets/pull/104
-- Status: Delivered
-- Head: `bb5b73ce6c5bd0cb9d3d301f9d41bf7925cda8d7`
-- Verdict: Ship It!
-- Review: https://github.com/acme/widgets/pull/104#pullrequestreview-503
-- Inline findings: 0
+- Excluded before review: closed/merged 0 · draft 1 · review not required 1 ·
+  stale label 1 · inactive 14+ days 1 · unchanged 1 · change unverified 0
+- Final job status: ✅ delivered 2 · ⏭️ no review needed 0 · ⏸️ skipped 0 ·
+  ❌ failed 0 · ⚠️ uncertain 0
+- Delivered verdicts: 🚢 Ship It! 1 · 💬 Comment Only 0 · ⚠️ Request Changes 1
+
+### 📋 Pull request results
+
+#### ✅ PR #7 · Fix duplicate webhook delivery
+
+- **Status:** Delivered
+- **Pull request:** https://github.com/acme/widgets/pull/7
+- **Reviewed head:** `47a031bd7b20a9f7a91d60dc123e22ef59074999`
+- **Verdict:** ⚠️ Request Changes
+- **Review:** https://github.com/acme/widgets/pull/7#pullrequestreview-501
+- **Findings:** 2 inline; high 1 · medium 1
+- **Outcome:** The webhook path can still deliver the same event twice after a
+  retry, so changes are required before merge.
+- **Testing & verification:** Existing unit coverage was inspected; retry and
+  duplicate-delivery behavior still needs a regression test.
+
+#### ✅ PR #104 · Remove legacy retry worker
+
+- **Status:** Delivered
+- **Pull request:** https://github.com/acme/widgets/pull/104
+- **Reviewed head:** `bb5b73ce6c5bd0cb9d3d301f9d41bf7925cda8d7`
+- **Verdict:** 🚢 Ship It!
+- **Review:** https://github.com/acme/widgets/pull/104#pullrequestreview-503
+- **Findings:** 0 inline; no actionable findings
+- **Outcome:** The removal preserves the remaining retry path and no
+  merge-blocking concern was found.
+- **Testing & verification:** Focused tests passed and the affected callers
+  were inspected.
+
+### 🧭 Follow-up
+
+PR #7 needs the two requested fixes and a regression test; rerun the sweep once
+those changes are pushed.
 ```
 
 The coordinator does not reproduce the Council reports, compare their scores,
@@ -75,43 +101,64 @@ Discovery finds three fresh, ready, review-required PRs: #21, #22, and #30.
   result is `Failed`.
 
 ```markdown
-### Otterbot review sweep · acme/payhub
+## 🦦 Otterbot Review Sweep · acme/payhub
 
-Run start: 2026-07-20T15:00:00Z · Stale cutoff: 2026-07-06T15:00:00Z
-Candidates: 3 · Eligible at snapshot: 3 · Workers started: 2
-Excluded: closed/merged 0 · draft 0 · review not required 0 · stale label 0 ·
-inactive 14+ days 0 · unchanged 0 · change unverified 0
-Delivered: 1 · No review needed after snapshot: 0 · Skipped after snapshot: 1 ·
-Failed: 1 · Uncertain: 0
+One review was posted. PR #22 no longer required review, and PR #30 needs a
+later retry because its review worker could not start.
 
-#### PR #21 · Add payout reconciliation
+### ⏱️ Run details
 
-- PR: https://github.com/acme/payhub/pull/21
-- Status: Delivered
-- Head: `0a226e03541fcf4767730264f381cf21a53f2055`
-- Verdict: Comment Only
-- Review: https://github.com/acme/payhub/pull/21#pullrequestreview-800
-- Inline findings: 1
+- Started: 2026-07-20T15:00:00Z
+- Stale cutoff: 2026-07-06T15:00:00Z (14 days)
+- Candidates checked: 3
+- Eligible at snapshot: 3 · Workers started: 2
 
-#### PR #22 · Update settlement schedule
+### 🔎 Queue audit
 
-- PR: https://github.com/acme/payhub/pull/22
-- Status: Skipped
-- Head: `bb2a16467853f2445c5ed6a5a0da1b8d61f160e9`
-- Verdict: Not produced
-- Review: Not delivered
-- Inline findings: 0
-- Note: Eligibility changed to reviewDecision=APPROVED before worker creation.
+- Excluded before review: closed/merged 0 · draft 0 · review not required 0 ·
+  stale label 0 · inactive 14+ days 0 · unchanged 0 · change unverified 0
+- Final job status: ✅ delivered 1 · ⏭️ no review needed 0 · ⏸️ skipped 1 ·
+  ❌ failed 1 · ⚠️ uncertain 0
+- Delivered verdicts: 🚢 Ship It! 0 · 💬 Comment Only 1 · ⚠️ Request Changes 0
 
-#### PR #30 · Harden webhook verification
+### 📋 Pull request results
 
-- PR: https://github.com/acme/payhub/pull/30
-- Status: Failed
-- Head: `09b629e9317acb33c09847bbc91e45cd70a50514`
-- Verdict: Not produced
-- Review: Not delivered
-- Inline findings: Unknown
-- Note: The worker could not load the required otterbot-review skill.
+#### ✅ PR #21 · Add payout reconciliation
+
+- **Status:** Delivered
+- **Pull request:** https://github.com/acme/payhub/pull/21
+- **Reviewed head:** `0a226e03541fcf4767730264f381cf21a53f2055`
+- **Verdict:** 💬 Comment Only
+- **Review:** https://github.com/acme/payhub/pull/21#pullrequestreview-800
+- **Findings:** 1 inline; low 1
+- **Outcome:** The reconciliation path is acceptable; one non-blocking
+  maintainability note was posted.
+- **Testing & verification:** Focused reconciliation tests passed.
+
+#### ⏸️ PR #22 · Update settlement schedule
+
+- **Status:** Skipped
+- **Pull request:** https://github.com/acme/payhub/pull/22
+- **Reviewed head:** `bb2a16467853f2445c5ed6a5a0da1b8d61f160e9`
+- **Verdict:** Not produced
+- **Review:** Not delivered
+- **Needs attention:** Eligibility changed to `reviewDecision=APPROVED` before
+  worker creation, so no review was posted.
+
+#### ❌ PR #30 · Harden webhook verification
+
+- **Status:** Failed
+- **Pull request:** https://github.com/acme/payhub/pull/30
+- **Reviewed head:** `09b629e9317acb33c09847bbc91e45cd70a50514`
+- **Verdict:** Not produced
+- **Review:** Not delivered
+- **Needs attention:** The worker could not load the required `otterbot-review`
+  skill. No review was posted; retry after the skill is available.
+
+### 🧭 Follow-up
+
+No action is needed for PR #22. Restore the worker's `otterbot-review` skill
+before retrying PR #30 on the next run.
 ```
 
 ## Example 3: No eligible pull requests
@@ -127,16 +174,25 @@ successful zero-job run; the coordinator creates or waits for no workers,
 invokes no review skill, and returns:
 
 ```markdown
-### Otterbot review sweep · acme/quiet-repo
+## 🦦 Otterbot Review Sweep · acme/quiet-repo
 
-Run start: 2026-07-20T15:00:00Z · Stale cutoff: 2026-07-06T15:00:00Z
-Candidates: 5 · Eligible at snapshot: 0 · Workers started: 0
-Excluded: closed/merged 0 · draft 2 · review not required 1 · stale label 0 ·
-inactive 14+ days 1 · unchanged 1 · change unverified 0
-Delivered: 0 · No review needed after snapshot: 0 · Skipped after snapshot: 0 ·
-Failed: 0 · Uncertain: 0
+No pull requests require an Otterbot review. No workers were started.
 
-No pull requests require an Otterbot review. Exiting.
+### ⏱️ Run details
+
+- Started: 2026-07-20T15:00:00Z
+- Stale cutoff: 2026-07-06T15:00:00Z (14 days)
+- Candidates checked: 5
+- Eligible at snapshot: 0 · Workers started: 0
+
+### 🔎 Queue audit
+
+- Excluded before review: closed/merged 0 · draft 2 · review not required 1 ·
+  stale label 0 · inactive 14+ days 1 · unchanged 1 · change unverified 0
+- Final job status: ✅ delivered 0 · ⏭️ no review needed 0 · ⏸️ skipped 0 ·
+  ❌ failed 0 · ⚠️ uncertain 0
+
+All candidates were filtered before review. Exiting successfully.
 ```
 
 ## Example 4: Invalid input
