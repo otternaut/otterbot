@@ -386,7 +386,7 @@ Use this shape, omitting fields that are unavailable or do not apply:
 ```
 
 For delivered reviews, use Ollie's verdict emojis exactly: 🚢 **Ship It!**,
-👍 **Needs a Human**, 💬 **Comment Only**, and ⚠️ **Request Changes**. Do not use a generic
+🙋 **Needs a Human**, 💬 **Comment Only**, and ⚠️ **Request Changes**. Do not use a generic
 `Delivered` label or `✅` on a delivered PR card. Use `⏭️`, `⏸️`, `❌`, and
 `⚠️` for No Review Needed, Skipped, Failed, and Uncertain respectively. In the
 queue, list only nonzero exclusion reasons and nonzero final statuses; omit the

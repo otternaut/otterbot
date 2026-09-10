@@ -171,7 +171,7 @@ not posted. Suggestion must be a specific change, never "clean this up".
 | Verdict | Host state | When |
 | --- | --- | --- |
 | 🚢 Ship It! | approved | Nothing open above nitpick and every gate rule passes |
-| 👍 Needs a Human | comment | Nothing open above nitpick, but a gate rule failed; the summary names the first failed rule |
+| 🙋 Needs a Human | comment | Nothing open above nitpick, but a gate rule failed; the summary names the first failed rule |
 | 💬 Comment Only | comment | At least one open minor, nothing above minor |
 | ⚠️ Request Changes | changes requested | At least one open critical or major |
 
