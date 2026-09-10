@@ -116,7 +116,8 @@ withdrawn &middot; my mistake: <what Ollie got wrong and the code that shows it>
 - **Convergence.** New findings on a re-review anchor to the interdiff, except
   a critical or major posted with "missed in an earlier round, my mistake". No
   new nitpicks after round one. One reply per thread per round. From round four
-  on, only criticals are new findings and a clean review is Needs Eyes.
+  on, only criticals are new findings and a clean review is Comment Only
+  with "Not approving because four rounds in" in the blurb.
 
 ## Reply conventions developers can use
 
@@ -155,6 +156,18 @@ bodies.
 Every finding marker carries `level` and `category`; every reply carries an
 `ollie-status`. Fix rate per level and category across a repository is a
 matter of collecting review comments and counting markers, with no toolchain
-required. Per-level fix rate is the primary signal for calibration: if minors
-are rarely fixed, they are probably nitpicks; if nitpicks are always fixed,
-some of them are probably minors.
+required. Three ratios matter:
+
+- **Fix rate per level** is the calibration signal: if minors are rarely
+  fixed, they are probably nitpicks; if nitpicks are always fixed, some of
+  them are probably minors.
+- **Withdrawn rate per level** is the precision signal. If it climbs after a
+  change to the process, verification in stage 2 is too loose.
+- **Findings per review against fix rate** is the volume signal: if the
+  budget is being hit and fix rate holds, the budget is right; if fix rate
+  falls as volume rises, the budget is too generous.
+
+Procedure: list Ollie's review comments on the repository, parse the
+`ollie-finding` marker from each thread's first comment and the last
+`ollie-status` marker from its replies, and tabulate. Run it after a few
+weeks on a new version before changing thresholds again.

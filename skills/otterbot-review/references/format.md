@@ -9,9 +9,9 @@ the examples are invented; the level of specificity is the point.
 ## Root comment
 
 ```markdown
-<!-- ollie-review: head: <full-sha>; base: <full-sha>; verdict: <ship-it|needs-context|needs-eyes|comment-only|request-changes>; gate: <pass|first failed rule>; round: <n> -->
+<!-- ollie-review: head: <full-sha>; base: <full-sha>; verdict: <ship-it|comment-only|request-changes>; gate: <pass|first failed rule>; round: <n> -->
 
-**<🚢|📝|👀|💬|⚠️> Ollie's Verdict &middot; <Ship It!|Needs Context|Needs Eyes|Comment Only|Request Changes>**
+**<🚢|💬|⚠️> Ollie's Verdict &middot; <Ship It|Comment Only|Request Changes>**
 
 <Decision justification and relevant technical evidence.>
 
@@ -30,16 +30,18 @@ Rules:
 - The banner comes first in bold: the verdict emoji, `Ollie's Verdict
   &middot;`, and the verdict, all wrapped in `**`. Omit alert-type markers and a separate
   PR title heading.
-- The verdict always carries its emoji: 🚢 Ship It!, 📝 Needs Context, 👀 Needs
-  Eyes, 💬 Comment Only, ⚠️ Request Changes.
+- The verdict always carries its emoji: 🚢 Ship It, 💬 Comment Only,
+  ⚠️ Request Changes. Older reviews may carry the retired `needs-context` and
+  `needs-eyes` slugs; read them as Comment Only.
 - The banner holds only the verdict emoji, Ollie's Verdict label, and verdict. Never
   append a `since` clause, commit list, or any other text. The summary stays
   outside it.
 - The blurb justifies the decision, leading with why that verdict applies
   and including relevant technical evidence. Explain blocking behavior or
-  minor volume for Request Changes, remaining issues for Comment Only,
-  failed gate rules for Needs Eyes or Needs Context, and the evidence that
-  supports confidence for Ship It! Include relevant code behavior, failure
+  minor volume for Request Changes, remaining issues for Comment Only, and
+  the evidence that supports confidence for Ship It. A Comment Only with no
+  open finding opens with `Not approving because <rule>` and names every
+  failed gate rule. Include relevant code behavior, failure
   conditions, test results, and verification limits. Keep it focused, with no
   fixed sentence or word limit; full finding details stay in inline comments.
 - On a re-review the banner is identical to an initial review. The paragraph
@@ -186,12 +188,11 @@ Root comment, submitted as a changes-requested review:
 Changes are required because the per-merchant Redis limiter on `POST /webhooks` has two blocking flaws: the bucket key comes from a client-controlled header, and the check-and-increment is two round trips, so bursts slip past the cap PAY-881 asks for.
 
 <details>
-<summary>Advisory Findings &middot; 4</summary>
+<summary>Advisory Findings &middot; 3</summary>
 
 - **security(critical)** &middot; [Rate-limit key is taken from the unauthenticated `X-Merchant-Id` header, so any caller can pick whose bucket they drain](https://github.com/acme/payhub/pull/142#discussion_r9001)
 - **correctness(major)** &middot; [Check and increment are two round trips, so concurrent requests bypass the cap](https://github.com/acme/payhub/pull/142#discussion_r9002)
 - **reliability(minor)** &middot; [A Redis error propagates as a 500, so an outage takes webhooks down instead of failing open or closed on purpose](https://github.com/acme/payhub/pull/142#discussion_r9003)
-- **maintainability(nitpick)** &middot; [The `50` and `60_000` literals belong in `config/limits.ts` next to the other quotas](https://github.com/acme/payhub/pull/142#discussion_r9004)
 
 </details>
 
@@ -249,23 +250,8 @@ Inline comment on `src/webhooks/handler.ts:88`:
 <sub>🦦 Ollie reviewed `8b2c6e1` &middot; floated by, poked at everything &middot; [how Ollie reviews](https://github.com/otternaut/otterbot/blob/main/skills/otterbot-review/references/for-developers.md)</sub>
 ```
 
-Inline comment on `src/webhooks/rateLimiter.ts:12`:
-
-```markdown
-<!-- ollie-finding: limit-constants-config; level: nitpick; category: maintainability; head: 8b2c6e1d4a9f7c3b5e0d1a8c6f2b9e4d7a3c1f0e -->
-🔵 **maintainability(nitpick)** &middot; The `50` and `60_000` literals belong in `config/limits.ts` next to the other quotas
-
-**Why** &middot; `src/webhooks/rateLimiter.ts:12-13` (added in `8b2c6e1`) declares `LIMIT = 50` and `WINDOW_MS = 60_000` locally. Every other quota in the service lives in `src/config/limits.ts`, and `test/config.test.ts` asserts that file against the env overrides.
-
-**Risk** &middot; None to correctness. The next person tuning quotas will look in `limits.ts`, miss these, and the two files will drift.
-
-**Suggestion** &middot; Export `WEBHOOK_RATE_LIMIT` and `WEBHOOK_RATE_WINDOW_MS` from `config/limits.ts` with the same env override pattern and import them here.
-
-<sub>🦦 Ollie reviewed `8b2c6e1` &middot; left no pebble unturned &middot; [how Ollie reviews](https://github.com/otternaut/otterbot/blob/main/skills/otterbot-review/references/for-developers.md)</sub>
-```
-
 In conversation Ollie then reports the review URL, the verdict, and the tally:
-1 critical, 1 major, 1 minor, 1 nitpick, all inline.
+1 critical, 1 major, 1 minor, all inline.
 
 ## Example 2: re-review after fixes
 
@@ -273,10 +259,9 @@ In conversation Ollie then reports the review URL, the verdict, and the tally:
 
 The freshness gate finds the review above at `8b2c6e1` and a new head
 `d7f4a9c` with a different tree. Three commits landed. The author replied on
-the Redis thread "we want this to fail open" and on the constants thread
-"@ollie defer PAY-902". Ollie reviews the interdiff, classifies every prior
-thread, and finds one new minor in the new test, which is inside the
-interdiff.
+the Redis thread "we want this to fail open". Ollie reviews the interdiff,
+classifies every prior thread, and finds one new minor in the new test, which
+is inside the interdiff.
 
 Root comment, submitted as a comment-state review, after which Ollie dismisses
 its own earlier changes-requested review with `Blockers fixed in d7f4a9c, see
@@ -290,12 +275,11 @@ https://github.com/acme/payhub/pull/142#pullrequestreview-7002`:
 Comment Only applies because both blockers are fixed and resolved, with two minors remaining. The Redis failure mode is still implicit: fail-open is the right call, as you said, but `handler.ts:88` still throws. One new minor: the parallel test never asserts a rejection, so it passes with the limiter disabled.
 
 <details>
-<summary>Advisory Findings &middot; 2 fixed &middot; 1 deferred &middot; 1 open &middot; 1 new</summary>
+<summary>Advisory Findings &middot; 2 fixed &middot; 1 open &middot; 1 new</summary>
 
 - **security(critical)** &middot; [Rate-limit key is taken from the unauthenticated header](https://github.com/acme/payhub/pull/142#discussion_r9001) &middot; fixed in `a1b2c3d`
 - **correctness(major)** &middot; [Check and increment are two round trips](https://github.com/acme/payhub/pull/142#discussion_r9002) &middot; fixed in `e4f5a6b`
 - **reliability(minor)** &middot; [A Redis error propagates as a 500](https://github.com/acme/payhub/pull/142#discussion_r9003) &middot; still open
-- **maintainability(nitpick)** &middot; [Limit literals belong in `config/limits.ts`](https://github.com/acme/payhub/pull/142#discussion_r9004) &middot; deferred
 - **tests(minor)** &middot; [The parallel test asserts at most 50 succeeded but never asserts that any request was rejected, so it passes with the limiter disabled](https://github.com/acme/payhub/pull/142#discussion_r9105)
 
 </details>
@@ -320,17 +304,12 @@ fixed in `e4f5a6b` &middot; a single `INCR` with `EXPIRE` on first hit closes th
 still open as of `d7f4a9c` &middot; agreed on fail-open, but `handler.ts:88` still has no catch, so a rejected Redis call still reaches the 500 mapper. Once the catch and counter land this can close.
 ```
 
-```markdown
-<!-- ollie-status: deferred -->
-deferred to PAY-902 &middot; fine as a follow-up since it has no runtime effect.
-```
-
-The two fixed threads and the deferred thread are resolved. The still-open
+The two fixed threads are resolved. The still-open
 thread stays open. Two minors are open, so the verdict is Comment Only. The
 new minor is posted as a normal inline comment on
 `test/rateLimiter.test.ts:88`. In conversation Ollie reports the new review
 URL, the verdict, the dismissal of its prior review, and the tally: 2 fixed,
-1 deferred, 1 still open, 1 new.
+1 still open, 1 new.
 
 ## Example 3: local review
 
@@ -375,7 +354,7 @@ Root comment, submitted as an approval:
 ```markdown
 <!-- ollie-review: head: 5c1e9a7b3d2f8e6a0c4b7d9f1e3a5c7b9d1f3e5a; base: 3f9a0c2e7b1d5a8c4e6f0b2d9a1c3e5f7b9d1a3c; verdict: ship-it; gate: pass; round: 1 -->
 
-**🚢 Ollie's Verdict &middot; Ship It!**
+**🚢 Ollie's Verdict &middot; Ship It**
 
 Approval is justified because the change only adds the verified merchant ID to three delivery log lines in `deliver.ts`, using the field name the dashboards already query. The ID comes from the signed event, the extended log-format test covers it, and `npm test` passes. No findings remain and every approval-gate rule passes.
 

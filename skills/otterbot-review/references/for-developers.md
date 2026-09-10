@@ -35,8 +35,11 @@ footer is Ollie being an otter; it changes every time and means nothing.
 | minor | 🟡 | An edge case, gap, or accidental behavior unlikely to bite soon | Comment Only |
 | nitpick | 🔵 | Maintainability or consistency, no runtime effect | none |
 
-Ollie caps itself at three nitpicks per review and posts none when there is a
-critical. If a finding feels wrong, say so in the thread; Ollie will re-check
+Ollie budgets its own volume so a review is something you can act on in one
+sitting: every critical and major is posted, but below that it keeps at most
+five minors and three nitpicks, and posts no nitpicks when there is a
+critical. Anything over the budget is dropped, not saved for
+later. If a finding feels wrong, say so in the thread; Ollie will re-check
 and withdraw it if you are right.
 
 The counts matter. One to three open minors is Comment Only. Four or more open
@@ -46,21 +49,24 @@ than two deferrals on one PR means Ollie asks a human to approve instead.
 
 ## The verdicts
 
-- **Ship It!** Ollie approved. Nothing above nitpick is open and every
+- **Ship It.** Ollie approved. Nothing above nitpick is open and every
   approval rule passed.
-- **Needs Context.** Nothing above nitpick is open, but Ollie could not verify
-  what the change is meant to do: the description is empty or one line, the code
-  does more than the description says, or a linked requirement was not readable.
-  Add the context and push, or reply on the root comment.
-- **Needs Eyes.** Nothing above nitpick is open, but Ollie will not approve.
-  The summary says why: the change touches an area that always needs a human
-  approval, such as auth, payments, migrations, CI, or infra; the PR is large; a
-  required check is failing; another reviewer has requested changes; or the
-  primary behavior has no test Ollie could see.
-- **Comment Only.** One to three minors are open. Mergeable at the team's
-  discretion.
+- **Comment Only.** Ollie is not blocking and not approving. Either one to
+  three minors are open, or the code is clean but an approval rule failed, in
+  which case the summary starts with "Not approving because" and says which:
+  the change alters who is authenticated or authorized, how secrets are
+  handled, something irreversible outside the system such as moving money or
+  deleting user data, a migration that cannot be rolled back, or what CI
+  deploys; the PR is large; a required check is failing; another reviewer
+  has requested changes; a critical was fixed but has no covering test yet; or
+  a linked requirement was not readable. Adding a log line or a test in one of
+  those areas does not count. Mergeable at the team's discretion.
 - **Request Changes.** At least one critical or major is open, or four or more
   minors. Fix it, or explain in the thread why it does not apply.
+
+A missing test for the behavior you changed shows up as an ordinary `tests`
+finding on the code, not as a reason to withhold approval, so you can fix it
+like anything else.
 
 Ollie never approves its own PRs, drafts, or dependency-bot PRs, and never
 approves while a human has requested changes.

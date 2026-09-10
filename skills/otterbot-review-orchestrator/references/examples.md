@@ -43,7 +43,7 @@ The webhook path can still deliver the same event twice after a retry.
 - **Verification:** Retry and duplicate-delivery behavior needs a regression
   test.
 
-#### 🚢 Ship It! · [PR #104 · Remove legacy retry worker](https://github.com/acme/widgets/pull/104)
+#### 🚢 Ship It · [PR #104 · Remove legacy retry worker](https://github.com/acme/widgets/pull/104)
 
 The removal preserves the remaining retry path.
 
