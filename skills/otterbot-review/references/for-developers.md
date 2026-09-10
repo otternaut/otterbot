@@ -35,6 +35,11 @@ Ollie caps itself at three nitpicks per review and posts none when there is a
 critical. If a finding feels wrong, say so in the thread; Ollie will re-check
 and withdraw it if you are right.
 
+The counts matter. One to three open minors is Comment Only. Four or more open
+minors is Request Changes, because that many gaps in one change means it is
+not ready. Deferring a minor to a ticket takes it out of the count, but more
+than two deferrals on one PR means Ollie asks a human to approve instead.
+
 ## The verdicts
 
 - **Ship It!** Ollie approved. Nothing above nitpick is open and every
@@ -48,10 +53,10 @@ and withdraw it if you are right.
   approval, such as auth, payments, migrations, CI, or infra; the PR is large; a
   required check is failing; another reviewer has requested changes; or the
   primary behavior has no test Ollie could see.
-- **Comment Only.** One or more minors are open. Mergeable at the team's
+- **Comment Only.** One to three minors are open. Mergeable at the team's
   discretion.
-- **Request Changes.** At least one critical or major is open. Fix it, or
-  explain in the thread why it does not apply.
+- **Request Changes.** At least one critical or major is open, or four or more
+  minors. Fix it, or explain in the thread why it does not apply.
 
 Ollie never approves its own PRs, drafts, or dependency-bot PRs, and never
 approves while a human has requested changes.
@@ -80,6 +85,9 @@ code, and replies on each one with `fixed in <sha>`, `still open as of
 A new root comment summarizes the delta, and Ollie's review state updates so a
 previous Request Changes stops blocking once the blockers are gone.
 
-Ollie does not post the same finding twice and does not re-raise a finding that
-was resolved. If you see something that looks like a repeat, it is a
+Ollie only raises new findings on lines changed since its last review, never
+adds nitpicks after the first round, and after three rounds hands the PR to a
+human. A fix that removes the risk counts even when it is not the fix Ollie
+suggested. Ollie does not post the same finding twice and does not re-raise a
+finding that was resolved. If you see something that looks like a repeat, it is a
 regression of a critical, and the reply will say so.

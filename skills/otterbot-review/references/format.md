@@ -9,7 +9,7 @@ the examples are invented; the level of specificity is the point.
 ## Root comment
 
 ```markdown
-<!-- ollie-review: head: <full-sha>; base: <full-sha>; verdict: <ship-it|needs-context|needs-eyes|comment-only|request-changes>; gate: <pass|first failed rule> -->
+<!-- ollie-review: head: <full-sha>; base: <full-sha>; verdict: <ship-it|needs-context|needs-eyes|comment-only|request-changes>; gate: <pass|first failed rule>; round: <n> -->
 #### 🦦 <PR title exactly as the host reports it> &middot; <Ship It!|Needs Context|Needs Eyes|Comment Only|Request Changes>
 
 <Summary paragraph.>
@@ -49,6 +49,7 @@ Rules:
   new`, and each bullet ends with its status: `fixed in <short-sha>`,
   `accepted`, `deferred`, `still open`, `superseded`, `withdrawn`, or `new`.
 - The blank line after `<summary>` is required for the list to render.
+- `round` in the marker counts Ollie's reviews on this PR, starting at 1.
 - No horizontal rules, no headings other than the title, no sign-off line.
 
 ## Inline comment
@@ -122,7 +123,7 @@ Ollie review. `npm test` is discoverable from the CI workflow and passes.
 Root comment, submitted as a changes-requested review:
 
 ```markdown
-<!-- ollie-review: head: 8b2c6e1d4a9f7c3b5e0d1a8c6f2b9e4d7a3c1f0e; base: 3f9a0c2e7b1d5a8c4e6f0b2d9a1c3e5f7b9d1a3c; verdict: request-changes; gate: - -->
+<!-- ollie-review: head: 8b2c6e1d4a9f7c3b5e0d1a8c6f2b9e4d7a3c1f0e; base: 3f9a0c2e7b1d5a8c4e6f0b2d9a1c3e5f7b9d1a3c; verdict: request-changes; gate: -; round: 1 -->
 #### 🦦 Add webhook rate limiting &middot; Request Changes
 
 Adds a per-merchant token bucket in front of `POST /webhooks` backed by Redis, wired through the existing `withRedis` helper and covered by a small unit suite. The shape is right and it follows the repo's middleware pattern. Two things stop it from doing its job: the merchant key comes from a client-controlled header, and the check-and-increment runs as two round trips, so bursts slip past the 50/min cap PAY-881 asks for. `npm test` passed with 42 tests; none exercise concurrency or a Redis outage. Worth a human's eyes: the middleware ordering in `router.ts` and the failure mode you actually want when Redis is down.
@@ -217,17 +218,18 @@ The freshness gate finds the review above at `8b2c6e1` and a new head
 `d7f4a9c` with a different tree. Three commits landed. The author replied on
 the Redis thread "we want this to fail open" and on the constants thread
 "@ollie defer PAY-902". Ollie reviews the interdiff, classifies every prior
-thread, and finds one new nitpick in the new test.
+thread, and finds one new minor in the new test, which is inside the
+interdiff.
 
 Root comment, submitted as a comment-state review, after which Ollie dismisses
 its own earlier changes-requested review with `Blockers fixed in d7f4a9c, see
 https://github.com/acme/payhub/pull/142#pullrequestreview-7002`:
 
 ```markdown
-<!-- ollie-review: head: d7f4a9c2e8b1d6f0a3c5e7b9d1f2a4c6e8b0d3f5; base: 3f9a0c2e7b1d5a8c4e6f0b2d9a1c3e5f7b9d1a3c; verdict: comment-only; gate: - -->
+<!-- ollie-review: head: d7f4a9c2e8b1d6f0a3c5e7b9d1f2a4c6e8b0d3f5; base: 3f9a0c2e7b1d5a8c4e6f0b2d9a1c3e5f7b9d1a3c; verdict: comment-only; gate: -; round: 2 -->
 #### 🦦 Add webhook rate limiting &middot; Comment Only
 
-Since `8b2c6e1`, three commits: `a1b2c3d` moves the limiter behind signature verification and keys on the signed merchant, `e4f5a6b` switches to `INCR` with `EXPIRE` and adds a 60-request parallel test, and `c7d8e9f` tightens the test setup. Both blockers are fixed and their threads are resolved. The Redis failure mode is still implicit; you replied that fail-open is the intent, which I agree with, but `handler.ts:88` still throws, so that thread stays open. The constants move is deferred to PAY-902. One new nitpick on the parallel test. `npm test` passed with 45 tests including the parallel case. Worth a human's eyes: the intended Redis failure mode, since it is a product decision more than a code one.
+Since `8b2c6e1`, three commits: `a1b2c3d` moves the limiter behind signature verification and keys on the signed merchant, `e4f5a6b` switches to `INCR` with `EXPIRE` and adds a 60-request parallel test, and `c7d8e9f` tightens the test setup. Both blockers are fixed and their threads are resolved. The Redis failure mode is still implicit; you replied that fail-open is the intent, which I agree with, but `handler.ts:88` still throws, so that thread stays open. The constants move is deferred to PAY-902. One new minor on the parallel test: it never asserts a rejection, so it would pass with the limiter disabled. `npm test` passed with 45 tests including the parallel case. Worth a human's eyes: the intended Redis failure mode, since it is a product decision more than a code one.
 
 <details>
 <summary>Findings &middot; 2 fixed &middot; 1 deferred &middot; 1 open &middot; 1 new</summary>
@@ -236,7 +238,7 @@ Since `8b2c6e1`, three commits: `a1b2c3d` moves the limiter behind signature ver
 * correctness &middot; major &middot; [Check and increment are two round trips](https://github.com/acme/payhub/pull/142#discussion_r9002) &middot; fixed in `e4f5a6b`
 * reliability &middot; minor &middot; [A Redis error propagates as a 500](https://github.com/acme/payhub/pull/142#discussion_r9003) &middot; still open
 * maintainability &middot; nitpick &middot; [Limit literals belong in `config/limits.ts`](https://github.com/acme/payhub/pull/142#discussion_r9004) &middot; deferred
-* tests &middot; nitpick &middot; [The parallel test asserts at most 50 succeeded but never asserts that any request was rejected](https://github.com/acme/payhub/pull/142#discussion_r9105) &middot; new
+* tests &middot; minor &middot; [The parallel test asserts at most 50 succeeded but never asserts that any request was rejected, so it passes with the limiter disabled](https://github.com/acme/payhub/pull/142#discussion_r9105) &middot; new
 
 </details>
 
@@ -266,7 +268,8 @@ deferred to PAY-902 &middot; fine as a follow-up since it has no runtime effect.
 ```
 
 The two fixed threads and the deferred thread are resolved. The still-open
-thread stays open. The new nitpick is posted as a normal inline comment on
+thread stays open. Two minors are open, so the verdict is Comment Only. The
+new minor is posted as a normal inline comment on
 `test/rateLimiter.test.ts:88`. In conversation Ollie reports the new review
 URL, the verdict, the dismissal of its prior review, and the tally: 2 fixed,
 1 deferred, 1 still open, 1 new.

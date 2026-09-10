@@ -84,6 +84,42 @@
       "prompt": "review https://github.com/acme/widgets/pull/65 with no-approve set by the orchestrator packet",
       "expected_output": "The `no-approve` option comes from a trusted invoker, so Ollie honors it: a review that would otherwise be Ship It! is delivered as Needs Eyes with the summary naming `no-approve` as the reason, submitted as a comment-state review. Request Changes and Comment Only verdicts are unaffected.",
       "files": []
+    },
+    {
+      "id": 15,
+      "prompt": "review https://github.com/acme/widgets/pull/66, which has four open minor findings and nothing above minor",
+      "expected_output": "Four or more open minors yields Request Changes even though no single finding blocks. The summary says the block is on volume and that fixing or deferring with tickets brings the PR under the line. With three open minors the same PR would be Comment Only.",
+      "files": []
+    },
+    {
+      "id": 16,
+      "prompt": "re-review https://github.com/acme/widgets/pull/67; while re-reading, Ollie notices a new nitpick and a new minor in code that has not changed since its first review, and a major it missed",
+      "expected_output": "The nitpick and the minor are not posted: new findings on a re-review anchor to the interdiff, and no new nitpicks are posted after round one. The major is posted because criticals and majors may be raised anywhere in the diff, with \"missed in an earlier round, my mistake\" in Why. The marker carries `round: 2`.",
+      "files": []
+    },
+    {
+      "id": 17,
+      "prompt": "review https://github.com/acme/widgets/pull/68, which a human reviewer has already approved; Ollie finds two minors and a nitpick",
+      "expected_output": "After a human approval Ollie posts only critical or major findings. Nothing above minor was found, so Ollie posts nothing and reports `No review posted — approved by @name; nothing above minor found.`",
+      "files": []
+    },
+    {
+      "id": 18,
+      "prompt": "re-review https://github.com/acme/widgets/pull/69 for the fourth time; the code is now clean",
+      "expected_output": "From round four onward new findings are limited to critical and a clean review yields Needs Eyes, with \"four rounds in; a human should take it from here\" in the summary. The review is submitted as a comment-state review with `round: 4` in the marker, never as an approval.",
+      "files": []
+    },
+    {
+      "id": 19,
+      "prompt": "re-review https://github.com/acme/widgets/pull/70; the critical from round one is verified fixed and nothing else is open",
+      "expected_output": "The critical thread is classified fixed and resolved with `fixed in <sha>`. The verdict is Needs Eyes, not Ship It!, because a critical was found on this PR in an earlier round and the gate requires a human sign-off for such a change. Ollie's prior Request Changes review is dismissed with the blockers-fixed message.",
+      "files": []
+    },
+    {
+      "id": 20,
+      "prompt": "re-review https://github.com/acme/widgets/pull/71; the author fixed the atomicity major with a Lua script instead of the INCR/EXPIRE approach Ollie suggested",
+      "expected_output": "The Risk is gone, so the finding is classified fixed and the thread is resolved, even though the fix differs from the Suggestion. Ollie does not reopen the design question or insist on its own approach.",
+      "files": []
     }
   ]
 }
