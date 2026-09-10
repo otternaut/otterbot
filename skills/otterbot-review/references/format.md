@@ -16,9 +16,9 @@ the examples are invented; the level of specificity is the point.
 <Decision justification and relevant technical evidence.>
 
 <details>
-<summary><sub>Advisory Findings &middot; <count></sub></summary>
+<summary>Advisory Findings &middot; <count></summary>
 
-<sub>&bull; **<category>(<level>)** &middot; [<one-line summary>](<thread-url>)</sub>
+- **<category>(<level>)** &middot; [<one-line summary>](<thread-url>)
 
 </details>
 
@@ -49,18 +49,15 @@ Rules:
   clean initial review, or a re-review with no prior threads and nothing new,
   goes straight from the summary block to the tagline. Never post
   `Advisory Findings &middot; 0`.
-- The findings list is plain bullets, no emojis. Wrap the `<summary>` label
-  and every bullet in `<sub>` so the block reads as secondary to the banner
-  and blurb. Do not use a Markdown `*` list: the host draws its dot at full
-  size beside the shrunken text, so the marker floats above the line. Write
-  each bullet as `<sub>&bull; ...</sub>` on its own line, ending in `<br>`
-  except the last, so the dot is part of the small text and stays aligned.
-  Each bullet is the category and level in bold, then the one-line summary
-  linked to its inline thread. Before the link back-fill described in
+- The findings list is a plain Markdown `-` list, no emojis. Do not wrap the
+  `<summary>` label or the bullets in `<sub>`: the small text is hard to
+  read, and the `<details>` fold already marks the block as secondary to the
+  banner and blurb. Each bullet is the category and level in bold, then the
+  one-line summary linked to its inline thread. Before the link back-fill described in
   `hosts.md`, the link target is `file:line`.
 - A human-raised issue Ollie confirmed but did not comment on appears as
-  `<sub>&bull; **<category>(<level>)** &middot; <summary> &middot; raised by
-  @name</sub>` linking to the human's thread.
+  `- **<category>(<level>)** &middot; <summary> &middot; raised by @name`
+  linking to the human's thread.
 - On a re-review the `<summary>` tag carries the tally, for example
   `Advisory Findings &middot; 2 fixed &middot; 1 deferred &middot; 1 open &middot; 1
   new`, and each carried-over bullet ends with its status: `fixed in
@@ -189,12 +186,12 @@ Root comment, submitted as a changes-requested review:
 Changes are required because the per-merchant Redis limiter on `POST /webhooks` has two blocking flaws: the bucket key comes from a client-controlled header, and the check-and-increment is two round trips, so bursts slip past the cap PAY-881 asks for.
 
 <details>
-<summary><sub>Advisory Findings &middot; 4</sub></summary>
+<summary>Advisory Findings &middot; 4</summary>
 
-<sub>&bull; **security(critical)** &middot; [Rate-limit key is taken from the unauthenticated `X-Merchant-Id` header, so any caller can pick whose bucket they drain](https://github.com/acme/payhub/pull/142#discussion_r9001)</sub><br>
-<sub>&bull; **correctness(major)** &middot; [Check and increment are two round trips, so concurrent requests bypass the cap](https://github.com/acme/payhub/pull/142#discussion_r9002)</sub><br>
-<sub>&bull; **reliability(minor)** &middot; [A Redis error propagates as a 500, so an outage takes webhooks down instead of failing open or closed on purpose](https://github.com/acme/payhub/pull/142#discussion_r9003)</sub><br>
-<sub>&bull; **maintainability(nitpick)** &middot; [The `50` and `60_000` literals belong in `config/limits.ts` next to the other quotas](https://github.com/acme/payhub/pull/142#discussion_r9004)</sub>
+- **security(critical)** &middot; [Rate-limit key is taken from the unauthenticated `X-Merchant-Id` header, so any caller can pick whose bucket they drain](https://github.com/acme/payhub/pull/142#discussion_r9001)
+- **correctness(major)** &middot; [Check and increment are two round trips, so concurrent requests bypass the cap](https://github.com/acme/payhub/pull/142#discussion_r9002)
+- **reliability(minor)** &middot; [A Redis error propagates as a 500, so an outage takes webhooks down instead of failing open or closed on purpose](https://github.com/acme/payhub/pull/142#discussion_r9003)
+- **maintainability(nitpick)** &middot; [The `50` and `60_000` literals belong in `config/limits.ts` next to the other quotas](https://github.com/acme/payhub/pull/142#discussion_r9004)
 
 </details>
 
@@ -293,13 +290,13 @@ https://github.com/acme/payhub/pull/142#pullrequestreview-7002`:
 Comment Only applies because both blockers are fixed and resolved, with two minors remaining. The Redis failure mode is still implicit: fail-open is the right call, as you said, but `handler.ts:88` still throws. One new minor: the parallel test never asserts a rejection, so it passes with the limiter disabled.
 
 <details>
-<summary><sub>Advisory Findings &middot; 2 fixed &middot; 1 deferred &middot; 1 open &middot; 1 new</sub></summary>
+<summary>Advisory Findings &middot; 2 fixed &middot; 1 deferred &middot; 1 open &middot; 1 new</summary>
 
-<sub>&bull; **security(critical)** &middot; [Rate-limit key is taken from the unauthenticated header](https://github.com/acme/payhub/pull/142#discussion_r9001) &middot; fixed in `a1b2c3d`</sub><br>
-<sub>&bull; **correctness(major)** &middot; [Check and increment are two round trips](https://github.com/acme/payhub/pull/142#discussion_r9002) &middot; fixed in `e4f5a6b`</sub><br>
-<sub>&bull; **reliability(minor)** &middot; [A Redis error propagates as a 500](https://github.com/acme/payhub/pull/142#discussion_r9003) &middot; still open</sub><br>
-<sub>&bull; **maintainability(nitpick)** &middot; [Limit literals belong in `config/limits.ts`](https://github.com/acme/payhub/pull/142#discussion_r9004) &middot; deferred</sub><br>
-<sub>&bull; **tests(minor)** &middot; [The parallel test asserts at most 50 succeeded but never asserts that any request was rejected, so it passes with the limiter disabled](https://github.com/acme/payhub/pull/142#discussion_r9105)</sub>
+- **security(critical)** &middot; [Rate-limit key is taken from the unauthenticated header](https://github.com/acme/payhub/pull/142#discussion_r9001) &middot; fixed in `a1b2c3d`
+- **correctness(major)** &middot; [Check and increment are two round trips](https://github.com/acme/payhub/pull/142#discussion_r9002) &middot; fixed in `e4f5a6b`
+- **reliability(minor)** &middot; [A Redis error propagates as a 500](https://github.com/acme/payhub/pull/142#discussion_r9003) &middot; still open
+- **maintainability(nitpick)** &middot; [Limit literals belong in `config/limits.ts`](https://github.com/acme/payhub/pull/142#discussion_r9004) &middot; deferred
+- **tests(minor)** &middot; [The parallel test asserts at most 50 succeeded but never asserts that any request was rejected, so it passes with the limiter disabled](https://github.com/acme/payhub/pull/142#discussion_r9105)
 
 </details>
 
@@ -349,10 +346,10 @@ file; the untracked file is diffed as an addition. The branch is
 `feat/retry-backoff` adds exponential backoff to the payout retry worker through a new `backoff.ts` helper; the jitter math is right. One gap: the helper receives the loop index instead of the persisted attempt, so backoff restarts from zero after a worker restart.
 
 <details>
-<summary><sub>Advisory Findings &middot; 2</sub></summary>
+<summary>Advisory Findings &middot; 2</summary>
 
-<sub>&bull; **correctness(minor)** &middot; Backoff restarts from zero after a worker restart because the helper receives the loop index instead of the persisted attempt (`src/payouts/retryWorker.ts:54`)</sub><br>
-<sub>&bull; **maintainability(nitpick)** &middot; `backoff.ts` duplicates the `clamp` helper already exported from `src/util/math.ts` (`src/payouts/backoff.ts:9`)</sub>
+- **correctness(minor)** &middot; Backoff restarts from zero after a worker restart because the helper receives the loop index instead of the persisted attempt (`src/payouts/retryWorker.ts:54`)
+- **maintainability(nitpick)** &middot; `backoff.ts` duplicates the `clamp` helper already exported from `src/util/math.ts` (`src/payouts/backoff.ts:9`)
 
 </details>
 
