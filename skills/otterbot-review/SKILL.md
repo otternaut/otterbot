@@ -185,8 +185,8 @@ not posted. Suggestion must be a specific change, never "clean this up".
 | ⚠️ Request Changes | changes requested | Any open critical or major, or four or more open minors |
 
 Open means posted this round or still open from a prior round, plus
-human-raised issues Ollie confirmed. Fixed, accepted, deferred, superseded, and
-withdrawn findings are not open.
+human-raised critical or major issues Ollie confirmed. Fixed, accepted,
+deferred, superseded, and withdrawn findings are not open.
 
 Decide in this order after findings are final: any open critical or major, or
 four or more open minors, yields Request Changes. Four minors block because
@@ -197,7 +197,9 @@ the gate: all rules
 pass yields Ship It!, a failed context rule yields Needs Context, and any other
 failure yields Needs Eyes. When several rules fail, Needs Context wins the title
 and the summary names every failed rule. Issues a human raised that Ollie
-confirmed count here even though Ollie posted no comment for them. In Request
+confirmed count here at critical or major even though Ollie posted no comment
+for them; they never count toward the minor volume threshold, since the human
+chose not to block on them. In Request
 Changes and Comment Only the summary still asks for missing context in one
 sentence.
 
@@ -205,7 +207,8 @@ sentence.
 fail to Needs Context; every other rule fails to Needs Eyes.
 
 - The description has at least two sentences or a linked ticket or issue, and
-  the code does what it says and nothing materially more.
+  the code does what it says and nothing materially more. A trivially safe
+  change may have a one-line description.
 - Every requirement source the correctness depends on, such as a linked ticket
   or spec, was accessible and read.
 - No open Ollie finding above nitpick, and at most three nitpicks.
@@ -234,8 +237,8 @@ fail to Needs Context; every other rule fails to Needs Eyes.
 - The `no-approve` option is not set.
 - At most two findings on the PR are deferred. Deferral is for the odd
   follow-up, not a route to approval.
-- No critical has been found on this PR in any round, fixed or not. A change
-  that once had a critical gets a human sign-off.
+- No critical has been found on this PR in any round, fixed or not, unless it
+  was withdrawn. A change that once had a critical gets a human sign-off.
 - This is at most Ollie's third review of the PR (§7, Convergence).
 - Ollie read every touched path and its direct callers.
 - Nothing in the verdict rests on an author assertion Ollie could not confirm
@@ -293,8 +296,8 @@ Suggestion &middot; <smallest concrete fix inside the change, plus the specific 
 
 The slug describes the issue, not its location, and is retained across
 re-reviews. A host `suggestion` block may follow Suggestion when the fix is
-small and mechanical. Omit the guide link when no public URL for
-`references/for-developers.md` is known.
+small and mechanical. The guide link defaults to this repository's copy:
+`https://github.com/otternaut/otterbot/blob/main/skills/otterbot-review/references/for-developers.md`.
 
 ## 7. Re-review
 

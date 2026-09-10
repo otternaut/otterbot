@@ -50,6 +50,8 @@ Rules:
   `accepted`, `deferred`, `still open`, `superseded`, `withdrawn`, or `new`.
 - The blank line after `<summary>` is required for the list to render.
 - `round` in the marker counts Ollie's reviews on this PR, starting at 1.
+- `gate` is `pass`, the first failed rule, or `-` when findings decided the
+  verdict before the gate ran.
 - No horizontal rules, no headings other than the title, no sign-off line.
 
 ## Inline comment
@@ -83,7 +85,7 @@ Rules:
 - Attach to the smallest changed range that makes the issue clear. When there
   is no line, use a file-level comment on the changed file; if the host has no
   file-level comments, use the nearest changed line.
-- Omit the guide link when no public URL for `for-developers.md` is known.
+- The guide link defaults to this repository's copy of `for-developers.md`.
 
 ## Tagline pool
 
@@ -153,7 +155,7 @@ Risk &middot; A caller can spoof another merchant's ID and exhaust their bucket,
 
 Suggestion &middot; Move the limiter after signature verification in `router.ts` and key on the verified `event.merchant_id`. If pre-verification limiting is wanted as a cheap first layer, key that one on source IP only and keep the per-merchant bucket behind the signature check. Add a test that sends a valid signature with a mismatched `X-Merchant-Id` and asserts the bucket charged is the signed merchant's.
 
-<sub>🦦 Ollie reviewed `8b2c6e1` &middot; no clam left uncracked &middot; [how Ollie reviews](https://github.com/otternaut/toolbox/blob/main/skills/otterbot-review/references/for-developers.md)</sub>
+<sub>🦦 Ollie reviewed `8b2c6e1` &middot; no clam left uncracked &middot; [how Ollie reviews](https://github.com/otternaut/otterbot/blob/main/skills/otterbot-review/references/for-developers.md)</sub>
 ```
 
 Inline comment on `src/webhooks/rateLimiter.ts:41-48`:
@@ -174,7 +176,7 @@ Suggestion &middot; Use a single `INCR` and call `EXPIRE` only when the returned
     if (count > LIMIT) return reject(res);
 ```
 
-<sub>🦦 Ollie reviewed `8b2c6e1` &middot; paws on every line &middot; [how Ollie reviews](https://github.com/otternaut/toolbox/blob/main/skills/otterbot-review/references/for-developers.md)</sub>
+<sub>🦦 Ollie reviewed `8b2c6e1` &middot; paws on every line &middot; [how Ollie reviews](https://github.com/otternaut/otterbot/blob/main/skills/otterbot-review/references/for-developers.md)</sub>
 ````
 
 Inline comment on `src/webhooks/handler.ts:88`:
@@ -189,7 +191,7 @@ Risk &middot; During a Redis blip every merchant's webhooks return 500. Most pro
 
 Suggestion &middot; Decide the failure mode explicitly. Given webhooks are retried by the sender, fail open: catch the Redis error, log at warn with the merchant ID, increment a `rate_limiter_bypass_total` counter, and let the request through. Add a test that rejects the Redis call and asserts the request succeeds and the counter increments.
 
-<sub>🦦 Ollie reviewed `8b2c6e1` &middot; floated by, poked at everything &middot; [how Ollie reviews](https://github.com/otternaut/toolbox/blob/main/skills/otterbot-review/references/for-developers.md)</sub>
+<sub>🦦 Ollie reviewed `8b2c6e1` &middot; floated by, poked at everything &middot; [how Ollie reviews](https://github.com/otternaut/otterbot/blob/main/skills/otterbot-review/references/for-developers.md)</sub>
 ```
 
 Inline comment on `src/webhooks/rateLimiter.ts:12`:
@@ -204,7 +206,7 @@ Risk &middot; None to correctness. The next person tuning quotas will look in `l
 
 Suggestion &middot; Export `WEBHOOK_RATE_LIMIT` and `WEBHOOK_RATE_WINDOW_MS` from `config/limits.ts` with the same env override pattern and import them here.
 
-<sub>🦦 Ollie reviewed `8b2c6e1` &middot; back in the water until the next push &middot; [how Ollie reviews](https://github.com/otternaut/toolbox/blob/main/skills/otterbot-review/references/for-developers.md)</sub>
+<sub>🦦 Ollie reviewed `8b2c6e1` &middot; back in the water until the next push &middot; [how Ollie reviews](https://github.com/otternaut/otterbot/blob/main/skills/otterbot-review/references/for-developers.md)</sub>
 ```
 
 In conversation Ollie then reports the review URL, the verdict, and the tally:

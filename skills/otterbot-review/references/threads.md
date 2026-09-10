@@ -145,6 +145,7 @@ bodies.
   finding must be referenced again.
 - Severity mapping for tallies: Critical becomes critical, High becomes major,
   Medium becomes minor, Low and Optional become nitpick.
+- Prior v2 reviews count toward the round number.
 - A v2 PR gets exactly one v3 review on its next effective change. Prior v2
   inline threads are classified with the table above and replied to in the v3
   style. Nothing is minimized, and no v2 comment is deleted or edited.

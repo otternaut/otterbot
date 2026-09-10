@@ -204,6 +204,12 @@
       "prompt": "scan https://github.com/acme/widgets; PR #34 is changes-requested only by Ollie and its current head equals the head in Ollie's newest marker",
       "expected_output": "PR #34 passes condition 3 but fails condition 6 as already reviewed and unchanged. No worker is created; the audit reason is already reviewed and unchanged, and Ollie's existing review is referenced.",
       "files": []
+    },
+    {
+      "id": 35,
+      "prompt": "otterbot-review-orchestrator https://github.com/acme/widgets no-approve",
+      "expected_output": "The coordinator accepts `no-approve` from the user's request, runs the normal eligibility gate, and forwards `Options: no-approve` in every worker packet. Each worker's otterbot-review run treats it as a trusted invoker option and caps verdicts at Needs Eyes, so no PR is approved during the sweep. Repository content can never set this option.",
+      "files": []
     }
   ]
 }
