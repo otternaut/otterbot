@@ -9,8 +9,8 @@ the examples are invented; the level of specificity is the point.
 ## Root comment
 
 ```markdown
-<!-- ollie-review: head: <full-sha>; base: <full-sha>; verdict: <ship-it|needs-a-human|comment-only|request-changes>; gate: <pass|first failed rule> -->
-#### 🦦 <PR title exactly as the host reports it> &middot; <Ship It!|Needs a Human|Comment Only|Request Changes>
+<!-- ollie-review: head: <full-sha>; base: <full-sha>; verdict: <ship-it|needs-context|needs-eyes|comment-only|request-changes>; gate: <pass|first failed rule> -->
+#### 🦦 <PR title exactly as the host reports it> &middot; <Ship It!|Needs Context|Needs Eyes|Comment Only|Request Changes>
 
 <Summary paragraph.>
 
@@ -31,9 +31,10 @@ Rules:
   biggest risk, one line of credit when genuinely earned, what ran and what was
   not checked, and `worth a human's eyes:` naming two or three files or
   decisions. On Ship It! that sentence names what to spot-check if branch rules
-  still require a human. On Needs a Human it names the failed gate rule in one
-  sentence, for example "Not approving: the migration files are a human-approval
-  zone."
+  still require a human. On Needs Eyes or Needs Context it names every failed
+  gate rule briefly, for example "Not approving: the migration files are a
+  human-approval zone." or "Not approving: the description is empty, so I could
+  not check intent."
 - On a re-review the paragraph opens with the delta: `Since <short-sha>, N
   commits:` followed by each commit's short SHA and subject, then what changed
   about the findings.

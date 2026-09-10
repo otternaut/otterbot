@@ -39,10 +39,14 @@ and withdraw it if you are right.
 
 - **Ship It!** Ollie approved. Nothing above nitpick is open and every
   approval rule passed.
-- **Needs a Human.** Ollie found nothing above nitpick but will not approve.
-  The summary says why in one sentence: the change touches an area that always
-  needs a human approval, such as auth, payments, migrations, CI, or infra; the
-  description is empty; the PR is large; a required check is failing; or the
+- **Needs Context.** Nothing above nitpick is open, but Ollie could not verify
+  what the change is meant to do: the description is empty or one line, the code
+  does more than the description says, or a linked requirement was not readable.
+  Add the context and push, or reply on the root comment.
+- **Needs Eyes.** Nothing above nitpick is open, but Ollie will not approve.
+  The summary says why: the change touches an area that always needs a human
+  approval, such as auth, payments, migrations, CI, or infra; the PR is large; a
+  required check is failing; another reviewer has requested changes; or the
   primary behavior has no test Ollie could see.
 - **Comment Only.** One or more minors are open. Mergeable at the team's
   discretion.

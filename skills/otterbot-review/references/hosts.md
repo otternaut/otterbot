@@ -11,7 +11,8 @@ use the listed fallback and say so in the conversation summary.
 | Verdict | GitHub | GitLab | Bitbucket Cloud |
 | --- | --- | --- | --- |
 | Ship It! | review event `APPROVE` | approve the merge request | approve the pull request |
-| Needs a Human | review event `COMMENT` | note only, no approval change | comment only |
+| Needs Context | review event `COMMENT` | note only, no approval change | comment only |
+| Needs Eyes | review event `COMMENT` | note only, no approval change | comment only |
 | Comment Only | review event `COMMENT` | note only, no approval change | comment only |
 | Request Changes | review event `REQUEST_CHANGES` | request changes where the version supports it; otherwise unapprove and post the root note | request changes |
 
@@ -54,7 +55,8 @@ Replace placeholders; never pass a filename as the body.
    thread.
 5. Threads: reply to a prior comment with the replies endpoint; resolve or
    unresolve with the GraphQL mutations using the thread node id.
-6. Transitions: when the new verdict is Needs a Human or Comment Only and the
+6. Transitions: when the new verdict is Needs Context, Needs Eyes, or Comment
+   Only and the
    prior Ollie review was changes requested with every blocker fixed, dismiss
    that prior review with the message `Blockers fixed in <sha>, see
    <review-url>`. A new approval or changes-requested review supersedes the

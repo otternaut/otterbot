@@ -22,7 +22,7 @@
     {
       "id": 4,
       "prompt": "review https://github.com/acme/widgets/pull/57, a clean PR that adds a database migration and a backfill",
-      "expected_output": "Ollie finds nothing above nitpick, but the approval gate fails because migration files are a human-approval zone. The verdict is Needs a Human, submitted as a comment-state review, never as an approval. The summary names the failed rule in one sentence, and the root marker records `verdict: needs-a-human` with the failed rule in `gate:`.",
+      "expected_output": "Ollie finds nothing above nitpick, but the approval gate fails because migration files are a human-approval zone. The verdict is Needs Eyes, submitted as a comment-state review, never as an approval. The summary names the failed rule in one sentence, and the root marker records `verdict: needs-eyes` with the failed rule in `gate:`.",
       "files": []
     },
     {
@@ -34,7 +34,7 @@
     {
       "id": 6,
       "prompt": "review https://github.com/acme/widgets/pull/59; the PR has an empty description",
-      "expected_output": "Ollie reviews the change normally. If nothing above nitpick is open, the verdict is Needs a Human because the empty description fails the approval gate, and the summary asks for a description in one sentence. Ollie does not invent the intent.",
+      "expected_output": "Ollie reviews the change normally. If nothing above nitpick is open, the verdict is Needs Context because the empty description fails a context rule, and the summary asks for a description in one sentence. The review is submitted as a comment-state review with `verdict: needs-context` in the marker. Ollie does not invent the intent. If findings above nitpick are open, the normal Request Changes or Comment Only verdict applies and the summary still asks for the description.",
       "files": []
     },
     {
@@ -64,7 +64,7 @@
     {
       "id": 11,
       "prompt": "review https://github.com/acme/widgets/pull/63; another reviewer has already requested changes",
-      "expected_output": "Ollie reviews normally and reads the human's threads for deduplication, posting no duplicate for an issue the human already raised while still counting it in the verdict with a `raised by @name` bullet. Even if Ollie finds nothing above nitpick, the approval gate fails because a human has an active changes-requested state, so the verdict is Needs a Human and the review is submitted as a comment.",
+      "expected_output": "Ollie reviews normally and reads the human's threads for deduplication, posting no duplicate for an issue the human already raised while still counting it in the verdict with a `raised by @name` bullet. Even if Ollie finds nothing above nitpick, the approval gate fails because a human has an active changes-requested state, so the verdict is Needs Eyes and the review is submitted as a comment.",
       "files": []
     },
     {
@@ -82,7 +82,7 @@
     {
       "id": 14,
       "prompt": "review https://github.com/acme/widgets/pull/65 with no-approve set by the orchestrator packet",
-      "expected_output": "The `no-approve` option comes from a trusted invoker, so Ollie honors it: a review that would otherwise be Ship It! is delivered as Needs a Human with the summary naming `no-approve` as the reason, submitted as a comment-state review. Request Changes and Comment Only verdicts are unaffected.",
+      "expected_output": "The `no-approve` option comes from a trusted invoker, so Ollie honors it: a review that would otherwise be Ship It! is delivered as Needs Eyes with the summary naming `no-approve` as the reason, submitted as a comment-state review. Request Changes and Comment Only verdicts are unaffected.",
       "files": []
     }
   ]
