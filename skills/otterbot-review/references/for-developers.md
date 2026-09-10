@@ -7,16 +7,15 @@ back. Reading it once saves a round trip on your next PR.
 ## What you will see
 
 One short root comment with the PR title and a verdict, a few sentences of
-summary, a `Tests` line, a `Worth a human's eyes` line, and a collapsible list
-of findings when there are any. Every finding is an inline comment on the line
-it is about, shaped like this:
+summary, and a collapsible list of findings when there are any. Every finding
+is an inline comment on the line it is about, shaped like this:
 
 ```text
-🟠 correctness · major · Check and increment are two round trips, so concurrent requests bypass the cap
+🟠 **correctness** · **major** · Check and increment are two round trips, so concurrent requests bypass the cap
 
-Why · the evidence, with file:line references and the commit that introduced the code
-Risk · what goes wrong, for whom, under what conditions
-Suggestion · the smallest concrete fix, plus the test that would prove it
+**Why** · the evidence, with file:line references and the commit that introduced the code
+**Risk** · what goes wrong, for whom, under what conditions
+**Suggestion** · the smallest concrete fix, plus the test that would prove it
 ```
 
 Ollie only reviews the lines you changed. It reads the rest of the codebase
