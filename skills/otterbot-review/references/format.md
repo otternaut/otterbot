@@ -16,10 +16,10 @@ the examples are invented; the level of specificity is the point.
 <Decision justification and relevant technical evidence.>
 
 <details>
-<summary>Advisory Findings &middot; <count></summary>
+<summary><sub>Advisory Findings &middot; <count></sub></summary>
 <br>
 
-* **<category>(<level>)** &middot; [<one-line summary>](<thread-url>)
+* <sub>**<category>(<level>)** &middot; [<one-line summary>](<thread-url>)</sub>
 
 </details>
 
@@ -35,9 +35,9 @@ Rules:
   Omit a separate PR title heading; the host already displays the title.
 - The verdict always carries its emoji: 🚢 Ship It!, 📝 Needs Context, 👀 Needs
   Eyes, 💬 Comment Only, ⚠️ Request Changes.
-- The banner holds the Ollie's Decision label, verdict and, on a re-review, the
-  `since` clause.
-  The summary stays outside it.
+- The banner holds only the Ollie's Decision label and the verdict. Never
+  append a `since` clause, commit list, or any other text. The summary stays
+  outside it.
 - The blurb justifies the decision, leading with why that verdict applies
   and including relevant technical evidence. Explain blocking behavior or
   minor volume for Request Changes, remaining issues for Comment Only,
@@ -45,22 +45,21 @@ Rules:
   supports confidence for Ship It! Include relevant code behavior, failure
   conditions, test results, and verification limits. Keep it focused, with no
   fixed sentence or word limit; full finding details stay in inline comments.
-- On a re-review the `since` clause continues the verdict line inside the
-  banner rather than taking a line of its own: `🦦 Ollie's Decision &middot; <emoji> **<verdict>**
-  &middot; since <prior-short-sha> &middot;` then each commit's short SHA and
-  a few-word subject, `&middot;` separated. Past five commits, give the count and the first and last SHAs
-  instead. The paragraph then says what changed about the findings.
+- On a re-review the banner is identical to an initial review. The paragraph
+  then says what changed about the findings. Name commits in the blurb only
+  when they help explain the decision, never as a banner suffix.
 - The `<details>` block appears only when the list has at least one bullet. A
   clean initial review, or a re-review with no prior threads and nothing new,
   goes straight from the summary block to the tagline. Never post
   `Advisory Findings &middot; 0`.
-- The findings list is plain bullets, no emojis. Each bullet is the category
-  and level in bold, then the one-line summary linked to its inline thread.
-  Before the link back-fill described in `hosts.md`, the link target is
-  `file:line`.
+- The findings list is plain bullets, no emojis. Wrap the `<summary>` label
+  and every bullet in `<sub>` so the block reads as secondary to the banner
+  and blurb. Each bullet is the category and level in bold, then the one-line
+  summary linked to its inline thread. Before the link back-fill described in
+  `hosts.md`, the link target is `file:line`.
 - A human-raised issue Ollie confirmed but did not comment on appears as
-  `**<category>(<level>)** &middot; <summary> &middot; raised by
-  @name` linking to the human's thread.
+  `<sub>**<category>(<level>)** &middot; <summary> &middot; raised by
+  @name</sub>` linking to the human's thread.
 - On a re-review the `<summary>` tag carries the tally, for example
   `Advisory Findings &middot; 2 fixed &middot; 1 deferred &middot; 1 open &middot; 1
   new`, and each carried-over bullet ends with its status: `fixed in
@@ -190,13 +189,13 @@ Root comment, submitted as a changes-requested review:
 Changes are required because the per-merchant Redis limiter on `POST /webhooks` has two blocking flaws: the bucket key comes from a client-controlled header, and the check-and-increment is two round trips, so bursts slip past the cap PAY-881 asks for.
 
 <details>
-<summary>Advisory Findings &middot; 4</summary>
+<summary><sub>Advisory Findings &middot; 4</sub></summary>
 <br>
 
-* **security(critical)** &middot; [Rate-limit key is taken from the unauthenticated `X-Merchant-Id` header, so any caller can pick whose bucket they drain](https://github.com/acme/payhub/pull/142#discussion_r9001)
-* **correctness(major)** &middot; [Check and increment are two round trips, so concurrent requests bypass the cap](https://github.com/acme/payhub/pull/142#discussion_r9002)
-* **reliability(minor)** &middot; [A Redis error propagates as a 500, so an outage takes webhooks down instead of failing open or closed on purpose](https://github.com/acme/payhub/pull/142#discussion_r9003)
-* **maintainability(nitpick)** &middot; [The `50` and `60_000` literals belong in `config/limits.ts` next to the other quotas](https://github.com/acme/payhub/pull/142#discussion_r9004)
+* <sub>**security(critical)** &middot; [Rate-limit key is taken from the unauthenticated `X-Merchant-Id` header, so any caller can pick whose bucket they drain](https://github.com/acme/payhub/pull/142#discussion_r9001)</sub>
+* <sub>**correctness(major)** &middot; [Check and increment are two round trips, so concurrent requests bypass the cap](https://github.com/acme/payhub/pull/142#discussion_r9002)</sub>
+* <sub>**reliability(minor)** &middot; [A Redis error propagates as a 500, so an outage takes webhooks down instead of failing open or closed on purpose](https://github.com/acme/payhub/pull/142#discussion_r9003)</sub>
+* <sub>**maintainability(nitpick)** &middot; [The `50` and `60_000` literals belong in `config/limits.ts` next to the other quotas](https://github.com/acme/payhub/pull/142#discussion_r9004)</sub>
 
 </details>
 
@@ -290,19 +289,19 @@ https://github.com/acme/payhub/pull/142#pullrequestreview-7002`:
 ```markdown
 <!-- ollie-review: head: d7f4a9c2e8b1d6f0a3c5e7b9d1f2a4c6e8b0d3f5; base: 3f9a0c2e7b1d5a8c4e6f0b2d9a1c3e5f7b9d1a3c; verdict: comment-only; gate: -; round: 2 -->
 
-> 🦦 Ollie's Decision &middot; 💬 **Comment Only** &middot; since `8b2c6e1` &middot; `a1b2c3d` limiter behind signature verification &middot; `e4f5a6b` `INCR` with `EXPIRE` plus a 60-request parallel test &middot; `c7d8e9f` test setup
+> 🦦 Ollie's Decision &middot; 💬 **Comment Only**
 
 Comment Only applies because both blockers are fixed and resolved, with two minors remaining. The Redis failure mode is still implicit: fail-open is the right call, as you said, but `handler.ts:88` still throws. One new minor: the parallel test never asserts a rejection, so it passes with the limiter disabled.
 
 <details>
-<summary>Advisory Findings &middot; 2 fixed &middot; 1 deferred &middot; 1 open &middot; 1 new</summary>
+<summary><sub>Advisory Findings &middot; 2 fixed &middot; 1 deferred &middot; 1 open &middot; 1 new</sub></summary>
 <br>
 
-* **security(critical)** &middot; [Rate-limit key is taken from the unauthenticated header](https://github.com/acme/payhub/pull/142#discussion_r9001) &middot; fixed in `a1b2c3d`
-* **correctness(major)** &middot; [Check and increment are two round trips](https://github.com/acme/payhub/pull/142#discussion_r9002) &middot; fixed in `e4f5a6b`
-* **reliability(minor)** &middot; [A Redis error propagates as a 500](https://github.com/acme/payhub/pull/142#discussion_r9003) &middot; still open
-* **maintainability(nitpick)** &middot; [Limit literals belong in `config/limits.ts`](https://github.com/acme/payhub/pull/142#discussion_r9004) &middot; deferred
-* **tests(minor)** &middot; [The parallel test asserts at most 50 succeeded but never asserts that any request was rejected, so it passes with the limiter disabled](https://github.com/acme/payhub/pull/142#discussion_r9105)
+* <sub>**security(critical)** &middot; [Rate-limit key is taken from the unauthenticated header](https://github.com/acme/payhub/pull/142#discussion_r9001) &middot; fixed in `a1b2c3d`</sub>
+* <sub>**correctness(major)** &middot; [Check and increment are two round trips](https://github.com/acme/payhub/pull/142#discussion_r9002) &middot; fixed in `e4f5a6b`</sub>
+* <sub>**reliability(minor)** &middot; [A Redis error propagates as a 500](https://github.com/acme/payhub/pull/142#discussion_r9003) &middot; still open</sub>
+* <sub>**maintainability(nitpick)** &middot; [Limit literals belong in `config/limits.ts`](https://github.com/acme/payhub/pull/142#discussion_r9004) &middot; deferred</sub>
+* <sub>**tests(minor)** &middot; [The parallel test asserts at most 50 succeeded but never asserts that any request was rejected, so it passes with the limiter disabled](https://github.com/acme/payhub/pull/142#discussion_r9105)</sub>
 
 </details>
 
@@ -352,11 +351,11 @@ file; the untracked file is diffed as an addition. The branch is
 `feat/retry-backoff` adds exponential backoff to the payout retry worker through a new `backoff.ts` helper; the jitter math is right. One gap: the helper receives the loop index instead of the persisted attempt, so backoff restarts from zero after a worker restart.
 
 <details>
-<summary>Advisory Findings &middot; 2</summary>
+<summary><sub>Advisory Findings &middot; 2</sub></summary>
 <br>
 
-* **correctness(minor)** &middot; Backoff restarts from zero after a worker restart because the helper receives the loop index instead of the persisted attempt (`src/payouts/retryWorker.ts:54`)
-* **maintainability(nitpick)** &middot; `backoff.ts` duplicates the `clamp` helper already exported from `src/util/math.ts` (`src/payouts/backoff.ts:9`)
+* <sub>**correctness(minor)** &middot; Backoff restarts from zero after a worker restart because the helper receives the loop index instead of the persisted attempt (`src/payouts/retryWorker.ts:54`)</sub>
+* <sub>**maintainability(nitpick)** &middot; `backoff.ts` duplicates the `clamp` helper already exported from `src/util/math.ts` (`src/payouts/backoff.ts:9`)</sub>
 
 </details>
 

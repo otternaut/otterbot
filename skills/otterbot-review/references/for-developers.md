@@ -6,9 +6,10 @@ back. Reading it once saves a round trip on your next PR.
 
 ## What you will see
 
-One short root comment with an otter and verdict banner, a justification of the decision
-with relevant technical evidence, and a collapsible list of findings when there are any. Every finding
-is an inline comment on the line it is about, shaped like this:
+One short root comment with an otter and verdict banner, a justification of
+the decision with relevant technical evidence, and a smaller collapsible list
+of findings when there are any. Every finding is an inline comment on the line
+it is about, shaped like this:
 
 ```text
 🟠 **correctness** · **major** · Check and increment are two round trips, so concurrent requests bypass the cap
