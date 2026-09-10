@@ -11,7 +11,7 @@ the examples are invented; the level of specificity is the point.
 ```markdown
 <!-- ollie-review: head: <full-sha>; base: <full-sha>; verdict: <ship-it|needs-context|needs-eyes|comment-only|request-changes>; gate: <pass|first failed rule>; round: <n> -->
 
-> 🦦 Ollie's Decision &middot; <🚢|📝|👀|💬|⚠️> **<Ship It!|Needs Context|Needs Eyes|Comment Only|Request Changes>**
+<🚢|📝|👀|💬|⚠️> Ollie's Verdict &middot; <Ship It!|Needs Context|Needs Eyes|Comment Only|Request Changes>
 
 <Decision justification and relevant technical evidence.>
 
@@ -28,14 +28,12 @@ the examples are invented; the level of specificity is the point.
 
 Rules:
 
-- The banner comes first: a plain blockquote containing
-  `🦦 Ollie's Decision &middot;`, the verdict emoji, and the bold verdict.
-  Use the host's neutral blockquote styling for every verdict. Omit alert-type
-  markers so no host-generated label such as Note or Caution appears.
-  Omit a separate PR title heading; the host already displays the title.
+- The banner comes first as plain text: the verdict emoji, `Ollie's Verdict
+  &middot;`, and the plain-text verdict. Omit alert-type markers and a separate
+  PR title heading.
 - The verdict always carries its emoji: 🚢 Ship It!, 📝 Needs Context, 👀 Needs
   Eyes, 💬 Comment Only, ⚠️ Request Changes.
-- The banner holds only the Ollie's Decision label and the verdict. Never
+- The banner holds only the verdict emoji, Ollie's Verdict label, and verdict. Never
   append a `since` clause, commit list, or any other text. The summary stays
   outside it.
 - The blurb justifies the decision, leading with why that verdict applies
@@ -67,8 +65,7 @@ Rules:
   `withdrawn`. A finding posted this round has no status suffix; the bare
   bullet is what marks it as new.
 - A blank line separates the `ollie-review` marker from the banner, so the
-  blockquote is parsed as its own block rather than being absorbed into the
-  HTML comment.
+  banner is rendered independently of the HTML comment.
 - The `<br>` line after `<summary>` and the blank line after it are both
   required: the blank line makes the list render as Markdown, and the `<br>`
   gives the first bullet breathing room under the summary.
@@ -184,7 +181,7 @@ Root comment, submitted as a changes-requested review:
 ```markdown
 <!-- ollie-review: head: 8b2c6e1d4a9f7c3b5e0d1a8c6f2b9e4d7a3c1f0e; base: 3f9a0c2e7b1d5a8c4e6f0b2d9a1c3e5f7b9d1a3c; verdict: request-changes; gate: -; round: 1 -->
 
-> 🦦 Ollie's Decision &middot; ⚠️ **Request Changes**
+⚠️ Ollie's Verdict &middot; Request Changes
 
 Changes are required because the per-merchant Redis limiter on `POST /webhooks` has two blocking flaws: the bucket key comes from a client-controlled header, and the check-and-increment is two round trips, so bursts slip past the cap PAY-881 asks for.
 
@@ -289,7 +286,7 @@ https://github.com/acme/payhub/pull/142#pullrequestreview-7002`:
 ```markdown
 <!-- ollie-review: head: d7f4a9c2e8b1d6f0a3c5e7b9d1f2a4c6e8b0d3f5; base: 3f9a0c2e7b1d5a8c4e6f0b2d9a1c3e5f7b9d1a3c; verdict: comment-only; gate: -; round: 2 -->
 
-> 🦦 Ollie's Decision &middot; 💬 **Comment Only**
+💬 Ollie's Verdict &middot; Comment Only
 
 Comment Only applies because both blockers are fixed and resolved, with two minors remaining. The Redis failure mode is still implicit: fail-open is the right call, as you said, but `handler.ts:88` still throws. One new minor: the parallel test never asserts a rejection, so it passes with the limiter disabled.
 
@@ -346,7 +343,7 @@ file; the untracked file is diffed as an addition. The branch is
 `feat/retry-backoff`. Nothing is posted anywhere.
 
 ```markdown
-> 🦦 Ollie's Decision &middot; 💬 **Comment Only**
+💬 Ollie's Verdict &middot; Comment Only
 
 `feat/retry-backoff` adds exponential backoff to the payout retry worker through a new `backoff.ts` helper; the jitter math is right. One gap: the helper receives the loop index instead of the persisted attempt, so backoff restarts from zero after a worker restart.
 
@@ -381,7 +378,7 @@ Root comment, submitted as an approval:
 ```markdown
 <!-- ollie-review: head: 5c1e9a7b3d2f8e6a0c4b7d9f1e3a5c7b9d1f3e5a; base: 3f9a0c2e7b1d5a8c4e6f0b2d9a1c3e5f7b9d1a3c; verdict: ship-it; gate: pass; round: 1 -->
 
-> 🦦 Ollie's Decision &middot; 🚢 **Ship It!**
+🚢 Ollie's Verdict &middot; Ship It!
 
 Approval is justified because the change only adds the verified merchant ID to three delivery log lines in `deliver.ts`, using the field name the dashboards already query. The ID comes from the signed event, the extended log-format test covers it, and `npm test` passes. No findings remain and every approval-gate rule passes.
 
