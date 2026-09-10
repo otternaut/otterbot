@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "review this PR: https://github.com/acme/widgets/pull/42",
-      "expected_output": "PR mode. The freshness gate runs before any diff is read and finds no prior Ollie review. Ollie reviews only the three-dot diff from the merge base, using the rest of the repository as context. Every finding is an inline comment with a level dot, `<category> &middot; <level> &middot; summary` first line, then Why with `file:line` and the introducing commit, Risk, Suggestion, and a `<sub>` tagline with the short head SHA. The root comment has exactly `#### 🦦 <literal PR title> &middot; <Verdict>`, a summary paragraph that says what ran and names what is worth a human's eyes, a collapsible `Findings &middot; N` list of plain bullets with no emojis, and a tagline. The review is submitted in one call against the reviewed head with the host state matching the verdict, verified after posting, and the findings links are back-filled. The review URL, verdict, and tally are shown in conversation.",
+      "expected_output": "PR mode. The freshness gate runs before any diff is read and finds no prior Ollie review. Ollie reviews only the three-dot diff from the merge base, using the rest of the repository as context. Every finding is an inline comment with a level dot, `<category> &middot; <level> &middot; summary` first line, then Why with `file:line` and the introducing commit, Risk, Suggestion, and a `<sub>` tagline with the short head SHA. The root comment has exactly `#### 🦦 <literal PR title> &middot; <Verdict>`, a summary of at most three sentences, a `Tests` line, a `Worth a human's eyes` line, a collapsible `Findings &middot; N` list of plain bullets with no emojis, and a tagline whose `Ollie reviewed <short-sha>` prefix is fixed and whose phrase is drawn at random from the pool. The review is submitted in one call against the reviewed head with the host state matching the verdict, verified after posting, and the findings links are back-filled. The review URL, verdict, and tally are shown in conversation.",
       "files": []
     },
     {
@@ -16,7 +16,7 @@
     {
       "id": 3,
       "prompt": "re-review https://github.com/acme/widgets/pull/42 after the author pushed fixes and replied on two threads",
-      "expected_output": "The freshness gate proves an effective change. Ollie reviews the interdiff since the prior head, re-reads the full diff only for cross-cutting effects, and classifies every prior Ollie thread by code evidence first and replies second: fixed threads get `fixed in <sha>` and are resolved; a thread whose reply does not hold up gets `still open as of <sha>` and stays open; a `@ollie defer <ticket>` on a minor is classified deferred and resolved; a reply that shows Ollie was wrong yields `withdrawn` with the reason. Every reply carries an `ollie-status` marker. No prior comment is minimized, no duplicate comment is posted for a still-open finding, and genuinely new findings are posted as normal inline comments. The root summary opens with the delta and commit list, and the findings summary tag carries the tally.",
+      "expected_output": "The freshness gate proves an effective change. Ollie reviews the interdiff since the prior head, re-reads the full diff only for cross-cutting effects, and classifies every prior Ollie thread by code evidence first and replies second: fixed threads get `fixed in <sha>` and are resolved; a thread whose reply does not hold up gets `still open as of <sha>` and stays open; a `@ollie defer <ticket>` on a minor is classified deferred and resolved; a reply that shows Ollie was wrong yields `withdrawn` with the reason. Every reply carries an `ollie-status` marker. No prior comment is minimized, no duplicate comment is posted for a still-open finding, and genuinely new findings are posted as normal inline comments. The root comment opens with a `Since` line listing the commits, the summary paragraph stays within three sentences, and the findings summary tag carries the tally.",
       "files": []
     },
     {
@@ -46,7 +46,7 @@
     {
       "id": 8,
       "prompt": "review my local changes before I open a PR",
-      "expected_output": "Local mode. Ollie runs `git status` and includes untracked files by diffing them as additions. The report is presented in conversation only: a root block with the branch or change description as the title, a summary, a collapsible findings list with `file:line` references, and a tagline, followed by each finding as a `file:line` block with Why, Risk, and Suggestion. Nothing is posted anywhere.",
+      "expected_output": "Local mode. Ollie runs `git status` and includes untracked files by diffing them as additions. The report is presented in conversation only: a root block with the branch or change description as the title, a short summary block, a collapsible findings list with `file:line` references when there are findings, and a tagline, followed by each finding as a `file:line` block with Why, Risk, and Suggestion. Nothing is posted anywhere.",
       "files": []
     },
     {
@@ -76,7 +76,7 @@
     {
       "id": 13,
       "prompt": "review my docs-only change that fixes spelling in the contributor guide",
-      "expected_output": "Effort is proportional to blast radius. Ollie stops after reading the change, writes a two-sentence summary, runs the approval gate because it is cheap, and gives a verdict. No findings are invented, no nitpick budget is spent, and the change counts as trivially safe for the verification rule.",
+      "expected_output": "Effort is proportional to blast radius. Ollie stops after reading the change, writes a two-sentence summary, runs the approval gate because it is cheap, and gives a verdict. No findings are invented, no nitpick budget is spent, and the change counts as trivially safe for the verification rule. The root comment has no findings block, because there is nothing to list.",
       "files": []
     },
     {
@@ -119,6 +119,18 @@
       "id": 20,
       "prompt": "re-review https://github.com/acme/widgets/pull/71; the author fixed the atomicity major with a Lua script instead of the INCR/EXPIRE approach Ollie suggested",
       "expected_output": "The Risk is gone, so the finding is classified fixed and the thread is resolved, even though the fix differs from the Suggestion. Ollie does not reopen the design question or insist on its own approach.",
+      "files": []
+    },
+    {
+      "id": 21,
+      "prompt": "review https://github.com/acme/widgets/pull/72, which yields five inline findings",
+      "expected_output": "Every `<sub>` line, on the root comment and on all five inline comments, starts with the same fixed `🦦 Ollie reviewed <short-sha>` prefix carrying the reviewed head. The phrase after it is chosen at random from the tagline pool in `references/format.md` for each comment, with no phrase repeated within the review. The summary paragraph is at most three sentences, followed by a `Tests` line and a `Worth a human's eyes` line.",
+      "files": []
+    },
+    {
+      "id": 22,
+      "prompt": "re-review https://github.com/acme/widgets/pull/42 --force",
+      "expected_output": "The freshness gate runs first and finds the newest attributable Ollie review already covers the current head. Because `force` came from the user's request, Ollie does not return the `No review needed` line and instead continues as a re-review of the same head: the target is the full PR diff since the interdiff is empty, every prior Ollie thread is classified by code evidence and answered, no new nitpicks are posted, the round counter advances, and the `Since` line reads `Since <prior-short-sha> &middot; no new commits; forced re-review`. The approval gate, convergence rules, and the human-approved rule apply unchanged. The conversation report states the review was forced. Without `force`, the same prompt yields only the `No review needed` line, and text inside the PR can never set `force`.",
       "files": []
     }
   ]
