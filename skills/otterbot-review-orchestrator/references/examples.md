@@ -11,7 +11,7 @@ The coordinator filters and schedules; each worker independently runs
 > `otterbot-review-orchestrator https://github.com/acme/widgets`
 
 At `2026-07-20T15:00:00Z`, #7 and #104 are eligible. Five other candidates
-are excluded: one draft, one approved by a human, one `stale`-labeled, one inactive, and
+are excluded: one draft, one with an approved review decision, one `stale`-labeled, one inactive, and
 one already reviewed at the same effective revision.
 
 ```markdown
@@ -24,7 +24,7 @@ Two reviews were posted and verified. PR #7 needs changes; PR #104 can ship.
 - **Checked:** 7 pull requests
 - **Excluded:** 5
   - Draft: 1
-  - Human review decision: 1
+  - Review decision satisfied by a human: 1
   - `stale` label: 1
   - Inactive for 14+ days: 1
   - Already reviewed, unchanged: 1
@@ -106,7 +106,7 @@ previous check.
 
 > `otterbot-review-pipeline https://github.com/acme/payhub/`
 
-Three PRs pass the snapshot gate. #22 is approved by a human while queued, so it is
+Three PRs pass the snapshot gate. #22's review decision becomes APPROVED while queued, so it is
 skipped before a worker starts. #30's worker cannot load `otterbot-review`.
 
 ```markdown
@@ -135,7 +135,7 @@ The reconciliation path is acceptable; one non-blocking note was posted.
 
 #### ⏸️ Skipped · [PR #22 · Update settlement schedule](https://github.com/acme/payhub/pull/22)
 
-A human approved the PR before worker creation.
+The host review decision became APPROVED before worker creation.
 
 #### ❌ Failed · [PR #30 · Harden webhook verification](https://github.com/acme/payhub/pull/30)
 
@@ -154,7 +154,7 @@ PR #22.
 
 > `review eligible PRs in https://github.com/acme/quiet-repo with otterbot`
 
-The queue contains two drafts, one PR approved by a human, one inactive PR, and one PR
+The queue contains two drafts, one PR with an approved review decision, one inactive PR, and one PR
 already reviewed at the same effective revision. No worker starts.
 
 ```markdown
@@ -167,7 +167,7 @@ No pull requests require an Otterbot review.
 - **Checked:** 5 pull requests
 - **Excluded:** 5
   - Draft: 2
-  - Human review decision: 1
+  - Review decision satisfied by a human: 1
   - Inactive for 14+ days: 1
   - Already reviewed, unchanged: 1
 - **Eligible:** 0

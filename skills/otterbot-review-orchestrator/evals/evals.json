@@ -10,7 +10,7 @@
     {
       "id": 2,
       "prompt": "otterbot-review-pipeline https://github.com/acme/widgets/",
-      "expected_output": "The pipeline-style invocation triggers otterbot-review-orchestrator. The trailing slash is normalized, and the same strict no-human-decision, non-draft, open, non-stale, recently active eligibility gate and isolated-worker workflow is used.",
+      "expected_output": "The pipeline-style invocation triggers otterbot-review-orchestrator. The trailing slash is normalized, and the same strict host-review-decision, non-draft, open, non-stale, recently active eligibility gate and isolated-worker workflow is used.",
       "files": []
     },
     {
@@ -52,13 +52,13 @@
     {
       "id": 9,
       "prompt": "scan https://github.com/acme/widgets; PR #9 is open and fresh but reviewDecision is APPROVED because a human reviewer approved it",
-      "expected_output": "PR #9 is excluded because a human reviewer holds an approved state. The coordinator does not infer that another review might be useful and creates no worker for it.",
+      "expected_output": "PR #9 is excluded because its host review decision is APPROVED and that decision comes from a human, so the review requirement is already satisfied. The coordinator does not infer that another review might be useful and creates no worker for it.",
       "files": []
     },
     {
       "id": 10,
       "prompt": "scan https://github.com/acme/widgets; PR #10 has reviewDecision CHANGES_REQUESTED from a human reviewer",
-      "expected_output": "PR #10 is excluded as human review decision present. The orchestrator does not run a re-review while a human's latest review is changes-requested; only Ollie's own prior state is allowed to keep a PR eligible.",
+      "expected_output": "PR #10 is excluded as human review decision present. The orchestrator does not run a re-review while the host decision is changes-requested because of a human; only Ollie's own prior state is allowed to keep a PR eligible.",
       "files": []
     },
     {
@@ -93,8 +93,8 @@
     },
     {
       "id": 16,
-      "prompt": "worker for PR #16 finishes analysis, but a human approves the PR before delivery",
-      "expected_output": "The worker's mandatory final eligibility check detects the human approval and posts nothing. It returns Skipped with the failed condition; the coordinator does not claim a verdict or delivery.",
+      "prompt": "worker for PR #16 finishes analysis, but a human approval flips reviewDecision to APPROVED before delivery",
+      "expected_output": "The worker's mandatory final eligibility check detects the satisfied review decision and posts nothing. It returns Skipped with the failed condition; the coordinator does not claim a verdict or delivery.",
       "files": []
     },
     {
@@ -111,7 +111,7 @@
     },
     {
       "id": 19,
-      "prompt": "https://github.com/acme/quiet-repo has two drafts, one PR approved by a human, and one PR inactive for 20 days",
+      "prompt": "https://github.com/acme/quiet-repo has two drafts, one PR with an APPROVED review decision, and one PR inactive for 20 days",
       "expected_output": "No PR passes the gate. The coordinator returns the aggregate exclusion audit, states that no pull requests require an Otterbot review, and exits successfully immediately. It creates or waits for no workers, invokes no otterbot-review skill, inspects no diff, and performs no delivery.",
       "files": []
     },
@@ -171,7 +171,7 @@
     },
     {
       "id": 29,
-      "prompt": "sweep https://github.com/acme/widgets; PR #7 receives Request Changes with one major and one minor inline finding, and PR #8 is skipped after a human approves it",
+      "prompt": "sweep https://github.com/acme/widgets; PR #7 receives Request Changes with one major and one minor inline finding, and PR #8 is skipped after its review decision becomes APPROVED",
       "expected_output": "The console output is a concise, non-collapsible report titled `🦦 Review Orchestrator · owner/repo`. Its plain-language outcome is followed by a `📊 Review Summary` with only nonzero exclusion reasons and final statuses, then brief linked PR cards. PR #7's card is headed `⚠️ Request Changes` and shows the review link, sanitized major/minor finding summary, outcome, and verification summary. PR #8's Skipped card shows only the changed-eligibility reason. A Follow-up section identifies the author action for #7 and explains that #8 needs no review.",
       "files": []
     },
@@ -203,6 +203,12 @@
       "id": 34,
       "prompt": "scan https://github.com/acme/widgets; PR #34 is changes-requested only by Ollie and its current head equals the head in Ollie's newest marker",
       "expected_output": "PR #34 passes condition 3 but fails condition 6 as already reviewed and unchanged. No worker is created; the audit reason is already reviewed and unchanged, and Ollie's existing review is referenced.",
+      "files": []
+    },
+    {
+      "id": 36,
+      "prompt": "scan https://github.com/acme/widgets; the repository requires two approvals, PR #36 already has one approval from a human reviewer, and reviewDecision is still REVIEW_REQUIRED",
+      "expected_output": "PR #36 stays eligible. The host decision REVIEW_REQUIRED is the source of truth: an individual human approval that has not satisfied the required count never excludes a PR. A fresh worker runs otterbot-review with the full finding set, and the worker's pre-delivery gate passes for the same reason unless the decision changes to APPROVED or CHANGES_REQUESTED before delivery.",
       "files": []
     },
     {

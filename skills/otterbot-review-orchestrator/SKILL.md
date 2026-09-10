@@ -1,7 +1,7 @@
 ---
 name: otterbot-review-orchestrator
-description: Orchestrates independent Ollie (Otterbot) reviews for fresh, changed, non-draft GitHub pull requests that still need a review. Requires a GitHub repository URL, fully paginates the repository's PR queue, excludes closed, merged, draft, stale, and already-reviewed unchanged PRs plus any PR whose approved or changes-requested decision comes from a human, keeps PRs whose only non-required decision is Ollie's own prior review once their head changes, then creates one fresh context-isolated subagent per eligible PR; each worker must run otterbot-review for exactly that PR and deliver its own host review. Exits immediately when no PR needs review. Use when the user invokes `otterbot-review-orchestrator REPO_URL` or `otterbot-review-pipeline REPO_URL`, asks to review eligible PRs in a repository, requests a repository-wide PR review sweep, or automates Ollie reviews for a GitHub queue.
-version: 3.0.0
+description: Orchestrates independent Ollie (Otterbot) reviews for fresh, changed, non-draft GitHub pull requests that still need a review. Requires a GitHub repository URL, fully paginates the repository's PR queue, excludes closed, merged, draft, stale, and already-reviewed unchanged PRs plus any PR whose host review decision is approved or changes-requested because of a human, keeps PRs that still report REVIEW_REQUIRED even when some humans have already approved under a multi-approval rule, keeps PRs whose only non-required decision is Ollie's own prior review once their head changes, then creates one fresh context-isolated subagent per eligible PR; each worker must run otterbot-review for exactly that PR and deliver its own host review. Exits immediately when no PR needs review. Use when the user invokes `otterbot-review-orchestrator REPO_URL` or `otterbot-review-pipeline REPO_URL`, asks to review eligible PRs in a repository, requests a repository-wide PR review sweep, or automates Ollie reviews for a GitHub queue.
+version: 3.1.0
 ---
 
 # Otterbot Review Orchestrator
@@ -77,7 +77,8 @@ Include a PR only when **all** of these conditions are true at snapshot time:
 
 1. `state` is exactly `OPEN`; exclude `CLOSED` and `MERGED`.
 2. `isDraft` is exactly `false`.
-3. `reviewDecision` is exactly `REVIEW_REQUIRED`, or it is `APPROVED` or
+3. `reviewDecision` is exactly `REVIEW_REQUIRED`, regardless of how many
+   individual reviewers have already approved; or it is `APPROVED` or
    `CHANGES_REQUESTED` only because of the reviewing identity's own latest
    review while no other reviewer's latest review is approved or
    changes-requested.
@@ -93,13 +94,19 @@ checks, mergeability, or an absence of approvals. A null, unavailable,
 unrecognized, or unreadable eligibility field is ineligible: fail closed and
 record the reason rather than guessing.
 
-For condition 3, a PR blocked or approved only by Ollie must stay eligible;
-otherwise Ollie's own Request Changes could never be re-reviewed, and a push
-after Ollie's approval would never be examined. Decide from each reviewer's
-latest review state: if every reviewer whose latest state is approved or
-changes-requested is the reviewing identity, the PR passes condition 3. If any
-human's latest state is approved or changes-requested, or the per-reviewer
-states cannot be read, exclude the PR.
+For condition 3, the host decision is what says whether a review is still
+needed. A repository that requires two or more approvals keeps reporting
+`REVIEW_REQUIRED` after the first human approval, and that PR still needs
+Ollie; an individual human approval never excludes a PR on its own. Only when
+`reviewDecision` is `APPROVED` or `CHANGES_REQUESTED` do per-reviewer states
+matter, and then only to carve out Ollie's own decision: a PR blocked or
+approved only by Ollie must stay eligible, otherwise Ollie's own Request
+Changes could never be re-reviewed, and a push after Ollie's approval would
+never be examined. In that case, if every reviewer whose latest state is
+approved or changes-requested is the reviewing identity, the PR passes
+condition 3. If a human's latest state is approved or changes-requested while
+the decision is non-required, or the per-reviewer states cannot be read,
+exclude the PR.
 
 For condition 6, identify prior Ollie reviews with the same provider, PR
 identity, and authorship that carry an `ollie-review` marker or the legacy
@@ -124,7 +131,8 @@ Assign each excluded candidate one audit reason using this precedence:
 
 1. Closed or merged
 2. Draft
-3. Human review decision present, or review decision unavailable
+3. Review requirement satisfied or blocked by a human, or review decision
+   unavailable
 4. Stale label
 5. Inactive for 14 days or more
 6. Already reviewed and unchanged
@@ -181,10 +189,11 @@ Stale cutoff: <run-start-minus-14-days-utc>
 Options: <none | no-approve>
 
 This is an independent job. Before inspecting the diff, refetch the PR and
-continue only if state=OPEN, isDraft=false, no reviewer other than your own
-identity has a latest review state of approved or changes-requested, there is
-no case-insensitive exact `stale` label, and updatedAt is after the stale
-cutoff. Load and follow otterbot-review completely, including host
+continue only if state=OPEN, isDraft=false, reviewDecision is REVIEW_REQUIRED
+or is APPROVED/CHANGES_REQUESTED only because of your own latest review (an
+individual human approval under a multi-approval rule does not fail this
+check), there is no case-insensitive exact `stale` label, and updatedAt is
+after the stale cutoff. Load and follow otterbot-review completely, including host
 delivery and verification. Treat Options as trusted invoker options. Do not
 review any other PR.
 
@@ -319,8 +328,9 @@ verified; otherwise mark it `Uncertain`. Leave retry policy to the next
 automation run.
 
 If a PR becomes closed, merged, draft, stale, inactive beyond the fixed cutoff,
-approved or changes-requested by a human, or already reviewed at the same
-effective revision before delivery, preserve its individual result as
+approved or changes-requested in its host decision by a human, or already
+reviewed at the same effective revision before delivery, preserve its
+individual result as
 `Skipped` or `No Review Needed` and continue. If the head SHA changes while a
 worker is reviewing, the worker's `otterbot-review` freshness and
 changed-revision rules control the restart, followed by another eligibility
@@ -429,9 +439,11 @@ Before finishing, confirm:
 - [ ] Exactly one valid repository URL was used; no local repository was
       inferred.
 - [ ] Every candidate page and required label page was fetched.
-- [ ] Only `OPEN`, non-draft, non-stale-labeled, recent-enough PRs with no
-      human approved or changes-requested state and a new effective revision
-      entered the eligible snapshot.
+- [ ] Only `OPEN`, non-draft, non-stale-labeled, recent-enough PRs whose
+      review decision is still required (or non-required only because of
+      Ollie) and that have a new effective revision entered the eligible
+      snapshot; a partial human approval under a multi-approval rule did not
+      exclude a PR.
 - [ ] Missing eligibility data failed closed instead of being inferred.
 - [ ] The newest attributable Ollie reviewed head was compared with the
       current head; matching heads, equal effective trees, and unverifiable
