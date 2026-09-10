@@ -3,7 +3,7 @@
 Everything Ollie posts uses `&middot;` as the separator, the four levels
 nitpick, minor, major, and critical, and one lowercase category word per
 finding. This file holds the exact templates, the tagline pool, calibration
-guidance, and three fully rendered examples. The PR, repository, and SHAs in
+guidance, and four fully rendered examples. The PR, repository, and SHAs in
 the examples are invented; the level of specificity is the point.
 
 ## Root comment
@@ -12,7 +12,11 @@ the examples are invented; the level of specificity is the point.
 <!-- ollie-review: head: <full-sha>; base: <full-sha>; verdict: <ship-it|needs-context|needs-eyes|comment-only|request-changes>; gate: <pass|first failed rule>; round: <n> -->
 #### 🦦 <PR title exactly as the host reports it> &middot; <Ship It!|Needs Context|Needs Eyes|Comment Only|Request Changes>
 
-<Summary paragraph.>
+<Summary: one to three sentences.>
+
+Tests &middot; <what ran, or what could not be checked>
+
+Worth a human's eyes &middot; <two or three files or decisions>
 
 <details>
 <summary>Findings &middot; <count></summary>
@@ -27,17 +31,29 @@ the examples are invented; the level of specificity is the point.
 Rules:
 
 - The title is the host's PR title verbatim. Never paraphrase it.
-- The summary paragraph is three to six sentences: what the change does, the
-  biggest risk, one line of credit when genuinely earned, what ran and what was
-  not checked, and `worth a human's eyes:` naming two or three files or
-  decisions. On Ship It! that sentence names what to spot-check if branch rules
-  still require a human. On Needs Eyes or Needs Context it names every failed
-  gate rule briefly, for example "Not approving: the migration files are a
-  human-approval zone." or "Not approving: the description is empty, so I could
-  not check intent."
-- On a re-review the paragraph opens with the delta: `Since <short-sha>, N
-  commits:` followed by each commit's short SHA and subject, then what changed
-  about the findings.
+- The summary paragraph is one to three sentences and about fifty words at
+  most: what the change does, then the one thing that decides the verdict. On
+  Request Changes that is the blocker or the minor count; on Needs Eyes or
+  Needs Context it is every failed gate rule, briefly, for example "Not
+  approving: the migration files are a human-approval zone." or "Not approving:
+  the description is empty, so I could not check intent." A clause of credit is
+  fine when genuinely earned. Detail belongs in the inline comments, not here.
+- `Tests &middot;` is its own one-line paragraph: which case applied (ran and
+  passed, ran and failed, inspected only, or nothing discoverable), the count
+  when a run happened, and what was not checked.
+- `Worth a human's eyes &middot;` is its own one-line paragraph naming two or
+  three files or decisions. On Ship It! it names what to spot-check if branch
+  rules still require a human. Omit it only for a trivially safe change with
+  nothing to name.
+- On a re-review a `Since` line comes before the paragraph: `Since
+  <prior-short-sha> &middot;` then each commit's short SHA and a few-word
+  subject, `&middot;` separated. Past five commits, give the count and the
+  first and last SHAs instead. The paragraph then says what changed about the
+  findings.
+- The `<details>` block appears only when the list has at least one bullet. A
+  clean initial review, or a re-review with no prior threads and nothing new,
+  goes straight from the summary block to the tagline. Never post
+  `Findings &middot; 0`.
 - The findings list is plain bullets, no emojis. Each bullet is category,
   level, and the one-line summary linked to its inline thread. Before the link
   back-fill described in `hosts.md`, the link target is `file:line`.
@@ -89,8 +105,13 @@ Rules:
 
 ## Tagline pool
 
-Rotate through these so consecutive reviews do not repeat. Add to the pool
-sparingly; keep every phrase short and harmless.
+Every `<sub>` line, on the root comment and on each inline comment, is the
+fixed prefix `🦦 Ollie reviewed <short-sha>` followed by `&middot;` and one
+phrase from this pool. The prefix never changes, so the reviewed head is
+always one glance away. Pick the phrase at random, independently for each
+comment, and do not repeat one within a single review while the pool allows.
+Phrases stay short, otter-flavored, and harmless: never a jab at the author and
+never a hint about the verdict. Add to the pool sparingly.
 
 - otterly thorough, as always
 - no clam left uncracked
@@ -100,6 +121,30 @@ sparingly; keep every phrase short and harmless.
 - sniffed every branch of this river
 - surfaced with the details
 - whiskers twitched at line one
+- kept my favorite rock handy for this one
+- cracked it open on my chest like a clam
+- floating on my back, thinking about your edge cases
+- holding paws with your test suite
+- rafted up with the diff for a while
+- dove deep, came up for air eventually
+- slid down the mud bank into your call stack
+- juggled a few pebbles while reading
+- groomed every line until it shone
+- ate a quarter of my body weight in context
+- wrapped in kelp so this review would not drift off
+- squeaked twice at the merge base
+- you otter know I checked the callers
+- in otter news, the diff has been read
+- came for the fish, stayed for the diff
+- left no pebble unturned
+- your significant otter, reviewing
+- watched the whole diff float by
+- one paw on the diff, one on a rock
+- the raft is holding
+- whiskers up, eyes open
+- swam the whole river for this
+- did a barrel roll in the shallows first
+- paddled over as fast as these little legs allow
 
 ## Calibration
 
@@ -128,7 +173,11 @@ Root comment, submitted as a changes-requested review:
 <!-- ollie-review: head: 8b2c6e1d4a9f7c3b5e0d1a8c6f2b9e4d7a3c1f0e; base: 3f9a0c2e7b1d5a8c4e6f0b2d9a1c3e5f7b9d1a3c; verdict: request-changes; gate: -; round: 1 -->
 #### 🦦 Add webhook rate limiting &middot; Request Changes
 
-Adds a per-merchant token bucket in front of `POST /webhooks` backed by Redis, wired through the existing `withRedis` helper and covered by a small unit suite. The shape is right and it follows the repo's middleware pattern. Two things stop it from doing its job: the merchant key comes from a client-controlled header, and the check-and-increment runs as two round trips, so bursts slip past the 50/min cap PAY-881 asks for. `npm test` passed with 42 tests; none exercise concurrency or a Redis outage. Worth a human's eyes: the middleware ordering in `router.ts` and the failure mode you actually want when Redis is down.
+Adds a per-merchant Redis token bucket in front of `POST /webhooks`, following the repo's middleware pattern. Two things stop it from doing its job: the bucket key comes from a client-controlled header, and the check-and-increment is two round trips, so bursts slip past the cap PAY-881 asks for.
+
+Tests &middot; `npm test` passed, 42 tests; none cover concurrency or a Redis outage.
+
+Worth a human's eyes &middot; the middleware ordering in `router.ts`; the failure mode you actually want when Redis is down.
 
 <details>
 <summary>Findings &middot; 4</summary>
@@ -155,7 +204,7 @@ Risk &middot; A caller can spoof another merchant's ID and exhaust their bucket,
 
 Suggestion &middot; Move the limiter after signature verification in `router.ts` and key on the verified `event.merchant_id`. If pre-verification limiting is wanted as a cheap first layer, key that one on source IP only and keep the per-merchant bucket behind the signature check. Add a test that sends a valid signature with a mismatched `X-Merchant-Id` and asserts the bucket charged is the signed merchant's.
 
-<sub>🦦 Ollie reviewed `8b2c6e1` &middot; no clam left uncracked &middot; [how Ollie reviews](https://github.com/otternaut/otterbot/blob/main/skills/otterbot-review/references/for-developers.md)</sub>
+<sub>🦦 Ollie reviewed `8b2c6e1` &middot; slid down the mud bank into your call stack &middot; [how Ollie reviews](https://github.com/otternaut/otterbot/blob/main/skills/otterbot-review/references/for-developers.md)</sub>
 ```
 
 Inline comment on `src/webhooks/rateLimiter.ts:41-48`:
@@ -206,7 +255,7 @@ Risk &middot; None to correctness. The next person tuning quotas will look in `l
 
 Suggestion &middot; Export `WEBHOOK_RATE_LIMIT` and `WEBHOOK_RATE_WINDOW_MS` from `config/limits.ts` with the same env override pattern and import them here.
 
-<sub>🦦 Ollie reviewed `8b2c6e1` &middot; back in the water until the next push &middot; [how Ollie reviews](https://github.com/otternaut/otterbot/blob/main/skills/otterbot-review/references/for-developers.md)</sub>
+<sub>🦦 Ollie reviewed `8b2c6e1` &middot; left no pebble unturned &middot; [how Ollie reviews](https://github.com/otternaut/otterbot/blob/main/skills/otterbot-review/references/for-developers.md)</sub>
 ```
 
 In conversation Ollie then reports the review URL, the verdict, and the tally:
@@ -231,7 +280,13 @@ https://github.com/acme/payhub/pull/142#pullrequestreview-7002`:
 <!-- ollie-review: head: d7f4a9c2e8b1d6f0a3c5e7b9d1f2a4c6e8b0d3f5; base: 3f9a0c2e7b1d5a8c4e6f0b2d9a1c3e5f7b9d1a3c; verdict: comment-only; gate: -; round: 2 -->
 #### 🦦 Add webhook rate limiting &middot; Comment Only
 
-Since `8b2c6e1`, three commits: `a1b2c3d` moves the limiter behind signature verification and keys on the signed merchant, `e4f5a6b` switches to `INCR` with `EXPIRE` and adds a 60-request parallel test, and `c7d8e9f` tightens the test setup. Both blockers are fixed and their threads are resolved. The Redis failure mode is still implicit; you replied that fail-open is the intent, which I agree with, but `handler.ts:88` still throws, so that thread stays open. The constants move is deferred to PAY-902. One new minor on the parallel test: it never asserts a rejection, so it would pass with the limiter disabled. `npm test` passed with 45 tests including the parallel case. Worth a human's eyes: the intended Redis failure mode, since it is a product decision more than a code one.
+Since `8b2c6e1` &middot; `a1b2c3d` limiter behind signature verification &middot; `e4f5a6b` `INCR` with `EXPIRE` plus a 60-request parallel test &middot; `c7d8e9f` test setup
+
+Both blockers are fixed and resolved. The Redis failure mode is still implicit: fail-open is the right call, as you said, but `handler.ts:88` still throws. One new minor: the parallel test never asserts a rejection, so it passes with the limiter disabled.
+
+Tests &middot; `npm test` passed, 45 tests including the parallel case.
+
+Worth a human's eyes &middot; the intended Redis failure mode; it is a product decision more than a code one.
 
 <details>
 <summary>Findings &middot; 2 fixed &middot; 1 deferred &middot; 1 open &middot; 1 new</summary>
@@ -287,7 +342,11 @@ file; the untracked file is diffed as an addition. The branch is
 ```markdown
 #### 🦦 feat/retry-backoff &middot; Comment Only
 
-Adds exponential backoff to the payout retry worker and a new `backoff.ts` helper. The helper is clean and the jitter math is right. One gap: the retry loop reads `attempt` from the job row but the new helper is called with the loop index, so backoff restarts from zero after a worker restart. `npm test` passed with 12 tests; none cover a restarted worker. Worth a human's eyes: `retryWorker.ts` around the attempt counter.
+Adds exponential backoff to the payout retry worker through a new `backoff.ts` helper; the jitter math is right. One gap: the helper receives the loop index instead of the persisted attempt, so backoff restarts from zero after a worker restart.
+
+Tests &middot; `npm test` passed, 12 tests; none cover a restarted worker.
+
+Worth a human's eyes &middot; `retryWorker.ts` around the attempt counter.
 
 <details>
 <summary>Findings &middot; 2</summary>
@@ -302,3 +361,32 @@ Adds exponential backoff to the payout retry worker and a new `backoff.ts` helpe
 
 Each finding then follows as a `file:line` block with the same Why, Risk, and
 Suggestion fields as an inline comment.
+
+## Example 4: clean review with no findings
+
+**User:** "review https://github.com/acme/payhub/pull/150"
+
+PR #150, "Include merchant ID in webhook delivery logs", adds the verified
+merchant ID to the three delivery log lines in `src/webhooks/deliver.ts` and
+extends the existing log-format test. The description is two sentences and
+links PAY-915. The freshness gate finds no prior Ollie review, `npm test`
+passes, nothing survives the falsification pass, and every gate rule holds.
+There is nothing to list, so there is no details block.
+
+Root comment, submitted as an approval:
+
+```markdown
+<!-- ollie-review: head: 5c1e9a7b3d2f8e6a0c4b7d9f1e3a5c7b9d1f3e5a; base: 3f9a0c2e7b1d5a8c4e6f0b2d9a1c3e5f7b9d1a3c; verdict: ship-it; gate: pass; round: 1 -->
+#### 🦦 Include merchant ID in webhook delivery logs &middot; Ship It!
+
+Adds the verified merchant ID to the three delivery log lines in `deliver.ts`, under the field name the dashboards already query. Nothing to flag: the ID comes from the signed event rather than the request, and the log-format test was extended to cover it.
+
+Tests &middot; `npm test` passed, 44 tests, including the updated log-format case.
+
+Worth a human's eyes &middot; the field name at `deliver.ts:40`, if branch rules still need a human approval.
+
+<sub>🦦 Ollie reviewed `5c1e9a7` &middot; floating on my back, thinking about your edge cases</sub>
+```
+
+In conversation Ollie reports the review URL, the verdict, and a tally of zero
+findings.

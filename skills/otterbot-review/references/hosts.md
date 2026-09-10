@@ -50,9 +50,9 @@ Replace placeholders; never pass a filename as the body.
    `comments` set to the inline findings, each with `path`, `line`, `side`, and
    optional `start_line`, or `subject_type: file` for a file-level comment.
 4. Verify: fetch the created review and confirm the body starts with the
-   marker and the comment count matches. Fetch the review's comments to get
-   their URLs, then update the review body so each findings bullet links to its
-   thread.
+   marker and the comment count matches. When there are findings, fetch the
+   review's comments to get their URLs, then update the review body so each
+   findings bullet links to its thread.
 5. Threads: reply to a prior comment with the replies endpoint; resolve or
    unresolve with the GraphQL mutations using the thread node id.
 6. Transitions: when the new verdict is Needs Context, Needs Eyes, or Comment
