@@ -11,7 +11,7 @@ The coordinator filters and schedules; each worker independently runs
 > `otterbot-review-orchestrator https://github.com/acme/widgets`
 
 At `2026-07-20T15:00:00Z`, #7 and #104 are eligible. Five other candidates
-are excluded: one draft, one approved, one `stale`-labeled, one inactive, and
+are excluded: one draft, one approved by a human, one `stale`-labeled, one inactive, and
 one already reviewed at the same effective revision.
 
 ```markdown
@@ -24,7 +24,7 @@ Two reviews were posted and verified. PR #7 needs changes; PR #104 can ship.
 - **Checked:** 7 pull requests
 - **Excluded:** 5
   - Draft: 1
-  - Review not required: 1
+  - Human review decision: 1
   - `stale` label: 1
   - Inactive for 14+ days: 1
   - Already reviewed, unchanged: 1
@@ -39,7 +39,7 @@ Two reviews were posted and verified. PR #7 needs changes; PR #104 can ship.
 The webhook path can still deliver the same event twice after a retry.
 
 - **Review:** [Open Otterbot review](https://github.com/acme/widgets/pull/7#pullrequestreview-501)
-- **Findings:** 2 inline findings — 1 high, 1 medium
+- **Findings:** 2 inline findings — 1 major, 1 minor
 - **Verification:** Retry and duplicate-delivery behavior needs a regression
   test.
 
@@ -55,7 +55,7 @@ The removal preserves the remaining retry path.
 Address PR #7's two findings and add the regression test, then rerun the sweep.
 ```
 
-The coordinator does not reproduce Council reports, compare scores, or make a
+The coordinator does not reproduce root comments or finding text, or make a
 combined merge recommendation.
 
 ### Live progress seen during the sweep
@@ -106,7 +106,7 @@ previous check.
 
 > `otterbot-review-pipeline https://github.com/acme/payhub/`
 
-Three PRs pass the snapshot gate. #22 becomes approved while queued, so it is
+Three PRs pass the snapshot gate. #22 is approved by a human while queued, so it is
 skipped before a worker starts. #30's worker cannot load `otterbot-review`.
 
 ```markdown
@@ -130,12 +130,12 @@ One review was posted. PR #22 no longer needs review, and PR #30 needs a retry.
 The reconciliation path is acceptable; one non-blocking note was posted.
 
 - **Review:** [Open Otterbot review](https://github.com/acme/payhub/pull/21#pullrequestreview-800)
-- **Findings:** 1 low-priority inline finding
+- **Findings:** 1 nitpick inline finding
 - **Verification:** Focused reconciliation tests passed.
 
 #### ⏸️ Skipped · [PR #22 · Update settlement schedule](https://github.com/acme/payhub/pull/22)
 
-`reviewDecision` changed to `APPROVED` before worker creation.
+A human approved the PR before worker creation.
 
 #### ❌ Failed · [PR #30 · Harden webhook verification](https://github.com/acme/payhub/pull/30)
 
@@ -154,7 +154,7 @@ PR #22.
 
 > `review eligible PRs in https://github.com/acme/quiet-repo with otterbot`
 
-The queue contains two drafts, one approved PR, one inactive PR, and one PR
+The queue contains two drafts, one PR approved by a human, one inactive PR, and one PR
 already reviewed at the same effective revision. No worker starts.
 
 ```markdown
@@ -167,7 +167,7 @@ No pull requests require an Otterbot review.
 - **Checked:** 5 pull requests
 - **Excluded:** 5
   - Draft: 2
-  - Review not required: 1
+  - Human review decision: 1
   - Inactive for 14+ days: 1
   - Already reviewed, unchanged: 1
 - **Eligible:** 0
