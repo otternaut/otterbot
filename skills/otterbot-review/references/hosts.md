@@ -17,7 +17,7 @@ use the listed fallback and say so in the conversation summary.
 | Request Changes | review event `REQUEST_CHANGES` | request changes where the version supports it; otherwise unapprove and post the root note | request changes |
 
 Where a host cannot express a state, post the root comment as a plain comment
-with the verdict in the title and state the limitation.
+and state the limitation; the verdict callout already carries the verdict.
 
 ## Capability map
 
@@ -28,6 +28,7 @@ with the verdict in the title and state the limitation.
 | Suggestion block | ```` ```suggestion ```` | ```` ```suggestion:-0+0 ```` | not supported; describe the change |
 | Edit review body after submit | yes | yes, edit the note | yes, edit the comment |
 | Resolve or unresolve a thread | GraphQL `resolveReviewThread` / `unresolveReviewThread` | resolve or unresolve the discussion | resolve or reopen the comment |
+| Alert callout for the verdict | yes: `> [!NOTE]`-style alerts | yes on 17.x and later; on older self-managed instances, fall back | no: falls back to a plain blockquote |
 | Dismiss own prior review | yes, with a message | unapprove | unapprove |
 | Required checks status | status check rollup on the head commit | pipeline status | commit statuses |
 | Reviewer states | latest review per reviewer | approvals and reviewer states | participant states |
@@ -63,7 +64,7 @@ Replace placeholders; never pass a filename as the body.
    prior state on its own.
 
 Self-review: GitHub rejects approving or requesting changes on your own PR.
-Post the review with `COMMENT` and state the verdict in the title.
+Post the review with `COMMENT`; the verdict callout carries the verdict.
 
 ## GitLab
 
@@ -71,7 +72,8 @@ Approvals are separate from notes. Post inline findings as draft notes and
 publish them together so the review lands at once; post the root comment as
 the first note. For Ship It!, approve. For Request Changes, use the reviewer
 request-changes action where available, otherwise remove any existing Ollie
-approval and rely on the title. Resolve discussions Ollie owns when a finding
+approval and rely on the verdict callout. Resolve discussions Ollie owns when a
+finding
 is classified fixed, deferred, accepted, superseded, or withdrawn.
 
 ## Bitbucket Cloud
@@ -79,6 +81,8 @@ is classified fixed, deferred, accepted, superseded, or withdrawn.
 Comments are posted individually; post the root comment first, then each
 inline comment, then set the participant state with approve or request
 changes. Note in the conversation summary that delivery was not atomic.
+Bitbucket has no alert callouts, so the verdict goes in a plain blockquote
+with no `[!TYPE]` line.
 
 ## Fallbacks
 
@@ -86,8 +90,12 @@ changes. Note in the conversation summary that delivery was not atomic.
   comment, then set the state. Say so.
 - No file-level comments: attach to the nearest changed line in the file.
 - No body editing: findings bullets keep `file:line` instead of links.
+- No alert callouts, or support unconfirmed: post the verdict as a plain
+  blockquote with the `[!TYPE]` line dropped and everything else unchanged. A
+  literal `[!CAUTION]` rendered as text is worse than no callout, so when a
+  host's support is in doubt, fall back rather than guess.
 - Cannot attach a verdict: post the root comment as a plain comment with the
-  verdict in the title and state why.
+  verdict callout intact and state why.
 - Cannot post at all: state the failure, show the report in conversation, and
   offer to review a pasted diff. Never present the review as delivered.
 

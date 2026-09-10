@@ -10,7 +10,11 @@ the examples are invented; the level of specificity is the point.
 
 ```markdown
 <!-- ollie-review: head: <full-sha>; base: <full-sha>; verdict: <ship-it|needs-context|needs-eyes|comment-only|request-changes>; gate: <pass|first failed rule>; round: <n> -->
-#### 🦦 <PR title exactly as the host reports it> &middot; <🚢 Ship It!|📝 Needs Context|👀 Needs Eyes|💬 Comment Only|⚠️ Request Changes>
+
+> [<!TIP|!IMPORTANT|!WARNING|!NOTE|!CAUTION>]
+> <🚢|📝|👀|💬|⚠️> **<Ship It!|Needs Context|Needs Eyes|Comment Only|Request Changes>**
+
+#### 🦦 <PR title exactly as the host reports it>
 
 <Summary: one to three sentences.>
 
@@ -27,10 +31,38 @@ the examples are invented; the level of specificity is the point.
 
 Rules:
 
-- The title is the host's PR title verbatim. Never paraphrase it.
-- The verdict in the title always carries its emoji: 🚢 Ship It!, 📝 Needs
-  Context, 👀 Needs Eyes, 💬 Comment Only, ⚠️ Request Changes. Never post the
-  verdict words alone.
+- The verdict callout comes first, then the heading. The callout is the
+  heaviest element on the comment, so leading with it makes reading order
+  match visual order; the host already shows the PR title above the comment,
+  which makes the title context rather than the payload.
+- The heading is the host's PR title verbatim, never paraphrased and never
+  carrying the verdict. A PR title can run past eighty characters, and a
+  verdict tacked onto its end is the last thing read instead of the first.
+- The verdict always carries its emoji: 🚢 Ship It!, 📝 Needs Context, 👀 Needs
+  Eyes, 💬 Comment Only, ⚠️ Request Changes. Never post the verdict words
+  alone.
+- Each verdict has one alert type, and no two verdicts share one, so the
+  callout's color is itself a verdict:
+
+  | Verdict | Alert | Renders |
+  | --- | --- | --- |
+  | 🚢 Ship It! | `[!TIP]` | green |
+  | 📝 Needs Context | `[!IMPORTANT]` | purple |
+  | 👀 Needs Eyes | `[!WARNING]` | yellow |
+  | 💬 Comment Only | `[!NOTE]` | blue |
+  | ⚠️ Request Changes | `[!CAUTION]` | red |
+
+  Read the type out of this table; never pick one by feel. The alert's own
+  label (`Note`, `Warning`, …) is fixed by the host and is not the verdict —
+  that is why the verdict word and its emoji still appear in the body of the
+  callout.
+- The callout holds the verdict and, on a re-review, the `since` clause. It
+  never holds the summary, a finding, or a second paragraph; a callout that
+  swallows the whole comment stops being a signal.
+- On a host without alert callouts, drop the `[!TYPE]` line and post the same
+  body as a plain blockquote. The emoji and the verdict word carry it. Never
+  emit a literal `[!TYPE]` line on a host that will render it as text; see
+  `hosts.md` for which hosts support alerts.
 - The summary paragraph is the whole summary block: one to three sentences and
   about fifty words at most, saying what the change does and the one thing
   that decides the verdict. On Request Changes that is the blocker or the minor
@@ -40,11 +72,11 @@ Rules:
   clause of credit is fine when genuinely earned. Mention the test run only
   when it decides the verdict, such as a failing run or a gate rule failed for
   lack of verification. Detail belongs in the inline comments, not here.
-- On a re-review a `Since` line comes before the paragraph: `Since
-  <prior-short-sha> &middot;` then each commit's short SHA and a few-word
-  subject, `&middot;` separated. Past five commits, give the count and the
-  first and last SHAs instead. The paragraph then says what changed about the
-  findings.
+- On a re-review the `since` clause continues the verdict line inside the
+  callout rather than taking a line of its own: `<emoji> **<verdict>**
+  &middot; since <prior-short-sha> &middot;` then each commit's short SHA and
+  a few-word subject, `&middot;` separated. Past five commits, give the count and the first and last SHAs
+  instead. The paragraph then says what changed about the findings.
 - The `<details>` block appears only when the list has at least one bullet. A
   clean initial review, or a re-review with no prior threads and nothing new,
   goes straight from the summary block to the tagline. Never post
@@ -62,13 +94,17 @@ Rules:
   <short-sha>`, `accepted`, `deferred`, `still open`, `superseded`, or
   `withdrawn`. A finding posted this round has no status suffix; the bare
   bullet is what marks it as new.
+- A blank line separates the `ollie-review` marker from the callout, so the
+  blockquote is parsed as its own block rather than being absorbed into the
+  HTML comment.
 - The `<br>` line after `<summary>` and the blank line after it are both
   required: the blank line makes the list render as Markdown, and the `<br>`
   gives the first bullet breathing room under the summary.
 - `round` in the marker counts Ollie's reviews on this PR, starting at 1.
 - `gate` is `pass`, the first failed rule, or `-` when findings decided the
   verdict before the gate ran.
-- No horizontal rules, no headings other than the title, no sign-off line.
+- No horizontal rules, no headings other than the title heading, no
+  sign-off line.
 
 ## Inline comment
 
@@ -175,7 +211,11 @@ Root comment, submitted as a changes-requested review:
 
 ```markdown
 <!-- ollie-review: head: 8b2c6e1d4a9f7c3b5e0d1a8c6f2b9e4d7a3c1f0e; base: 3f9a0c2e7b1d5a8c4e6f0b2d9a1c3e5f7b9d1a3c; verdict: request-changes; gate: -; round: 1 -->
-#### 🦦 Add webhook rate limiting &middot; ⚠️ Request Changes
+
+> [!CAUTION]
+> ⚠️ **Request Changes**
+
+#### 🦦 Add webhook rate limiting
 
 Adds a per-merchant Redis token bucket in front of `POST /webhooks`, following the repo's middleware pattern. Two things stop it from doing its job: the bucket key comes from a client-controlled header, and the check-and-increment is two round trips, so bursts slip past the cap PAY-881 asks for.
 
@@ -279,9 +319,11 @@ https://github.com/acme/payhub/pull/142#pullrequestreview-7002`:
 
 ```markdown
 <!-- ollie-review: head: d7f4a9c2e8b1d6f0a3c5e7b9d1f2a4c6e8b0d3f5; base: 3f9a0c2e7b1d5a8c4e6f0b2d9a1c3e5f7b9d1a3c; verdict: comment-only; gate: -; round: 2 -->
-#### 🦦 Add webhook rate limiting &middot; 💬 Comment Only
 
-Since `8b2c6e1` &middot; `a1b2c3d` limiter behind signature verification &middot; `e4f5a6b` `INCR` with `EXPIRE` plus a 60-request parallel test &middot; `c7d8e9f` test setup
+> [!NOTE]
+> 💬 **Comment Only** &middot; since `8b2c6e1` &middot; `a1b2c3d` limiter behind signature verification &middot; `e4f5a6b` `INCR` with `EXPIRE` plus a 60-request parallel test &middot; `c7d8e9f` test setup
+
+#### 🦦 Add webhook rate limiting
 
 Both blockers are fixed and resolved. The Redis failure mode is still implicit: fail-open is the right call, as you said, but `handler.ts:88` still throws. One new minor: the parallel test never asserts a rejection, so it passes with the limiter disabled.
 
@@ -338,7 +380,10 @@ file; the untracked file is diffed as an addition. The branch is
 `feat/retry-backoff`. Nothing is posted anywhere.
 
 ```markdown
-#### 🦦 feat/retry-backoff &middot; 💬 Comment Only
+> [!NOTE]
+> 💬 **Comment Only**
+
+#### 🦦 feat/retry-backoff
 
 Adds exponential backoff to the payout retry worker through a new `backoff.ts` helper; the jitter math is right. One gap: the helper receives the loop index instead of the persisted attempt, so backoff restarts from zero after a worker restart.
 
@@ -372,7 +417,11 @@ Root comment, submitted as an approval:
 
 ```markdown
 <!-- ollie-review: head: 5c1e9a7b3d2f8e6a0c4b7d9f1e3a5c7b9d1f3e5a; base: 3f9a0c2e7b1d5a8c4e6f0b2d9a1c3e5f7b9d1a3c; verdict: ship-it; gate: pass; round: 1 -->
-#### 🦦 Include merchant ID in webhook delivery logs &middot; 🚢 Ship It!
+
+> [!TIP]
+> 🚢 **Ship It!**
+
+#### 🦦 Include merchant ID in webhook delivery logs
 
 Adds the verified merchant ID to the three delivery log lines in `deliver.ts`, under the field name the dashboards already query. Nothing to flag: the ID comes from the signed event rather than the request, and the log-format test was extended to cover it.
 
