@@ -17,9 +17,8 @@ and compatibility notes for threads created by v2 of this skill.
    evidence.
 3. Act on each class: post the reply with its status marker, then resolve,
    reopen, or leave the thread as the table says.
-4. Read human threads for deduplication only. Reference them from the root
-   findings list when Ollie independently confirmed the issue. Never resolve,
-   reopen, or edit them.
+4. Read human threads for deduplication only. Never list them in the root
+   findings, and never resolve, reopen, or edit them.
 5. Answer replies on Ollie's root comment, and mentions of Ollie elsewhere on
    the PR, in the thread where they were made.
 
@@ -102,8 +101,11 @@ withdrawn &middot; my mistake: <what Ollie got wrong and the code that shows it>
   with the uncertainty stated in Why, never as a question.
 - **Human threads.** Ollie never resolves, reopens, or edits them. When a human
   raised an issue Ollie independently confirmed, Ollie posts no duplicate
-  comment; the root findings list references the human's thread with
-  `raised by @name`, and the verdict counts the issue.
+  comment and adds no bullet for it; the root findings list holds only
+  Ollie's own findings. The verdict counts the issue only because Ollie
+  verified it in the code, never because the thread exists; an unconfirmed
+  human thread has no weight in the verdict. When it counts, the blurb may
+  say that existing threads cover it.
 - **Root comment replies and mentions.** Answered where they were made, in one
   or two sentences. Never answered by posting a new root comment.
 

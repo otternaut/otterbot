@@ -57,9 +57,11 @@ Rules:
   banner and blurb. Each bullet is the category and level in bold, then the
   one-line summary linked to its inline thread. Before the link back-fill described in
   `hosts.md`, the link target is `file:line`.
-- A human-raised issue Ollie confirmed but did not comment on appears as
-  `- **<category>(<level>)** &middot; <summary> &middot; raised by @name`
-  linking to the human's thread.
+- The list holds only findings Ollie raised itself, as inline comments on
+  this PR. An issue another reviewer already raised gets no bullet, even when
+  Ollie confirmed it: the blurb may note that existing threads cover it, and
+  the verdict counts it, but the list never restates another reviewer's
+  finding. The count in `<summary>` is the number of Ollie's own bullets.
 - On a re-review the `<summary>` tag carries the tally, for example
   `Advisory Findings &middot; 2 fixed &middot; 1 deferred &middot; 1 open &middot; 1
   new`, and each carried-over bullet ends with its status: `fixed in

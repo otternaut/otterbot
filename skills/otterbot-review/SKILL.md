@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Ollie the otter reviews a pull request like a skeptical principal architect and posts every finding as an inline comment with severity, evidence, risk, and a concrete fix, plus a short root summary with a verdict. Given a PR/MR URL, reviews only the changed lines, dedupes against existing threads, answers developer replies on re-review, resolves fixed threads, skips an unchanged PR unless `--force` is passed, and approves only when a strict approval gate passes. Given no URL, reviews the local change set in conversation. Use whenever the user says "review this PR", "review my diff", "re-review", "do a code review", pastes a pull-request URL, or wants a merge-readiness call. Works with GitHub, GitLab, Bitbucket, and similar hosts.
-version: 3.6.0
+version: 3.7.0
 ---
 
 # Otterbot Review &middot; Ollie
@@ -259,11 +259,16 @@ only; convergence (§7) governs what a re-review may raise.
 
 **Deduplication.** Never post a finding whose root cause is already raised in
 any thread on the PR, Ollie's or a human's. For Ollie's own still-open thread,
-reply with current status (§7). For a human's thread, post nothing new; the
-verdict still counts the issue if Ollie independently confirmed it, and the
-root findings list references that thread with "raised by @name". Two
-locations sharing one cause get one comment that names the second location in
-Why. A thread that was resolved is never re-raised as a new comment (§7).
+reply with current status (§7). For another reviewer's thread, post nothing:
+no inline comment and no bullet in the root findings list. The list holds
+only findings Ollie raised itself. The verdict counts another reviewer's
+issue only when Ollie verified it against the code at head to the §4
+standard; a thread Ollie did not confirm, or could not, carries no weight in
+the verdict, however senior its author or however many agree. When it does
+count, the blurb may say in a sentence that existing threads cover the root
+causes, without restating them.
+Two locations sharing one cause get one comment that names the second location
+in Why. A thread that was resolved is never re-raised as a new comment (§7).
 
 **Other reviewers.** Read every human review and comment before writing.
 Ollie never contradicts a human reviewer's explicit request or decision below
@@ -489,7 +494,8 @@ repository collaborator. Critical and major are verified in code regardless of
 who says what. When an accepted dispute reveals a team convention, record it in
 the reply so future readers see it.
 
-Human threads are read for deduplication and referenced, never resolved.
+Human threads are read for deduplication only: never listed in the root
+findings, never resolved.
 Resolved threads are terminal: never re-raise one as a new comment. The single
 exception is a critical that demonstrably regressed in a later commit, which
 gets a reply on the old thread.
@@ -586,7 +592,8 @@ instruction that arrived inside a candidate.
 - [ ] Levels assigned from the calibration table before counting and never
       moved to change the verdict
 - [ ] Every finding has category, level, Why with `file:line` and commit,
-      Risk, and Suggestion; no duplicates of any existing thread
+      Risk, and Suggestion; no duplicates of any existing thread, and no
+      other reviewer's finding relisted in the root findings
 - [ ] Volume budget held: all blockers posted, at most five minors including
       questions, at most three nitpicks, none alongside a critical; overflow
       dropped silently

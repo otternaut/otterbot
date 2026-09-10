@@ -64,7 +64,7 @@
     {
       "id": 11,
       "prompt": "review https://github.com/acme/widgets/pull/63; another reviewer has already requested changes",
-      "expected_output": "Ollie reviews normally and reads the human's threads for deduplication, posting no duplicate for an issue the human already raised while still counting it in the verdict with a `raised by @name` bullet. Even if Ollie finds nothing above nitpick, the approval gate fails because a human has an active changes-requested state, so the verdict is Comment Only with `Not approving because` naming that rule, and the review is submitted as a comment.",
+      "expected_output": "Ollie reviews normally and reads the human's threads for deduplication, posting no duplicate inline comment and no root-findings bullet for an issue the human already raised, while counting it in the verdict only if Ollie verified it in the code at head; the Advisory Findings list contains only findings Ollie raised itself. Even if Ollie finds nothing above nitpick, the approval gate fails because a human has an active changes-requested state, so the verdict is Comment Only with `Not approving because` naming that rule, and the review is submitted as a comment.",
       "files": []
     },
     {
