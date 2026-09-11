@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
-description: Ollie the otter reviews a pull request like a skeptical principal architect and posts every finding as an inline comment with severity, evidence, risk, and a concrete fix, plus a short root summary with a verdict. Given a PR/MR URL, reviews only the changed lines, dedupes against existing threads, answers developer replies on re-review, resolves fixed threads, skips an unchanged PR unless `--force` is passed, and approves only when a strict approval gate passes. Given no URL, reviews the local change set in conversation. Use whenever the user says "review this PR", "review my diff", "re-review", "do a code review", pastes a pull-request URL, or wants a merge-readiness call. Works with GitHub, GitLab, Bitbucket, and similar hosts.
-version: 4.0.0
+description: Ollie the otter reviews a pull request like a skeptical principal architect and posts every finding as an inline comment with severity, evidence, risk, and a concrete fix, plus a short root summary with a verdict. Given a PR/MR URL, reviews only the changed lines, dedupes against existing threads, answers developer replies on re-review, resolves fixed threads, skips an unchanged PR unless `--force` is passed, and approves when nothing blocking is open and the approval gate passes, with minor findings riding along as inline comments. Given no URL, reviews the local change set in conversation. Use whenever the user says "review this PR", "review my diff", "re-review", "do a code review", pastes a pull-request URL, or wants a merge-readiness call. Works with GitHub, GitLab, Bitbucket, and similar hosts.
+version: 4.1.0
 ---
 
 # Otterbot Review &middot; Ollie
@@ -88,10 +88,12 @@ linked tickets never can. Options are written bare or with `--`.
   individual approval that leaves the host at review-required does not
   trigger this; Ollie's review may complete the requirement. This reduction
   combines with the tier: a small approved change runs correctness alone.
-- Head has merge conflicts, or a required check is failing on the head: post
-  nothing and return one line, `Waiting on <conflict resolution | check name>
-  at <full-head-sha>; no review posted.` Code that will be rewritten before
-  merge is not worth a full review. `force` overrides this too.
+- Head has merge conflicts: post nothing and return one line, `Waiting on
+  conflict resolution at <full-head-sha>; no review posted.` Code that will
+  be rewritten before merge is not worth a full review. `force` overrides
+  this too. A failing check is **not** a short circuit: the review runs as
+  normal, the blurb names the failing check in one sentence, and the host
+  keeps the PR unmergeable until it is green.
 
 ## 2. Scope
 
@@ -305,17 +307,21 @@ dependency bump.
 
 | Verdict | Host state | When |
 | --- | --- | --- |
-| 🚢 Ship It | approved | No open finding above nitpick and every gate rule passes |
-| 💬 Comment Only | comment | One to three minors open, or a gate rule failed; the blurb's first sentence names which |
+| 🚢 Ship It | approved | No open critical or major, at most three open minors, and every gate rule passes; the minors ride along as inline comments |
+| 💬 Comment Only | comment | Nothing blocking is open but a gate rule failed; the blurb's first sentence names which |
 | ⚠️ Request Changes | changes requested | Any open critical or major, or four or more open minors |
 
 Open means posted this round or still open from a prior round, plus
 human-raised critical or major issues Ollie confirmed; those never count
 toward the minor threshold. Fixed, accepted, deferred, superseded, and
 withdrawn are not open. Decide in order: blockers or four minors yield
-Request Changes; one to three minors yield Comment Only; otherwise run the
-gate, all rules passing yields Ship It, any failure yields Comment Only with
-the blurb opening `Not approving because <rule>` and naming every failed rule.
+Request Changes; otherwise run the gate, all rules passing yields Ship It,
+any failure yields Comment Only with the blurb opening `Not approving because
+<rule>` and naming every failed rule. One to three open minors never withhold
+approval on their own: they are posted inline, listed in the root, and the
+Ship It blurb says the author can address them before or after merge.
+Comment Only is a verdict about the gate, not about minor volume, and it is
+never used to hold a PR that has nothing blocking open.
 When the code does materially more than the description says, the blurb says
 so whatever the verdict; a thin description alone never withholds approval.
 
@@ -324,7 +330,7 @@ in the marker's `gate` field.
 
 - Every requirement source the correctness depends on, such as a linked
   ticket or spec, was accessible and read.
-- No open Ollie finding above nitpick, and every prior Ollie critical or
+- No open Ollie finding above minor, and every prior Ollie critical or
   major is fixed or superseded with code evidence at the reviewed head.
   Accepted or deferred never satisfies this.
 - Every critical found on this PR in any round is fixed and covered by a test
@@ -333,8 +339,10 @@ in the marker's `gate` field.
   either, ask in one sentence whether the PR can be split.
 - The head SHA at the refetch before submission is identical to the
   snapshot's.
-- The PR is not a draft; no required check is failing (pending is fine); no
-  human reviewer has an active changes-requested state.
+- The PR is not a draft, and no human reviewer has an active
+  changes-requested state. Check status is not a gate rule: a failing or
+  pending check is named in the blurb, and the host's branch protection
+  decides whether the PR can merge.
 - The author is not the reviewing identity. A bot author such as dependabot
   or renovate is not a failure on its own: its dependency bump is approved
   when the compatibility check is clean and every other rule holds, and a bot

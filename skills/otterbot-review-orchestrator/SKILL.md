@@ -207,7 +207,7 @@ The otterbot-review freshness gate is mandatory. If the newest attributable
 Ollie review already covers this effective revision, return No Review Needed
 with the existing review reference and do not post, edit, reply, resolve,
 dismiss, or otherwise deliver anything. If otterbot-review returns its
-`Waiting on ...` line for a failing required check or a merge conflict,
+`Waiting on ...` line for a merge conflict,
 return Skipped with that line as the reason.
 
 Return only a concise completion envelope. Include the PR number and URL,

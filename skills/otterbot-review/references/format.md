@@ -38,10 +38,10 @@ Rules:
   outside it.
 - The blurb justifies the decision, leading with why that verdict applies
   and including relevant technical evidence. Explain blocking behavior or
-  minor volume for Request Changes, remaining issues for Comment Only, and
-  the evidence that supports confidence for Ship It. A Comment Only with no
-  open finding opens with `Not approving because <rule>` and names every
-  failed gate rule. Include relevant code behavior, failure
+  minor volume for Request Changes, the failed gate rule for Comment Only,
+  and the evidence that supports confidence for Ship It, naming any open
+  minors as non-blocking. Comment Only always opens with `Not approving
+  because <rule>` and names every failed gate rule. Include relevant code behavior, failure
   conditions, test results, and verification limits. Keep it focused, with no
   fixed sentence or word limit; full finding details stay in inline comments.
 - On a re-review the banner is identical to an initial review. The paragraph
