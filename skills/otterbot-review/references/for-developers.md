@@ -28,8 +28,10 @@ formatting fix gets a quick read and a verdict. A dependency bump gets a
 compatibility check against the release notes and how the code uses the
 package. A change under about a hundred lines gets the correctness and tests
 passes; larger changes get the full set, including security and reliability.
-Small PRs therefore come back faster, and splitting a large PR is the best
-way to get a quicker, sharper review.
+Line counts ignore comments, docstrings, and documentation files, so a
+well-commented PR is not treated as large. Size never blocks approval: on a
+very large PR Ollie reviews the riskiest files first and says which ones it
+only skimmed.
 
 Nitpicks and simple minors come with a suggestion block you can apply with
 one click. Anything that needs a design decision or a new test is described
@@ -70,7 +72,7 @@ than two deferrals on one PR means Ollie asks a human to approve instead.
   the change alters who is authenticated or authorized, how secrets are
   handled, something irreversible outside the system such as moving money or
   deleting user data, a migration that cannot be rolled back, or what CI
-  deploys; the PR is large; another reviewer has requested changes; a
+  deploys; another reviewer has requested changes; a
   critical was fixed but has no covering test yet; or a linked requirement was
   not readable. Adding a log line or a test in one of those areas does not
   count. Mergeable at the team's discretion.
