@@ -174,6 +174,48 @@
       "prompt": "review https://github.com/acme/widgets/pull/79, which adds an optional parameter to an internal helper that is fully typed and called from two places in the same module",
       "expected_output": "The correctness specialist checks both callers and records nothing about null or negative inputs, because the parameter is constrained by the type system at an internal boundary and the quiet rules say typed internal boundaries are already checked. The interfaces lens does not run, since nothing a person or another program consumes changed. The tests specialist holds the change to the repository's existing testing depth. With nothing verified above nitpick and the gate passing, the verdict is Ship It.",
       "files": []
+    },
+    {
+      "id": 30,
+      "prompt": "review https://github.com/acme/widgets/pull/80, a dependabot PR that bumps @aws-sdk/client-s3 from 3.1098.0 to 3.1121.0 in package.json and the lockfile; checks are green but do not run unit tests",
+      "expected_output": "The effort tier is dependency bump: every non-noise changed line is a version constraint, so no specialist fans out and the coordinator runs the compatibility check itself. It classifies the jump as same-major, finds the call sites that import the package, reads the release notes between the versions for breaking changes on those APIs, and confirms declared peer and sibling ranges in the lockfile still resolve. Because the checks do not run the suite, it attempts a local run only if one is discoverable inside the time box, and otherwise says so in the blurb and relies on the check. A clean check needs no `tests` finding. Bot authorship is not a gate failure, so with every other gate rule passing the verdict is Ship It, submitted as an approval, with the blurb stating the version range, the APIs checked, and the check evidence.",
+      "files": []
+    },
+    {
+      "id": 31,
+      "prompt": "review https://github.com/acme/widgets/pull/81, a renovate PR that bumps a validation library from 2.9.1 to 3.0.0 whose release notes drop a parser function the repository calls in two files",
+      "expected_output": "The dependency bump tier still applies, but the compatibility check finds a major jump with a breaking change on an API the repository uses, so Ollie posts a finding anchored on the manifest line at the level the calibration table gives a change that would ship broken, naming both call sites in Why. The verdict follows the finding mechanically, and Ollie does not approve. Renovate being the author neither blocks nor excuses anything; the check decides.",
+      "files": []
+    },
+    {
+      "id": 32,
+      "prompt": "review https://github.com/acme/widgets/pull/82, a 60-line change to an internal retry helper, in an environment that offers parallel subagents",
+      "expected_output": "The tier is small, so Ollie does not fan out even though subagents are available: correctness and tests run sequentially in the coordinator from their checklists, and security runs only if the diff touches a zone or outside input. Context reading stops at direct callers of the helper. Candidates are verified in budget order, blockers first, and the suite is not re-run locally when a passing check on the head already ran it. The conversation report names the tier.",
+      "files": []
+    },
+    {
+      "id": 33,
+      "prompt": "review https://github.com/acme/widgets/pull/83, a standard-size change whose specialists return thirty candidates, twenty-two of them hinted at nitpick",
+      "expected_output": "Ollie sorts candidates by level hint and Risk, verifies every critical and major hint first, then verifies minors until five survive and nitpicks until three survive plus a small margin, and stops. The remaining nitpick candidates are dropped without verification and without mention, because the volume budget would have cut them regardless. Every posted finding was still verified in the coordinator against the §4 standard; the ordering changes what gets verified, never the bar for posting.",
+      "files": []
+    },
+    {
+      "id": 34,
+      "prompt": "review https://github.com/acme/widgets/pull/84, whose head has a failing required check",
+      "expected_output": "The snapshot short circuit fires before any diff is read. Ollie posts nothing and returns one line, `Waiting on <check name> at <full-head-sha>; no review posted.`, because code that will be rewritten before merge is not worth a full review. The same applies to a head with merge conflicts. With `force` set by a trusted invoker, the review proceeds and the failing check fails the approval gate as before.",
+      "files": []
+    },
+    {
+      "id": 35,
+      "prompt": "re-review https://github.com/acme/widgets/pull/85, a human-approved PR whose author pushed one more commit",
+      "expected_output": "Two reductions apply. Because a human approved, Ollie runs only the correctness, security, and reliability lenses and verifies only critical and major hints. Because it is a re-review, the maintainability lens is skipped, since no new nitpick may be posted after round one. Prior threads are still classified and answered. If nothing above minor is found, Ollie posts nothing and reports `No review posted — approved by @name; nothing above minor found.`",
+      "files": []
+    },
+    {
+      "id": 36,
+      "prompt": "review https://github.com/acme/widgets/pull/86, a three-commit PR with findings in two files",
+      "expected_output": "Ollie takes the PR state from one snapshot fetch and refetches only the head SHA before submission. It finds the introducing commit for every anchor with one blame per changed file restricted to the PR's commits, two blames in total, not one per anchored line. Delivery stays within its call budget, with thread resolutions batched into one request.",
+      "files": []
     }
   ]
 }

@@ -109,8 +109,12 @@ Rules:
 - Risk says what goes wrong, for whom, under what conditions. If the impact is
   small, say so; that is what justifies a minor or nitpick.
 - Suggestion is the smallest concrete fix inside the change plus the specific
-  test to add. A host `suggestion` block may follow when the fix is small and
-  mechanical. Never quote a secret.
+  test to add. A host `suggestion` block follows on every nitpick and on
+  every minor whose fix is a contiguous edit of the anchored range with no
+  design choice left open; the block replaces exactly that range and matches
+  the file's indentation. Fixes that need a new test, another file, or a
+  decision stay in prose, and a critical never gets a block. Never quote a
+  secret.
 - Attach to the smallest changed range that makes the issue clear. When there
   is no line, use a file-level comment on the changed file; if the host has no
   file-level comments, use the nearest changed line.
