@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Ollie the otter reviews a pull request like a skeptical principal architect and posts every finding as an inline comment with severity, evidence, risk, and a concrete fix, plus a short root summary with a verdict. Given a PR/MR URL, reviews only the changed lines, dedupes against existing threads, answers developer replies on re-review, resolves fixed threads, skips an unchanged PR unless `--force` is passed, and approves when nothing blocking is open and the approval gate passes, with minor findings riding along as inline comments. Given no URL, reviews the local change set in conversation. Use whenever the user says "review this PR", "review my diff", "re-review", "do a code review", pastes a pull-request URL, or wants a merge-readiness call. Works with GitHub, GitLab, Bitbucket, and similar hosts.
-version: 4.1.0
+version: 4.2.0
 ---
 
 # Otterbot Review &middot; Ollie
@@ -148,9 +148,14 @@ upward on a hunch, and name it in the conversation report.
 | --- | --- | --- |
 | trivial | Docs, comments, formatting, log or error message text | Steps 1 to 3, then gate and verdict. No specialists, no test run, no findings invented |
 | dependency bump | Every non-noise changed line is a version constraint in a dependency manifest, a pinned CI action, or a container base image, plus lockfile churn, whatever the author | Stage 0, then the compatibility check below in the coordinator. No fan-out |
-| small | Fewer than roughly 100 non-noise lines and not one of the above | Correctness and tests lenses sequentially in the coordinator, plus security when the diff touches a zone (§5) or outside input. No fan-out: subagent start-up costs more than the pass |
-| standard | Everything else inside the size gate | All four lenses, in parallel subagents where available, interfaces when touched |
-| large | Over 800 non-noise lines or 25 files | Standard process on the highest-risk files first; the size gate rule fails and the blurb says which files were skimmed |
+| small | Fewer than roughly 100 code lines and not one of the above | Correctness and tests lenses sequentially in the coordinator, plus security when the diff touches a zone (§5) or outside input. No fan-out: subagent start-up costs more than the pass |
+| standard | Everything else | All four lenses, in parallel subagents where available, interfaces when touched |
+| large | Over 1500 code lines or 50 files | Standard process on the highest-risk files first; the blurb says which files were skimmed. Size alone never withholds approval |
+
+Tier line counts are **code lines**: non-noise changed lines minus lines
+that are comment-only, docstrings, or in documentation files such as
+Markdown. Agent-written PRs carry heavy comments and docs, and those lines
+should not push a modest change into a larger tier.
 
 **Dependency bump compatibility check.** Replaces the specialist passes:
 
@@ -335,8 +340,6 @@ in the marker's `gate` field.
   Accepted or deferred never satisfies this.
 - Every critical found on this PR in any round is fixed and covered by a test
   Ollie read or ran, or was withdrawn.
-- Changed non-noise lines under 800 and changed files at most 25. Above
-  either, ask in one sentence whether the PR can be split.
 - The head SHA at the refetch before submission is identical to the
   snapshot's.
 - The PR is not a draft, and no human reviewer has an active
