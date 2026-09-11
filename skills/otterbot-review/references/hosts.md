@@ -1,6 +1,6 @@
 # Host delivery notes
 
-The skill is host-agnostic; this file records how the delivery rules in §8 map
+The skill is host-agnostic; this file records how the delivery rules in §7 map
 onto the hosts Ollie is most often used with, and what to do when a host lacks
 a capability. Verify flags and field names against the host's current
 documentation before relying on them; APIs drift. When a capability is missing,
@@ -35,24 +35,34 @@ and state the limitation; the verdict banner already carries the verdict.
 The recommended sequence for a GitHub PR, using the GitHub CLI's API access.
 Replace placeholders; never pass a filename as the body.
 
-1. Identity and freshness: `gh api user` for the reviewing login; fetch the PR
-   with head and base SHAs, `isDraft`, `reviewDecision`, `statusCheckRollup`,
-   the latest review per author, and every review thread with comments and
-   `isResolved`. The marker in the newest Ollie review body gives the reviewed
-   head. Compare tree OIDs of the two commits when heads differ.
+1. Snapshot: `gh api user` for the reviewing login, then one GraphQL query on
+   the pull request that returns everything §1 of the skill needs:
+   `author`, `headRefOid`, `baseRefOid`, `isDraft`, `mergeable`,
+   `reviewDecision`, `changedFiles`, `additions`, `deletions`, the head
+   commit's `statusCheckRollup`, `latestReviews` with author and body,
+   `reviewThreads` with `isResolved` and each comment's author and body, and
+   `files` with per-file additions and deletions. The marker in the newest
+   Ollie review body gives the reviewed head. Compare tree OIDs of the two
+   commits only when heads differ. Nothing else is fetched until the head
+   refetch before submission.
 2. Diff scope: `git diff --merge-base <base> <head>` or the compare endpoint.
-   Use `git blame` at the head restricted to the PR's commits to find the
-   introducing SHA for each anchored line.
+   Use one `git blame` per changed file at the head, restricted to the PR's
+   commits, to find the introducing SHA for every anchor in that file; a
+   single-commit PR needs no blame.
 3. Submit: one call to create the review with `commit_id` set to the reviewed
    head, `event` set from the verdict, `body` set to the root Markdown, and
    `comments` set to the inline findings, each with `path`, `line`, `side`, and
    optional `start_line`, or `subject_type: file` for a file-level comment.
-4. Verify: fetch the created review and confirm the body starts with the
-   marker and the comment count matches. When there are findings, fetch the
-   review's comments to get their URLs, then update the review body so each
-   findings bullet links to its thread.
-5. Threads: reply to a prior comment with the replies endpoint; resolve or
-   unresolve with the GraphQL mutations using the thread node id.
+4. Verify: one GraphQL query on the pull request fetches the new review's
+   body and its comments (id, url, path, line) together, so the marker, the
+   comment count, and the thread URLs come back in one call. Then one PATCH
+   updates the review body so each findings bullet links to its thread. If
+   that PATCH fails, retry once, then leave `file:line` and move on.
+5. Threads: reply to a prior comment with the replies endpoint, one call per
+   reply. Resolve and unresolve in a single GraphQL request by aliasing the
+   mutations, for example
+   `r1: resolveReviewThread(input:{threadId:"..."}) { thread { isResolved } }`
+   repeated per thread, rather than one request per thread.
 6. Transitions: when the new verdict is Comment Only and the prior Ollie
    review was changes requested with every blocker fixed, dismiss
    that prior review with the message `Blockers fixed in <sha>, see

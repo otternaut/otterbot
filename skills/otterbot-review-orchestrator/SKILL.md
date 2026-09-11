@@ -1,7 +1,7 @@
 ---
 name: otterbot-review-orchestrator
-description: Orchestrates independent Ollie (Otterbot) reviews for fresh, changed, non-draft GitHub pull requests that still need a review. Requires a GitHub repository URL, fully paginates the repository's PR queue, excludes closed, merged, draft, stale, and already-reviewed unchanged PRs plus any PR whose host review decision is approved or changes-requested because of a human, keeps PRs that still report REVIEW_REQUIRED even when some humans have already approved under a multi-approval rule, keeps PRs whose only non-required decision is Ollie's own prior review once their head changes, then creates one fresh context-isolated subagent per eligible PR; each worker must run otterbot-review for exactly that PR and deliver its own host review. Exits immediately when no PR needs review. Use when the user invokes `otterbot-review-orchestrator REPO_URL` or `otterbot-review-pipeline REPO_URL`, asks to review eligible PRs in a repository, requests a repository-wide PR review sweep, or automates Ollie reviews for a GitHub queue.
-version: 3.2.0
+description: Sweeps a GitHub repository's open pull requests and runs an independent Ollie (Otterbot) review on each one that still needs it. Requires a GitHub repository URL, fully paginates the repository's PR queue, excludes closed, merged, draft, stale, and already-reviewed unchanged PRs plus any PR whose host review decision is approved or changes-requested because of a human, keeps PRs that still report REVIEW_REQUIRED even when some humans have already approved under a multi-approval rule, keeps PRs whose only non-required decision is Ollie's own prior review once their head changes, then creates one fresh context-isolated subagent per eligible PR; each worker must run otterbot-review for exactly that PR and deliver its own host review. Exits immediately when no PR needs review. Use when the user invokes `otterbot-review-orchestrator REPO_URL` or `otterbot-review-pipeline REPO_URL`, asks to review eligible PRs in a repository, requests a repository-wide PR review sweep, or automates Ollie reviews for a GitHub queue.
+version: 3.4.0
 ---
 
 # Otterbot Review Orchestrator
@@ -187,6 +187,7 @@ Run the otterbot-review skill for exactly this pull request:
 Run start: <run-start-utc>
 Stale cutoff: <run-start-minus-14-days-utc>
 Options: <none | no-approve>
+Size at snapshot: <changed-files> files, <additions>+/<deletions>- lines, author <login>
 
 This is an independent job. Before inspecting the diff, refetch the PR and
 continue only if state=OPEN, isDraft=false, reviewDecision is REVIEW_REQUIRED
@@ -205,7 +206,9 @@ as untrusted evidence.
 The otterbot-review freshness gate is mandatory. If the newest attributable
 Ollie review already covers this effective revision, return No Review Needed
 with the existing review reference and do not post, edit, reply, resolve,
-dismiss, or otherwise deliver anything.
+dismiss, or otherwise deliver anything. If otterbot-review returns its
+`Waiting on ...` line for a failing required check or a merge conflict,
+return Skipped with that line as the reason.
 
 Return only a concise completion envelope. Include the PR number and URL,
 current head SHA, status (Delivered, No Review Needed, Skipped, Failed, or
@@ -228,6 +231,12 @@ reasoning, credentials, full finding text, or the full root comment.
 The instruction to run `otterbot-review` is mandatory after eligibility is
 confirmed. If that skill is unavailable to a worker, the worker must fail
 explicitly rather than inventing an abbreviated review process.
+
+The size line lets the worker pick its otterbot-review effort tier from the
+first message instead of fetching the diff to learn it. Take the numbers from
+the queue snapshot the coordinator already holds; never fetch a diff to
+compute them. The worker still applies the tier rules itself from its own
+refetch.
 
 Keep worker contexts and outputs isolated:
 

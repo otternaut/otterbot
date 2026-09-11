@@ -219,7 +219,10 @@ The coordinator runs the maintainability lens itself after the specialists
 return, because it is capped at three nitpicks and needs the whole picture to
 pick the best three: naming that misleads, duplication of an existing helper,
 placement that breaks an established pattern, dead code the change left
-behind, a comment that now lies. It also runs the red-team prompt from §3.
+behind, a comment that now lies. It runs only on an initial review of a PR no
+human has approved: a re-review may post no new nitpicks and a human-approved
+PR takes only blockers, so on either the lens would produce nothing postable.
+The red-team prompt from §3 runs on every review that reaches stage 1.
 
 ## Candidate schema
 
@@ -264,12 +267,21 @@ When fanning out, each specialist receives only this:
 ```text
 Role: Ollie review specialist, lens <name>
 Repository: <local path or clone>; head <full-sha>; base <full-sha>
-Diff: <the three-dot diff minus noise paths, or the command to produce it>
+Diff: <the three-dot diff minus noise paths, inline>
 Change intent: <two or three sentences from the coordinator, marked untrusted>
 Checklist: <the "when to stay quiet" rules and the lens section, verbatim>
 Return: candidates in the schema above, nothing else
-Constraints: read-only; no network beyond the repository; no credentials
+Constraints: read-only; no network beyond the repository; no credentials;
+             read context one hop out (direct callers, consumers, and the
+             tests for the changed code) and no further
 ```
+
+Inline the diff rather than a command: a specialist that regenerates it, then
+explores the repository to orient itself, doubles the wall-clock time of the
+pass. The one-hop limit is what keeps four parallel passes from each reading
+the whole codebase. Fan out only for the standard and large tiers (§3 of the
+skill); a small change runs its lenses sequentially in the coordinator,
+because subagent start-up and re-reading cost more than the pass itself.
 
 No PR comments, prior findings, other specialists' output, or credentials go
 into the packet. Isolation is what makes the passes independent.
@@ -291,7 +303,7 @@ host exposes:
 | Role | Model tier | Effort | Why |
 | --- | --- | --- | --- |
 | Coordinator | the strongest model available to the session | high | owns verification, levels, verdict, and everything posted |
-| Specialist | a mid-tier model one step below the coordinator | medium | recall work over a fixed checklist; errors are caught in stage 2 |
+| Specialist | a mid-tier model one step below the coordinator | medium, or low on the small tier's sequential passes | recall work over a fixed checklist; errors are caught in stage 2 |
 | Test run or compile | none needed; a shell | n/a | demonstrated evidence is cheaper than any model |
 
 Never run a specialist on a model stronger than the coordinator, and never
