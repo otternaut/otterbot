@@ -61,11 +61,12 @@ than two deferrals on one PR means Ollie asks a human to approve instead.
 
 ## The verdicts
 
-- **Ship It.** Ollie approved. Nothing above nitpick is open and every
-  approval rule passed.
-- **Comment Only.** Ollie is not blocking and not approving. Either one to
-  three minors are open, or the code is clean but an approval rule failed, in
-  which case the summary starts with "Not approving because" and says which:
+- **Ship It.** Ollie approved. Nothing above minor is open, at most three
+  minors are open, and every approval rule passed. Any open minors are posted
+  inline as non-blocking suggestions you can take before or after merge.
+- **Comment Only.** Ollie is not blocking and not approving. Nothing blocking
+  is open, but an approval rule failed; the summary starts with "Not approving
+  because" and says which:
   the change alters who is authenticated or authorized, how secrets are
   handled, something irreversible outside the system such as moving money or
   deleting user data, a migration that cannot be rolled back, or what CI
@@ -74,10 +75,11 @@ than two deferrals on one PR means Ollie asks a human to approve instead.
   not readable. Adding a log line or a test in one of those areas does not
   count. Mergeable at the team's discretion.
 
-If your PR has a failing required check or a merge conflict, Ollie does not
-review it at all yet; it leaves a one-line note and picks the PR up once the
-check is green or the conflict is resolved, since code that is about to
-change is not worth a full pass.
+If your PR has a merge conflict, Ollie does not review it at all yet; it
+leaves a one-line note and picks the PR up once the conflict is resolved,
+since code that is about to change is not worth a full pass. A failing check
+does not stop the review: Ollie reviews as normal, mentions the failing check
+in the summary, and leaves merge eligibility to branch protection.
 - **Request Changes.** At least one critical or major is open, or four or more
   minors. Fix it, or explain in the thread why it does not apply.
 

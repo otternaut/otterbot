@@ -28,7 +28,7 @@
     {
       "id": 5,
       "prompt": "review https://github.com/acme/widgets/pull/58, which has one minor finding and nothing else",
-      "expected_output": "The verdict is Comment Only and the review is submitted as a comment-state review, not an approval. The single minor is an inline comment, the findings list has one plain bullet with bold category and level, and the summary says what decides the verdict.",
+      "expected_output": "With nothing blocking open and every gate rule passing, the verdict is Ship It and the review is submitted as an approval. The single minor is an inline comment, the findings list has one plain bullet with bold category and level, and the blurb names the minor as non-blocking and says the author can address it before or after merge. A minor never yields Comment Only on its own; that verdict is reserved for a failed gate rule.",
       "files": []
     },
     {
@@ -88,7 +88,7 @@
     {
       "id": 15,
       "prompt": "review https://github.com/acme/widgets/pull/66, which has four open minor findings and nothing above minor",
-      "expected_output": "Four or more open minors yields Request Changes even though no single finding blocks. The summary says the block is on volume and that fixing or deferring with tickets brings the PR under the line. With three open minors the same PR would be Comment Only.",
+      "expected_output": "Four or more open minors yields Request Changes even though no single finding blocks. The summary says the block is on volume and that fixing or deferring with tickets brings the PR under the line. With three open minors the same PR would be Ship It, provided the gate passes, with the minors posted inline.",
       "files": []
     },
     {
@@ -202,7 +202,7 @@
     {
       "id": 34,
       "prompt": "review https://github.com/acme/widgets/pull/84, whose head has a failing required check",
-      "expected_output": "The snapshot short circuit fires before any diff is read. Ollie posts nothing and returns one line, `Waiting on <check name> at <full-head-sha>; no review posted.`, because code that will be rewritten before merge is not worth a full review. The same applies to a head with merge conflicts. With `force` set by a trusted invoker, the review proceeds and the failing check fails the approval gate as before.",
+      "expected_output": "The failing check does not short-circuit the review and is not a gate rule. Ollie reviews the diff as normal, names the failing check in one blurb sentence, and decides the verdict from the findings and the remaining gate rules; a clean review is still Ship It, since branch protection keeps the PR unmergeable until the check is green. Only merge conflicts on the head short-circuit with `Waiting on conflict resolution at <full-head-sha>; no review posted.`",
       "files": []
     },
     {
