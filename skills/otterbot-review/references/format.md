@@ -20,9 +20,13 @@ do not substitute ✅ or another success icon, including on edits and retries.
 <details>
 <summary>Advisory Findings &middot; <colored status tally></summary>
 
-| Status | Finding | Details |
-|---|---|---|
-| <status dot>&nbsp;<status label> | <sub><category> · <level></sub><br>**[<short summary>](<original-thread-url>)** | <fix SHA or relevant status detail; — if none> |
+<br>
+
+> **<status dot> <lowercase status label> · <level>(<category>)**
+>
+> **[<short summary>](<original-thread-url>)**
+>
+> `<file>:<line>`
 
 </details>
 
@@ -48,7 +52,8 @@ Use extra words only when essential. For Request Changes, `gate: -` means
 blockers decided the verdict before approval was considered. The collapsible `Advisory Findings` section is required whenever Ollie has
 current or prior findings on the PR, including a clean re-review with only
 resolved findings. Omit it when there are none; never render a zero-findings
-section. Keep the blank line after `</summary>` so the table renders correctly.
+section. Add one standalone `<br>` between `</summary>` and the first
+blockquote, with a blank line on each side, for a small gap below the title.
 
 Include each distinct Ollie finding once, linking to its original thread
 when one exists. Overflow findings without threads are visible entries with
@@ -67,35 +72,49 @@ limit. Prior findings and verified overflow can also affect the approval count.
 Keep overflow evidence and fixes visible; preserve the supplementary ledger from `approval.md` in the root,
 including during link back-fill; do not invent thread links for its entries.
 
-Use one table with columns **Status**, **Finding**, **Details**, in that order.
-Sort rows by current status, with active findings first, in this order:
-🟠 **Open**, 🔵 **New**, 🟡 **Deferred**, 🟢 **Fixed**, 🟣 **Accepted**,
-⚪ **Superseded**, ⚪ **Withdrawn**. Do not add status headings or count rows.
+Use one full-width blockquote per finding, separated by a blank line, an
+unquoted `---` horizontal rule and another blank line. Do not use a table.
+Sort entries by current status, with active findings first, in this order:
+🟠 **open**, 🔵 **new**, 🟡 **deferred**, 🟢 **fixed**, 🟣 **accepted**,
+⚪ **superseded**, ⚪ **withdrawn**. Do not add status group headings.
 Open displays the existing `still open` status; New is for findings first
 raised this round.
 These are display labels, not changes to stored statuses or approval rules.
-Keep each finding in exactly one row; a regressed finding returns to Open.
-Fixed entries retain their verified fix SHA when known. Accepted, superseded
-and withdrawn findings retain their own status and must not be labeled fixed.
+Keep each finding in exactly one blockquote; a regressed finding returns to
+Open. Fixed entries retain their verified fix SHA when known. Accepted,
+superseded and withdrawn findings retain their own status and must not be
+labeled fixed.
 
-Use colored dots only in the Status column and collapsed summary; inline
-comments retain their severity dots. Always pair a status dot with its label.
-Replace every space within a Status cell with `&nbsp;`, including between the
-dot and label and within multiword labels. This lets the column size to its
-longest unbroken status without a fixed width; do not rely on custom CSS in
-host comments. Renderer overrides may still affect wrapping.
+Start each blockquote with
+`**<status dot> <lowercase status label> · <level>(<category>)**`
+(for example `**🔵 new · major(correctness)**`), then a quoted blank line (`>`),
+then the bold linked title. Bold the entire first line, including the status
+and `level(category)`. Lowercase all entry status labels and use plain emoji dots
+without subscript formatting. Keep summary dots as shown below. Use
+colored dots only for status in this index and its collapsed summary; inline
+comments retain their severity dots. Always pair an entry's status dot with
+its label. Use normal spaces and Markdown paragraphs so content can wrap
+naturally; no non-breaking spaces, HTML line breaks within entries or custom
+CSS. The single `<br>` below the section title is only a spacer.
 
-In Finding, put `<sub><category> · <level></sub>` above the bold linked title,
-separated by `<br>`. Put fix SHAs and relevant status notes in Details; use `—`
-when there is no additional detail, rather than repeating the status. For
-threadless overflow, use a plain bold title and retain the stable ID, code
-reference, trigger/consequence and fix visibly in the row. Escape literal
-pipes in cell content as `\|` and use `<br>` for line breaks within cells.
+For fixed entries with a verified fix SHA, append `` · fixed in `<sha>` `` to
+the first line, inside its bold formatting, as shown below. Omit this suffix
+when the fix SHA is unknown; do not repeat it below the title.
 
-The collapsed summary shows nonzero status counts in row order, including
+Every entry follows this order: bold status line, description, file reference.
+Use the bold linked short summary as the description; include any necessary
+status note in that description. End with a code-formatted `file:line`
+reference, separated by a quoted blank line. Retain this reference after
+thread links are back-filled. For historical findings, reuse the original
+location; if unavailable, say “File reference unavailable” rather than invent
+one. For threadless overflow, use a plain bold summary and include the stable
+ID, trigger/consequence and fix in the description, with the supporting code
+reference last. Prefix every paragraph and blank line within an entry with `>`.
+
+The collapsed summary shows nonzero status counts in entry order, including
 on initial review (for example `🔵 3 new`). Counts must match the entries.
 When every finding is verified fixed, use `🟢 All <count> findings fixed`
-(singular `finding` for one); retain the Fixed rows and original links inside.
+(singular `finding` for one); retain the Fixed entries and original links inside.
 For mixed statuses, use the tally even if no findings remain open.
 
 Example with known thread links (the URLs below are placeholders):
@@ -104,12 +123,37 @@ Example with known thread links (the URLs below are placeholders):
 <details>
 <summary>Advisory Findings &middot; 🟠 1 open &middot; 🟡 1 deferred &middot; 🟢 2 fixed</summary>
 
-| Status | Finding | Details |
-|---|---|---|
-| 🟠&nbsp;Open | <sub>correctness · major</sub><br>**[Missing retry limit](<original-thread-url>)** | — |
-| 🟡&nbsp;Deferred | <sub>observability · minor</sub><br>**[Missing timeout logging](<original-thread-url>)** | Awaiting logging follow-up. |
-| 🟢&nbsp;Fixed | <sub>correctness · minor</sub><br>**[Missing null guard](<original-thread-url>)** | Fixed in `a1b2c3d` |
-| 🟢&nbsp;Fixed | <sub>reliability · major</sub><br>**[Duplicate event delivery](<original-thread-url>)** | Fixed in `e4f5a6b` |
+<br>
+
+> **🟠 open · major(correctness)**
+>
+> **[Missing retry limit](<original-thread-url>)**
+>
+> `src/jobs/worker.ts:84`
+
+---
+
+> **🟡 deferred · minor(observability)**
+>
+> **[Missing timeout logging](<original-thread-url>)** — awaiting logging follow-up.
+>
+> `src/network/client.ts:112`
+
+---
+
+> **🟢 fixed · minor(correctness) · fixed in `a1b2c3d`**
+>
+> **[Missing null guard](<original-thread-url>)**
+>
+> `src/users/profile.ts:37`
+
+---
+
+> **🟢 fixed · major(reliability) · fixed in `e4f5a6b`**
+>
+> **[Duplicate event delivery](<original-thread-url>)**
+>
+> `src/events/consumer.ts:96`
 
 </details>
 ```

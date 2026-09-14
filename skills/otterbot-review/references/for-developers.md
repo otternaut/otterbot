@@ -3,13 +3,18 @@
 Ollie 🦦 leaves a concise first-pass review with evidenced bugs and concrete
 fixes. Findings are inline or visibly summarized under Advisory Findings; the root explains the verdict in about two
 sentences. A collapsible **Advisory Findings** section links to each current
-and prior Ollie finding in a Status / Finding / Details table. Category and
-severity sit above each linked title; status labels use non-breaking spaces.
-Rows are sorted by status with active items first:
-🟠 Open, 🔵 New, 🟡 Deferred, 🟢 Fixed, 🟣 Accepted, ⚪ Superseded and
-⚪ Withdrawn. The collapsed summary shows counts for each nonzero status;
+and prior Ollie finding in separate blockquotes. Status and `level(category)`
+(for example `major(correctness)`) form the bold first line, followed by the
+linked description and then a `file:line` reference. A small gap separates
+the section title from the first finding. Relevant notes stay in
+the description. Entries are sorted by status with active items first:
+🟠 open, 🔵 new, 🟡 deferred, 🟢 fixed, 🟣 accepted, ⚪ superseded and
+⚪ withdrawn. The collapsed summary shows counts for each nonzero status;
 when all findings are verified fixed, it says **🟢 All N findings fixed**.
-Fixed entries show the fix commit when known and retain their original links.
+Fixed entries append “fixed in” and the verified fix commit to the bold status
+line when known, and retain their original links.
+The entire status and `level(category)` line is bold. Entry status labels
+are lowercase, with plain emoji dots.
 Dots indicate status here; inline dots indicate severity. It is omitted only
 when there are no findings.
 Every comment keeps Ollie's otter footer and reviewed commit.
