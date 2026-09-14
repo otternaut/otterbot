@@ -73,8 +73,8 @@ limit. Prior findings and verified overflow can also affect the approval count.
 Keep overflow evidence and fixes visible; preserve the supplementary ledger from `approval.md` in the root,
 including during link back-fill; do not invent thread links for its entries.
 
-Use one full-width blockquote per finding, separated by a blank line, an
-unquoted `---` horizontal rule and another blank line. Do not use a table.
+Use one full-width blockquote per finding, separated by a single blank line.
+Do not use horizontal rules or a table.
 Sort entries by current status, with active findings first, in this order:
 🟠 **open**, 🔵 **new**, 🟡 **deferred**, 🟢 **fixed**, 🟣 **accepted**,
 ⚪ **superseded**, ⚪ **withdrawn**. Do not add status group headings.
@@ -130,19 +130,13 @@ Example with known thread links (the URLs below are placeholders):
 > <sub>[Missing retry limit](<original-thread-url>)</sub>
 > <sub>`src/jobs/worker.ts:84`</sub>
 
----
-
 > <sub>**🟡 deferred · 🟡 observability(minor)**</sub>
 > <sub>[Missing timeout logging](<original-thread-url>) — awaiting logging follow-up.</sub>
 > <sub>`src/network/client.ts:112`</sub>
 
----
-
 > <sub>**🟢 fixed · 🟡 correctness(minor) · fixed in `a1b2c3d`**</sub>
 > <sub>[Missing null guard](<original-thread-url>)</sub>
 > <sub>`src/users/profile.ts:37`</sub>
-
----
 
 > <sub>**🟢 fixed · 🟠 reliability(major) · fixed in `e4f5a6b`**</sub>
 > <sub>[Duplicate event delivery](<original-thread-url>)</sub>
