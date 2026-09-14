@@ -1,0 +1,42 @@
+{
+  "case_id": null,
+  "run_id": null,
+  "skill_version": null,
+  "skill_content_digest": null,
+  "model": null,
+  "job": null,
+  "tier": null,
+  "snapshot_identity": null,
+  "sequence_id": null,
+  "budget_seconds": null,
+  "elapsed_seconds": null,
+  "phases_seconds": {
+    "snapshot": null,
+    "instructions": null,
+    "evidence": null,
+    "rendering": null,
+    "delivery": null
+  },
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cached_input_tokens": null,
+    "includes_specialists": null,
+    "tool_calls": null,
+    "tool_returned_bytes": null,
+    "repeated_read_bytes": null
+  },
+  "outcome": {
+    "verdict": null,
+    "readiness": null,
+    "coverage_complete": null,
+    "serious_defects_expected": null,
+    "serious_defects_missed": null,
+    "false_findings": null,
+    "false_holds": null,
+    "unsafe_approval": null,
+    "duplicate_writes": null,
+    "budget_overrun_reason": null
+  },
+  "artifact_path": null
+}

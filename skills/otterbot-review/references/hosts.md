@@ -1,9 +1,9 @@
 # Host delivery notes
 
-The skill is host-agnostic; this file records how the delivery rules in §7 map
+The skill is host-agnostic; this file records how the delivery rules map
 onto the hosts Ollie is most often used with, and what to do when a host lacks
-a capability. Verify flags and field names against the host's current
-documentation before relying on them; APIs drift. When a capability is missing,
+a capability. Prefer available tool schemas and established repository helpers. Consult host
+documentation when a capability or field is unknown or rejected. When a capability is missing,
 use the listed fallback and say so in the conversation summary.
 
 ## Review states
@@ -11,7 +11,7 @@ use the listed fallback and say so in the conversation summary.
 | Verdict | GitHub | GitLab | Bitbucket Cloud |
 | --- | --- | --- | --- |
 | Ship It | review event `APPROVE` | approve the merge request | approve the pull request |
-| Comment Only | review event `COMMENT` | note only, no approval change | comment only |
+| Comment Only | `COMMENT` plus reconcile prior Ollie state | note plus reconcile prior Ollie state | comment plus reconcile prior Ollie state |
 | Request Changes | review event `REQUEST_CHANGES` | request changes where the version supports it; otherwise unapprove and post the root note | request changes |
 
 Where a host cannot express a state, post the root comment as a plain comment
@@ -35,39 +35,39 @@ and state the limitation; the verdict banner already carries the verdict.
 The recommended sequence for a GitHub PR, using the GitHub CLI's API access.
 Replace placeholders; never pass a filename as the body.
 
-1. Snapshot: `gh api user` for the reviewing login, then one GraphQL query on
-   the pull request that returns everything §1 of the skill needs:
-   `author`, `headRefOid`, `baseRefOid`, `isDraft`, `mergeable`,
-   `reviewDecision`, `changedFiles`, `additions`, `deletions`, the head
-   commit's `statusCheckRollup`, `latestReviews` with author and body,
-   `reviewThreads` with `isResolved` and each comment's author and body, and
-   `files` with per-file additions and deletions. The marker in the newest
-   Ollie review body gives the reviewed head. Compare tree OIDs of the two
-   commits only when heads differ. Nothing else is fetched until the head
-   refetch before submission.
-2. Diff scope: `git diff --merge-base <base> <head>` or the compare endpoint.
-   Use one `git blame` per changed file at the head, restricted to the PR's
-   commits, to find the introducing SHA for every anchor in that file; a
-   single-commit PR needs no blame.
-3. Submit: one call to create the review with `commit_id` set to the reviewed
-   head, `event` set from the verdict, `body` set to the root Markdown, and
-   `comments` set to the inline findings, each with `path`, `line`, `side`, and
-   optional `start_line`, or `subject_type: file` for a file-level comment.
-4. Verify: one GraphQL query on the pull request fetches the new review's
-   body and its comments (id, url, path, line) together, so the marker, the
-   comment count, and the thread URLs come back in one call. Then one PATCH
-   updates the review body so each findings bullet links to its thread. If
-   that PATCH fails, retry once, then leave `file:line` and move on.
+1. Fetch the reviewing identity and a lightweight PR snapshot for early exits:
+   author, head/base SHAs, target/integration context, draft/merge state,
+   review decision, checks, latest
+   reviewer states and the newest attributable Ollie marker. Then fetch changed
+   files, lightweight thread identities/anchors/revisions and the newest
+   attributable root review and ledger when review continues. Retrieve detailed
+   bodies for new/edited/affected threads or missing records; when reliable
+   metadata is unavailable, reconcile the full needed history. Fully paginate all needed
+   connections, including nested comments; a single query is not a guarantee
+   of completeness. Reuse results throughout the review.
+2. Read the diff at the snapshot head. Investigate introducing commits only
+   when provenance is necessary to establish a finding's scope.
+3. Refresh head/base context and mutable gates once, then submit one review with the reviewed `commit_id`,
+   verdict `event`, root Markdown `body` and inline `comments`. Changed head/base context
+   prevents approval until assessed; never relabel findings as reviewing the newer head.
+4. After the state transitions below, verify marker, effective review state,
+   head/base context, readiness, coverage state and mutable gates
+   (including CI/enforcement when relied upon), comment
+   count and URLs together.
+   Match returned comments to findings by marker or anchor, then update the root
+   once to back-fill all new Advisory Findings links, preserving the approval
+   ledger and ollie-state markers. Prior links come from the
+   snapshot. If there are no missing links, no edit is needed. Retry a failed
+   update at most once, then retain plain file:line entries and report the
+   linking limitation without resubmitting the review.
 5. Threads: reply to a prior comment with the replies endpoint, one call per
-   reply. Resolve and unresolve in a single GraphQL request by aliasing the
+   necessary reply, never for unchanged status alone. Resolve and unresolve in a single GraphQL request by aliasing the
    mutations, for example
    `r1: resolveReviewThread(input:{threadId:"..."}) { thread { isResolved } }`
    repeated per thread, rather than one request per thread.
-6. Transitions: when the new verdict is Comment Only and the prior Ollie
-   review was changes requested with every blocker fixed, dismiss
-   that prior review with the message `Blockers fixed in <sha>, see
-   <review-url>`. A new approval or changes-requested review supersedes the
-   prior state on its own.
+6. Reconcile the new verdict with Ollie's prior effective host state using
+   the transition rules below; verify the effective state, not just the new
+   comment's event. Never touch another reviewer's review.
 
 Self-review: GitHub rejects approving or requesting changes on your own PR.
 Post the review with `COMMENT`; the verdict banner carries the verdict.
@@ -76,9 +76,11 @@ Post the review with `COMMENT`; the verdict banner carries the verdict.
 
 Approvals are separate from notes. Post inline findings as draft notes and
 publish them together so the review lands at once; post the root comment as
-the first note. For Ship It, approve. For Request Changes, use the reviewer
+the first note. For Ship It, approve with the reviewed head as the API SHA
+precondition; a mismatch prevents approval. For Request Changes, use the reviewer
 request-changes action where available, otherwise remove any existing Ollie
-approval and rely on the verdict banner. Resolve discussions Ollie owns when a
+approval and rely on the verdict banner. For Comment Only, remove any prior
+Ollie approval. Resolve discussions Ollie owns when a
 finding
 is classified fixed, deferred, accepted, superseded, or withdrawn.
 
@@ -86,14 +88,53 @@ is classified fixed, deferred, accepted, superseded, or withdrawn.
 
 Comments are posted individually; post the root comment first, then each
 inline comment, then set the participant state with approve or request
-changes. Note in the conversation summary that delivery was not atomic.
+changes; Comment Only removes any prior Ollie approval. Note in the conversation summary that delivery was not atomic.
+
+## Effective review-state transitions
+
+A new comment is not proof that an earlier approval or request for changes no
+longer counts. Determine and reconcile Ollie's effective host state:
+
+| Desired verdict | Required state action |
+| --- | --- |
+| Ship It | Approve at the reviewed head after all gates pass; supersede or clear Ollie's prior request for changes using the supported host operation |
+| Request Changes | Submit that state and remove any prior Ollie approval if the host does not supersede it automatically |
+| Comment Only after approval | Withdraw/dismiss only Ollie's prior approval, then leave the explanatory comment |
+| Comment Only after Request Changes | Clear/dismiss Ollie's prior request only when every old blocker is verified fixed, superseded or disproven; retain any unresolved blocker as Request Changes |
+| Comment Only with no active Ollie decision | Post the explanation; no removal needed |
+
+GitHub uses review dismissal where an old decision must be cleared; GitLab
+and Bitbucket have separate unapproval operations. Use the host's documented
+operation for removing Ollie's request for changes when a new review does not
+supersede it. Never reset all approvals or dismiss human reviews. Perform
+necessary removals before granting any new approval; verify final effective
+state after transitions. Include current head and mutable gates in that
+verification. If a new push or gate change invalidated an approval during
+delivery, withdraw Ollie's approval and explain the race without rereviewing
+in a loop. Use atomic SHA preconditions where supported; on hosts without
+atomic conditional approval, the final check is detection/recovery rather
+than a guarantee against concurrent pushes. If removal is unauthorized or unsupported, report
+that the prior decision remains active and the review state is not reconciled.
+Do not claim a Comment Only gate is enforced while Ollie's approval still
+counts. Do not claim blockers cleared on the host while its request remains.
 
 ## Fallbacks
 
+Shadow bypasses all submission, transition, reply and edit operations; save a
+local hypothetical result and attempted-action plan instead. For live work,
+use one submission, one verification fetch and at most one root link update
+normally, plus required state-transition calls, one call per necessary
+thread reply and a batched resolution call. If a submission times
+out, check the reviewed-head marker before retrying; never blindly duplicate
+a review. Allow at most one recovery attempt for a failed operation, then
+report the limitation. Pagination is required retrieval, not a retry loop.
+
+
 - No single-call submission: post the root comment first, then each inline
   comment, then set the state. Say so.
+- No body editing: retain known prior links and plain `file:line` for new
+  findings; report that new links could not be back-filled.
 - No file-level comments: attach to the nearest changed line in the file.
-- No body editing: findings bullets keep `file:line` instead of links.
 - Cannot attach a verdict: post the root comment as a plain comment with the
   verdict banner intact and state why.
 - Cannot post at all: state the failure, show the report in conversation, and
@@ -108,8 +149,8 @@ delivery target instead of the conversation. Read managed state with
 `sc worktree status --json` for the target branch and
 `sc worktree review-list --json` for existing comments. Post the root comment
 with `sc worktree review-add ... --provider otterbot-review`, then each inline
-finding on its changed range. On a re-review, resolve every prior
-`otterbot-review` comment with `sc worktree review-reply <id> --provider
-otterbot-review --resolve` before posting the new root and only the current
-open findings; this archival marks the old generation superseded on that
-surface and does not imply a finding was fixed.
+finding on its changed range. On a re-review, update only affected Ollie comments
+using the same lifecycle rules as host threads: resolve verified fixes, answer
+new questions, and leave unchanged still-open comments without another reply.
+Keep the personality footer on each newly posted comment or reply. Do not
+archive unresolved findings merely to replace the review generation.

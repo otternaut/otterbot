@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Exercise decision boundaries and reject malformed normalized snapshots.
+set -euo pipefail
+SKILL_ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+case "${1:-}" in
+  --help|-h) printf 'Usage: test-decisions [--dry-run]\n'; exit 0 ;;
+  --dry-run) printf 'Would check decision-cases.tsv and malformed inputs; no host actions.\n'; exit 0 ;;
+  '') ;;
+  *) printf 'Unknown option\n' >&2; exit 2 ;;
+esac
+count=0
+while read -r name blockers minors coverage context evidence gates ci host verdict readiness reason; do
+  [[ -n "$name" && "$name" != \#* ]] || continue
+  result=$("$SKILL_ROOT/scripts/decide" --blockers "$blockers" --minors "$minors" \
+    --coverage "$coverage" --context "$context" --evidence "$evidence" \
+    --gates "$gates" --ci "$ci" --host "$host")
+  [[ "$result" == *"\"verdict\":\"$verdict\""* && "$result" == *"\"readiness\":\"$readiness\""* ]] || {
+    printf 'FAIL %s: %s\n' "$name" "$result" >&2; exit 1;
+  }
+  if [[ "$reason" != - ]]; then
+    [[ "$result" == *"\"$reason\""* ]] || { printf 'Missing reason: %s\n' "$name" >&2; exit 1; }
+  else
+    [[ "$result" == *'"reasons":[]'* ]] || { printf 'Unexpected hold: %s\n' "$name" >&2; exit 1; }
+  fi
+  count=$((count + 1))
+done < "$SKILL_ROOT/evals/decision-cases.tsv"
+base=(--blockers 0 --minors 0 --coverage complete --context current --evidence adequate --gates pass --ci ready --host ready)
+for invalid in missing duplicate negative unknown; do
+  case "$invalid" in
+    missing) args=(--blockers 0) ;;
+    duplicate) args=("${base[@]}" --minors 1) ;;
+    negative) args=(--blockers -1 "${base[@]:2}") ;;
+    unknown) args=("${base[@]}" --approve-anyway yes) ;;
+  esac
+  if "$SKILL_ROOT/scripts/decide" "${args[@]}" >/dev/null 2>&1; then
+    printf 'Accepted invalid input: %s\n' "$invalid" >&2; exit 1
+  fi
+done
+printf '%s decision cases and 4 invalid-input cases passed.\n' "$count"

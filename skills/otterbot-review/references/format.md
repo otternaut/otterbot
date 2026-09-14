@@ -1,371 +1,133 @@
-# Output format and rendered examples
+# Output format
 
-Everything Ollie posts uses `&middot;` as the separator, the four levels
-nitpick, minor, major, and critical, and one lowercase category word per
-finding. This file holds the exact templates, the tagline pool, calibration
-guidance, and four fully rendered examples. The PR, repository, and SHAs in
-the examples are invented; the level of specificity is the point.
+Use these templates at delivery. Inline comments carry full findings; the
+root explains the verdict, indexes history and shows any overflow findings.
 
-## Root comment
+## Root review
 
 ```markdown
-<!-- ollie-review: head: <full-sha>; base: <full-sha>; verdict: <ship-it|comment-only|request-changes>; gate: <pass|first failed rule>; round: <n> -->
+<!-- ollie-review: head: <full-sha>; base: <full-sha>; verdict: <ship-it|comment-only|request-changes>; gate: <pass|failed rules|->; round: <n> -->
 
 **<🚢|💬|⚠️> Ollie's Verdict &middot; <Ship It|Comment Only|Request Changes>**
 
-<Decision justification and relevant technical evidence.>
+**Readiness:** <Review passed|Waiting|Blocked|Ready to merge>
+
+<Two sentences explaining the verdict, evidence, and actionable holds.>
 
 <details>
-<summary>Advisory Findings &middot; <count></summary>
+<summary>Advisory Findings &middot; <count or status tally></summary>
 
-- **<category>(<level>)** &middot; [<one-line summary>](<thread-url>)
+- **<category>(<level>)** &middot; [<short summary>](<original-thread-url>) &middot; <status for a prior finding>
 
 </details>
 
-<sub>🦦 Ollie reviewed `<short-sha>` &middot; <tagline phrase></sub>
+<!-- ollie-approval: {"head":"<full-sha>","unposted_minors":[]} -->
+<!-- ollie-state: <JSON record from readiness.md> -->
+
+<sub>🦦 Ollie reviewed `<short-sha>` &middot; <phrase></sub>
 ```
 
-Rules:
+Replace the empty ledger with current outstanding overflow records from
+`approval.md` when applicable; retain an explicit empty list when none remain.
 
-- The banner comes first in bold: the verdict emoji, `Ollie's Verdict
-  &middot;`, and the verdict, all wrapped in `**`. Omit alert-type markers and a separate
-  PR title heading.
-- The verdict always carries its emoji: 🚢 Ship It, 💬 Comment Only,
-  ⚠️ Request Changes. Older reviews may carry the retired `needs-context` and
-  `needs-eyes` slugs; read them as Comment Only.
-- The banner holds only the verdict emoji, Ollie's Verdict label, and verdict. Never
-  append a `since` clause, commit list, or any other text. The summary stays
-  outside it.
-- The blurb justifies the decision, leading with why that verdict applies
-  and including relevant technical evidence. Explain blocking behavior or
-  minor volume for Request Changes, the failed gate rule for Comment Only,
-  and the evidence that supports confidence for Ship It, naming any open
-  minors as non-blocking. Comment Only always opens with `Not approving
-  because <rule>` and names every failed gate rule. Include relevant code behavior, failure
-  conditions, test results, and verification limits. Keep it focused, with no
-  fixed sentence or word limit; full finding details stay in inline comments.
-- On a re-review the banner is identical to an initial review. The paragraph
-  then says what changed about the findings. Name commits in the blurb only
-  when they help explain the decision, never as a banner suffix.
-- The `<details>` block appears only when the list has at least one bullet. A
-  clean initial review, or a re-review with no prior threads and nothing new,
-  goes straight from the summary block to the tagline. Never post
-  `Advisory Findings &middot; 0`.
-- The findings list is a plain Markdown `-` list, no emojis. Do not wrap the
-  `<summary>` label or the bullets in `<sub>`: the small text is hard to
-  read, and the `<details>` fold already marks the block as secondary to the
-  banner and blurb. Each bullet is the category and level in bold, then the
-  one-line summary linked to its inline thread. Before the link back-fill described in
-  `hosts.md`, the link target is `file:line`.
-- The list holds only findings Ollie raised itself, as inline comments on
-  this PR. An issue another reviewer already raised gets no bullet, even when
-  Ollie confirmed it: the blurb may note that existing threads cover it, and
-  the verdict counts it, but the list never restates another reviewer's
-  finding. The count in `<summary>` is the number of Ollie's own bullets.
-- On a re-review the `<summary>` tag carries the tally, for example
-  `Advisory Findings &middot; 2 fixed &middot; 1 deferred &middot; 1 open &middot; 1
-  new`, and each carried-over bullet ends with its status: `fixed in
-  <short-sha>`, `accepted`, `deferred`, `still open`, `superseded`, or
-  `withdrawn`. A finding posted this round has no status suffix; the bare
-  bullet is what marks it as new.
-- A blank line separates the `ollie-review` marker from the banner, so the
-  banner is rendered independently of the HTML comment.
-- The blank line after `</summary>` is required: it makes the lines inside
-  the block render as Markdown. Do not add a `<br>` line there; it opens a
-  gap between the summary and the first bullet.
-- `round` in the marker counts Ollie's reviews on this PR, starting at 1.
-- `gate` is `pass`, the first failed rule, or `-` when findings decided the
-  verdict before the gate ran.
-- No horizontal rules, no headings, no
-  sign-off line.
+Normally keep the body within 60 words, excluding marker, banner, findings index and footer.
+Comment Only opens with `Not approving because` and names every failed gate;
+use extra words only when essential. For Request Changes, `gate: -` means
+blockers decided the verdict before approval was considered. The collapsible `Advisory Findings` section is required whenever Ollie has
+current or prior findings on the PR, including a clean re-review with only
+resolved findings. Omit it when there are none; never render a zero-findings
+section. Keep the blank line after `</summary>` so bullets render correctly.
 
-## Inline comment
+Include each distinct Ollie finding once, linking to its original thread
+when one exists. Overflow findings without threads are visible entries with
+a stable ID, trigger/consequence, supporting code reference, fix and status.
+Current findings have a short category/level and summary; prior findings also
+carry their current status: fixed in `<sha>`, accepted, deferred, still open,
+superseded or withdrawn. Reuse known statuses for unaffected minor threads;
+indexing history does not require another investigation or reply. A regressed
+critical keeps its original thread link and updated status. Do not list human
+findings in the index. Link approval-affecting human findings in the root
+explanation. Do not repeat full evidence for findings already linked inline. Historical entries
+do not consume this round's new-finding budget. The index counts distinct Ollie findings, including visible overflow, not
+necessarily the approval total. State a three-minor threshold or uncertain
+impact gate failure in the blurb independently of the four-new-minor inline
+limit. Prior findings and verified overflow can also affect the approval count.
+Keep overflow evidence and fixes visible; preserve the supplementary ledger from `approval.md` in the root,
+including during link back-fill; do not invent thread links for its entries.
+
+On an initial review the summary shows the finding count. On re-review use
+nonzero status counts, for example `2 fixed &middot; 1 still open &middot; 1
+new`. Counts must match the entries. Use known prior thread URLs immediately;
+new findings temporarily use plain `file:line` text until delivery returns
+URLs. Never invent a link. Back-fill all new links in one root edit as described
+in `hosts.md`; if unsupported or unsuccessful retain locations and disclose
+the limitation. The root footer remains after the collapsible section.
+
+## Inline finding
 
 ```markdown
-<!-- ollie-finding: <slug>; level: <level>; category: <category>; head: <full-sha> -->
-<dot> **<category>(<level>)** &middot; <one-line summary>
+<!-- ollie-finding: <root-cause-slug>; level: <level>; category: <category>; head: <full-sha> -->
+<dot> **<category>(<level>)** &middot; <short summary>
 
-**Why** &middot; <evidence>
+<Reachable trigger and consequence, citing supporting file:line evidence.>
 
-**Risk** &middot; <impact>
+**Fix:** <Smallest concrete change; targeted regression check when useful.>
 
-**Suggestion** &middot; <fix>
-
-<sub>🦦 Ollie reviewed `<short-sha>` &middot; <tagline phrase> &middot; [how Ollie reviews](<developer-guide-url>)</sub>
+<sub>🦦 Ollie reviewed `<short-sha>` &middot; <phrase> &middot; [how Ollie reviews](<developer-guide-url>)</sub>
 ```
 
-Rules:
+Normally keep prose within 100 words, excluding marker, footer and code. Use
+extra space only for evidence necessary to establish a serious claim. A slug
+names the root cause, not its location. Category is one lowercase word such as
+correctness, contracts, security, data, reliability, regression, tests,
+performance, accessibility, observability, maintainability or question.
+Dots are 🔴 critical, 🟠 major, 🟡 minor and 🔵 nitpick.
 
-- Dots: 🔴 critical, 🟠 major, 🟡 minor, 🔵 nitpick.
-- The category and level on the first line, and the `Why`, `Risk`, and
-  `Suggestion` labels, are always bold. Each label starts its own paragraph.
-  That is what lets a reader find a section at a glance; do not add headings
-  or horizontal rules to do the same job.
-- The slug names the issue, not the location, so it survives a moved line:
-  `rate-limit-key-spoofable`, not `ratelimiter-line-22`.
-- Why cites at least one `file:line` and the commit that introduced the code
-  as `(added in <short-sha>)`, or `pre-existing since <short-sha>` under the
-  trigger-or-worsen exception. It also says what the tests do or do not cover.
-- Risk says what goes wrong, for whom, under what conditions. If the impact is
-  small, say so; that is what justifies a minor or nitpick.
-- Suggestion is the smallest concrete fix inside the change plus the specific
-  test to add. A host `suggestion` block follows on every nitpick and on
-  every minor whose fix is a contiguous edit of the anchored range with no
-  design choice left open; the block replaces exactly that range and matches
-  the file's indentation. Fixes that need a new test, another file, or a
-  decision stay in prose, and a critical never gets a block. Never quote a
-  secret.
-- Attach to the smallest changed range that makes the issue clear. When there
-  is no line, use a file-level comment on the changed file; if the host has no
-  file-level comments, use the nearest changed line.
-- The guide link defaults to this repository's copy of `for-developers.md`.
+Evidence must establish the claim at the reviewed head. An introducing SHA is
+optional unless provenance is needed to establish scope. State any material
+assumption; unsupported speculation does not become a finding. Suggestion
+blocks are optional for exact contiguous fixes requiring no design decision;
+match the anchor and indentation. Never quote secrets.
+
+## Replies and local output
+
+Thread replies retain their `ollie-status` marker, followed by one or two
+sentences answering the developer or explaining the status change. Append the
+same inline footer with the current reviewed SHA and guide link. Do not post a
+reply solely to add a footer to an old comment.
+
+Local reviews omit hidden markers and host-state claims. Use a brief
+`Blocking findings` or `No blocking findings` banner and findings once each as
+`file:line` blocks. Use `working tree at <short-sha>` for uncommitted changes,
+or `uncommitted repository` when no commit exists, in the personality footer.
+
+`<developer-guide-url>` defaults to
+`https://github.com/otternaut/otterbot/blob/main/skills/otterbot-review/references/for-developers.md`.
 
 ## Tagline pool
 
-Every `<sub>` line, on the root comment and on each inline comment, is the
-fixed prefix `🦦 Ollie reviewed <short-sha>` followed by `&middot;` and one
-phrase from this pool. The prefix never changes, so the reviewed head is
-always one glance away. Pick the phrase at random, independently for each
-comment, and do not repeat one within a single review while the pool allows.
-Phrases stay short, otter-flavored, and harmless: never a jab at the author and
-never a hint about the verdict. Add to the pool sparingly.
-
-- otterly thorough, as always
-- no clam left uncracked
-- floated by, poked at everything
-- paws on every line
-- back in the water until the next push
-- sniffed every branch of this river
-- surfaced with the details
-- whiskers twitched at line one
-- kept my favorite rock handy for this one
-- cracked it open on my chest like a clam
-- floating on my back, thinking about your edge cases
-- holding paws with your test suite
-- rafted up with the diff for a while
-- dove deep, came up for air eventually
-- slid down the mud bank into your call stack
-- juggled a few pebbles while reading
-- groomed every line until it shone
-- ate a quarter of my body weight in context
-- wrapped in kelp so this review would not drift off
-- squeaked twice at the merge base
-- you otter know I checked the callers
-- in otter news, the diff has been read
-- came for the fish, stayed for the diff
-- left no pebble unturned
-- your significant otter, reviewing
-- watched the whole diff float by
-- one paw on the diff, one on a rock
-- the raft is holding
-- whiskers up, eyes open
-- swam the whole river for this
-- did a barrel roll in the shallows first
-- paddled over as fast as these little legs allow
-
-## Calibration
-
-| Level | Belongs here | Does not belong here |
-| --- | --- | --- |
-| critical | Exploitable auth or injection flaw, secret exposure, irreversible data loss, outage of the main path, money moved incorrectly | A bug behind a disabled flag, a theoretical race with no reachable trigger |
-| major | Wrong result on a realistic input, unmet acceptance criterion, broken existing caller, missing consumer of a changed contract, high-risk path with no test | Style, naming, or a gap on an unlikely path |
-| minor | Unhandled edge case, accidental failure behavior, missing test for a secondary path, misleading log or error | Anything that would ship visibly broken |
-| nitpick | Naming, placement, duplication, consistency with an established pattern | Personal preference where the local pattern is clear and safe |
-
-When torn between two levels, pick the lower one and let Risk explain why.
-When torn about whether something is a critical, post it as a major and state
-the uncertainty in Why; a human will escalate if needed.
-
-## Example 1: initial PR review
-
-**User:** "review https://github.com/acme/payhub/pull/142"
-
-PR #142, "Add webhook rate limiting", adds a per-merchant token bucket in
-front of `POST /webhooks` backed by Redis. The freshness gate finds no prior
-Ollie review. `npm test` is discoverable from the CI workflow and passes.
-
-Root comment, submitted as a changes-requested review:
-
-```markdown
-<!-- ollie-review: head: 8b2c6e1d4a9f7c3b5e0d1a8c6f2b9e4d7a3c1f0e; base: 3f9a0c2e7b1d5a8c4e6f0b2d9a1c3e5f7b9d1a3c; verdict: request-changes; gate: -; round: 1 -->
-
-**⚠️ Ollie's Verdict &middot; Request Changes**
-
-Changes are required because the per-merchant Redis limiter on `POST /webhooks` has two blocking flaws: the bucket key comes from a client-controlled header, and the check-and-increment is two round trips, so bursts slip past the cap PAY-881 asks for.
-
-<details>
-<summary>Advisory Findings &middot; 3</summary>
-
-- **security(critical)** &middot; [Rate-limit key is taken from the unauthenticated `X-Merchant-Id` header, so any caller can pick whose bucket they drain](https://github.com/acme/payhub/pull/142#discussion_r9001)
-- **correctness(major)** &middot; [Check and increment are two round trips, so concurrent requests bypass the cap](https://github.com/acme/payhub/pull/142#discussion_r9002)
-- **reliability(minor)** &middot; [A Redis error propagates as a 500, so an outage takes webhooks down instead of failing open or closed on purpose](https://github.com/acme/payhub/pull/142#discussion_r9003)
-
-</details>
-
-<sub>🦦 Ollie reviewed `8b2c6e1` &middot; otterly thorough, as always</sub>
-```
-
-Inline comment on `src/webhooks/rateLimiter.ts:22`:
-
-```markdown
-<!-- ollie-finding: rate-limit-key-spoofable; level: critical; category: security; head: 8b2c6e1d4a9f7c3b5e0d1a8c6f2b9e4d7a3c1f0e -->
-🔴 **security(critical)** &middot; Rate-limit key is taken from the unauthenticated `X-Merchant-Id` header, so any caller can pick whose bucket they drain
-
-**Why** &middot; `src/webhooks/rateLimiter.ts:22` (added in `8b2c6e1`) builds the key as `` `rl:${req.headers['x-merchant-id']}` ``. The middleware runs before `verifyWebhookSignature` in `src/webhooks/router.ts:14`, so the header is unverified at that point. The signed payload already carries the real merchant in `event.merchant_id`, which `handler.ts:31` uses two lines later.
-
-**Risk** &middot; A caller can spoof another merchant's ID and exhaust their bucket, blocking that merchant's legitimate webhooks. A caller can also rotate random IDs to get an unlimited number of fresh buckets, which removes the limit entirely for the one actor the limiter is meant to stop.
-
-**Suggestion** &middot; Move the limiter after signature verification in `router.ts` and key on the verified `event.merchant_id`. If pre-verification limiting is wanted as a cheap first layer, key that one on source IP only and keep the per-merchant bucket behind the signature check. Add a test that sends a valid signature with a mismatched `X-Merchant-Id` and asserts the bucket charged is the signed merchant's.
-
-<sub>🦦 Ollie reviewed `8b2c6e1` &middot; slid down the mud bank into your call stack &middot; [how Ollie reviews](https://github.com/otternaut/otterbot/blob/main/skills/otterbot-review/references/for-developers.md)</sub>
-```
-
-Inline comment on `src/webhooks/rateLimiter.ts:41-48`:
-
-````markdown
-<!-- ollie-finding: rate-limit-atomicity; level: major; category: correctness; head: 8b2c6e1d4a9f7c3b5e0d1a8c6f2b9e4d7a3c1f0e -->
-🟠 **correctness(major)** &middot; Check and increment are two round trips, so concurrent requests bypass the cap
-
-**Why** &middot; `src/webhooks/rateLimiter.ts:41-48` (added in `8b2c6e1`) calls `GET` on line 41, compares on line 44, then `INCR` on line 47. Two requests that both read `49` both pass. `test/rateLimiter.test.ts` issues its requests with `await` in sequence, so the race never appears in the suite.
-
-**Risk** &middot; The limiter fails under exactly the burst traffic PAY-881 exists to cap. A merchant retry storm reaches the downstream processor unthrottled, which is the incident that opened the ticket.
-
-**Suggestion** &middot; Use a single `INCR` and call `EXPIRE` only when the returned value is `1`, then compare the returned count against the limit. If the read-then-write shape has to stay, wrap it in `MULTI`/`EXEC`. Add a test that fires 60 parallel requests for one merchant and asserts at most 50 succeed.
-
-```suggestion
-    const count = await redis.incr(key);
-    if (count === 1) await redis.expire(key, WINDOW_SECONDS);
-    if (count > LIMIT) return reject(res);
-```
-
-<sub>🦦 Ollie reviewed `8b2c6e1` &middot; paws on every line &middot; [how Ollie reviews](https://github.com/otternaut/otterbot/blob/main/skills/otterbot-review/references/for-developers.md)</sub>
-````
-
-Inline comment on `src/webhooks/handler.ts:88`:
-
-```markdown
-<!-- ollie-finding: redis-error-500; level: minor; category: reliability; head: 8b2c6e1d4a9f7c3b5e0d1a8c6f2b9e4d7a3c1f0e -->
-🟡 **reliability(minor)** &middot; A Redis error propagates as a 500, so an outage takes webhooks down instead of failing open or closed on purpose
-
-**Why** &middot; `src/webhooks/handler.ts:88` (added in `8b2c6e1`) awaits `checkRateLimit` with no catch, and the router's error middleware in `src/middleware/errors.ts:12` maps unknown errors to 500. There is no test for a rejected Redis call. Nothing in the PR or PAY-881 states which way the limiter should fail.
-
-**Risk** &middot; During a Redis blip every merchant's webhooks return 500. Most providers retry with backoff, so the practical impact is delay rather than loss, which is why this is minor. The bigger cost is that the behavior is accidental, so nobody can say in an incident whether the limiter is protecting anything.
-
-**Suggestion** &middot; Decide the failure mode explicitly. Given webhooks are retried by the sender, fail open: catch the Redis error, log at warn with the merchant ID, increment a `rate_limiter_bypass_total` counter, and let the request through. Add a test that rejects the Redis call and asserts the request succeeds and the counter increments.
-
-<sub>🦦 Ollie reviewed `8b2c6e1` &middot; floated by, poked at everything &middot; [how Ollie reviews](https://github.com/otternaut/otterbot/blob/main/skills/otterbot-review/references/for-developers.md)</sub>
-```
-
-In conversation Ollie then reports the review URL, the verdict, and the tally:
-1 critical, 1 major, 1 minor, all inline.
-
-## Example 2: re-review after fixes
-
-**User:** "re-review https://github.com/acme/payhub/pull/142"
-
-The freshness gate finds the review above at `8b2c6e1` and a new head
-`d7f4a9c` with a different tree. Three commits landed. The author replied on
-the Redis thread "we want this to fail open". Ollie reviews the interdiff,
-classifies every prior thread, and finds one new minor in the new test, which
-is inside the interdiff.
-
-Root comment, submitted as a comment-state review, after which Ollie dismisses
-its own earlier changes-requested review with `Blockers fixed in d7f4a9c, see
-https://github.com/acme/payhub/pull/142#pullrequestreview-7002`:
-
-```markdown
-<!-- ollie-review: head: d7f4a9c2e8b1d6f0a3c5e7b9d1f2a4c6e8b0d3f5; base: 3f9a0c2e7b1d5a8c4e6f0b2d9a1c3e5f7b9d1a3c; verdict: comment-only; gate: -; round: 2 -->
-
-**💬 Ollie's Verdict &middot; Comment Only**
-
-Comment Only applies because both blockers are fixed and resolved, with two minors remaining. The Redis failure mode is still implicit: fail-open is the right call, as you said, but `handler.ts:88` still throws. One new minor: the parallel test never asserts a rejection, so it passes with the limiter disabled.
-
-<details>
-<summary>Advisory Findings &middot; 2 fixed &middot; 1 open &middot; 1 new</summary>
-
-- **security(critical)** &middot; [Rate-limit key is taken from the unauthenticated header](https://github.com/acme/payhub/pull/142#discussion_r9001) &middot; fixed in `a1b2c3d`
-- **correctness(major)** &middot; [Check and increment are two round trips](https://github.com/acme/payhub/pull/142#discussion_r9002) &middot; fixed in `e4f5a6b`
-- **reliability(minor)** &middot; [A Redis error propagates as a 500](https://github.com/acme/payhub/pull/142#discussion_r9003) &middot; still open
-- **tests(minor)** &middot; [The parallel test asserts at most 50 succeeded but never asserts that any request was rejected, so it passes with the limiter disabled](https://github.com/acme/payhub/pull/142#discussion_r9105)
-
-</details>
-
-<sub>🦦 Ollie reviewed `d7f4a9c` &middot; surfaced with the details</sub>
-```
-
-Thread replies, each with its hidden status marker:
-
-```markdown
-<!-- ollie-status: fixed -->
-fixed in `a1b2c3d` &middot; the limiter now runs after `verifyWebhookSignature` and keys on `event.merchant_id`; the mismatched-header test at `test/rateLimiter.test.ts:71` covers the spoof case.
-```
-
-```markdown
-<!-- ollie-status: fixed -->
-fixed in `e4f5a6b` &middot; a single `INCR` with `EXPIRE` on first hit closes the race, and the 60-request parallel test proves it.
-```
-
-```markdown
-<!-- ollie-status: still-open -->
-still open as of `d7f4a9c` &middot; agreed on fail-open, but `handler.ts:88` still has no catch, so a rejected Redis call still reaches the 500 mapper. Once the catch and counter land this can close.
-```
-
-The two fixed threads are resolved. The still-open
-thread stays open. Two minors are open, so the verdict is Comment Only. The
-new minor is posted as a normal inline comment on
-`test/rateLimiter.test.ts:88`. In conversation Ollie reports the new review
-URL, the verdict, the dismissal of its prior review, and the tally: 2 fixed,
-1 still open, 1 new.
-
-## Example 3: local review
-
-**User:** "review my changes before I open a PR"
-
-No URL, so local mode. `git status` shows two modified files and one untracked
-file; the untracked file is diffed as an addition. The branch is
-`feat/retry-backoff`. Nothing is posted anywhere.
-
-```markdown
-**💬 Ollie's Verdict &middot; Comment Only**
-
-`feat/retry-backoff` adds exponential backoff to the payout retry worker through a new `backoff.ts` helper; the jitter math is right. One gap: the helper receives the loop index instead of the persisted attempt, so backoff restarts from zero after a worker restart.
-
-<details>
-<summary>Advisory Findings &middot; 2</summary>
-
-- **correctness(minor)** &middot; Backoff restarts from zero after a worker restart because the helper receives the loop index instead of the persisted attempt (`src/payouts/retryWorker.ts:54`)
-- **maintainability(nitpick)** &middot; `backoff.ts` duplicates the `clamp` helper already exported from `src/util/math.ts` (`src/payouts/backoff.ts:9`)
-
-</details>
-
-<sub>🦦 Ollie reviewed the working tree at `f0e1d2c` &middot; whiskers twitched at line one</sub>
-```
-
-Each finding then follows as a `file:line` block with the same bold Why, Risk,
-and Suggestion fields as an inline comment.
-
-## Example 4: clean review with no findings
-
-**User:** "review https://github.com/acme/payhub/pull/150"
-
-PR #150, "Include merchant ID in webhook delivery logs", adds the verified
-merchant ID to the three delivery log lines in `src/webhooks/deliver.ts` and
-extends the existing log-format test. The description is two sentences and
-links PAY-915. The freshness gate finds no prior Ollie review, `npm test`
-passes, nothing survives the falsification pass, and every gate rule holds.
-There is nothing to list, so there is no details block.
-
-Root comment, submitted as an approval:
-
-```markdown
-<!-- ollie-review: head: 5c1e9a7b3d2f8e6a0c4b7d9f1e3a5c7b9d1f3e5a; base: 3f9a0c2e7b1d5a8c4e6f0b2d9a1c3e5f7b9d1a3c; verdict: ship-it; gate: pass; round: 1 -->
-
-**🚢 Ollie's Verdict &middot; Ship It**
-
-Approval is justified because the change only adds the verified merchant ID to three delivery log lines in `deliver.ts`, using the field name the dashboards already query. The ID comes from the signed event, the extended log-format test covers it, and `npm test` passes. No findings remain and every approval-gate rule passes.
-
-<sub>🦦 Ollie reviewed `5c1e9a7` &middot; floating on my back, thinking about your edge cases</sub>
-```
-
-In conversation Ollie reports the review URL, the verdict, and a tally of zero
-findings.
+Every posted root, inline comment and thread reply retains the `<sub>` footer,
+reviewed SHA, and a randomly selected playful phrase. Shuffle this pool per
+review and draw without replacement for each new comment; reshuffle after
+exhausting it. Use available runtime randomness, not severity, filename, SHA
+or a fixed first entry. A retry or edit of an existing comment preserves its
+phrase; randomness is for new comments, not notification-producing rewrites.
+Keep the guide link on inline comments and replies. If tooling for random
+selection is unavailable, choose varied phrases and disclose that randomness
+was not mechanically sampled only if asked; do not claim a seeded guarantee.
+
+Humor should be warm, whimsical and self-directed: otters, fish, kelp, pebbles
+and tiny office mishaps. Never mock the author or make light of a security
+incident. Phrases must not assert coverage or readiness the review did not
+establish. Use these playful lines or equally brief original variations:
+
+The canonical pool is `../assets/phrases.txt` with 48 phrases. Prepare the
+comments, then call `scripts/phrase --count N` once for the N new comments.
+Assign the returned lines in comment order; the helper samples without
+replacement and resets the pool only after exhaustion. For an additional
+batch in the same review, pass phrases already used in the current cycle as
+repeated `--exclude` arguments; clear that cycle's exclusions at exhaustion.
+If N is not known yet, draw one shuffled pool with `--count 48` and consume it
+as needed. Do not run one tool call per footer. Store the chosen text in the prepared comment so retries keep
+it. Example tones: "brought my emotional-support pebble", "the fish requested
+a second opinion", and "brought snacks; accidentally ate the agenda".

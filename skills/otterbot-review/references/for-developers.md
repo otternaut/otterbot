@@ -1,128 +1,177 @@
 # How Ollie reviews your pull request
 
-Ollie 🦦 is the otter that leaves a first-pass review on every pull request.
-This page explains what the comments mean, how approval works, and how to talk
-back. Reading it once saves a round trip on your next PR.
+Ollie 🦦 leaves a concise first-pass review with evidenced bugs and concrete
+fixes. Findings are inline or visibly summarized under Advisory Findings; the root explains the verdict in about two
+sentences. A collapsible **Advisory Findings** section links to each current
+and prior Ollie finding, showing the status of earlier findings, including
+fixed or withdrawn ones. It is omitted only when there are no findings.
+Every comment keeps Ollie's otter footer and reviewed commit.
 
-## What you will see
+## What readiness means
 
-One short root comment with an otter and verdict banner, a justification of
-the decision with relevant technical evidence, and a smaller collapsible list
-of findings when there are any. Every finding is an inline comment on the line
-it is about, shaped like this:
+The review verdict is separate from readiness. **Review passed** means Ollie's
+review gates passed; **Waiting** names checks, evidence or human actions still
+needed; **Blocked** means verified defects remain. **Ready to merge** requires
+complete review, passing required checks and verified host eligibility for the
+exact PR head and target/base context. It is not an automatic merge action.
+Every hold states what clears it, who acts next and what triggers reassessment.
 
-```text
-🟠 **correctness** · **major** · Check and increment are two round trips, so concurrent requests bypass the cap
+Ollie records completed and incomplete review areas. Fixing listed findings
+cannot bypass old coverage gaps. A base-branch advance can invalidate readiness
+even without a PR commit; only affected integration evidence is reassessed.
+Replies, CI results and human decisions can update gates without rereading
+unchanged code when coverage and context remain valid.
 
-**Why** · the evidence, with file:line references and the commit that introduced the code
-**Risk** · what goes wrong, for whom, under what conditions
-**Suggestion** · the smallest concrete fix, plus the test that would prove it
-```
+`--shadow` produces a local hypothetical review with no host writes;
+`--no-approve` still posts feedback. Deployed automation must wire event routing
+or run metadata-aware sweeps; installing skill instructions does not create a
+listener. Ollie's footer is randomly sampled per new comment, avoids repeats
+until the pool is exhausted, and stays unchanged on edits/retries.
 
-Ollie only reviews the lines you changed. It reads the rest of the codebase
-for context, but it will not comment on pre-existing code unless your change
-newly triggers a problem there.
+## What Ollie checks
 
-How hard Ollie looks depends on the size and kind of change. A docs or
-formatting fix gets a quick read and a verdict. A dependency bump gets a
-compatibility check against the release notes and how the code uses the
-package. A change under about a hundred lines gets the correctness and tests
-passes; larger changes get the full set, including security and reliability.
-Line counts ignore comments, docstrings, and documentation files, so a
-well-commented PR is not treated as large. Size never blocks approval: on a
-very large PR Ollie reviews the riskiest files first and says which ones it
-only skimmed.
+One integrated review covers correctness, security, reliability, relevant
+tests and interfaces. Ollie reads direct callers and contracts as needed,
+comments only on changed code or problems it newly triggers, and uses passing
+CI as evidence without rerunning the suite. Missing tests alone are not a
+finding: a comment needs a specific failure scenario and consequence.
+Consequential changes also need a relevant test, targeted reproduction, or
+concrete code-path argument establishing the behavior. Without adequate
+evidence, Ollie explains the gap and withholds approval rather than inventing
+a defect. Green CI and human sign-off alone do not prove coverage.
 
-Nitpicks and simple minors come with a suggestion block you can apply with
-one click. Anything that needs a design decision or a new test is described
-in prose instead.
+Docs and wording changes get a quick read. Dependency bumps get compatibility
+checks against used APIs and declared ranges. Large reviews prioritize risk
+and disclose incomplete coverage. `--deep` adds up to two focused independent
+checks when useful; it does not expand the review into a repository audit.
+Focused checklists apply to changed risk boundaries in the integrated pass.
+Default total budgets are four minutes for small reviews, eight for standard,
+and twelve for large/sensitive/deep reviews, including delivery reserve. Gate
+reassessments target 90 seconds. These are provisional targets, not guarantees
+against slow host calls. A trusted `--budget-minutes N` can change the total.
+Ollie stops investigation at the deadline, preserves progress and explains
+remaining gaps; incomplete evidence never permits approval. Re-reviews reuse
+verified unchanged evidence and investigate affected paths. A covering test
+for a prior critical remains required. All 48 playful phrases remain, randomly
+assigned in batches without repeats until the pool is exhausted.
 
-The footer on every comment names the commit Ollie reviewed. The rest of the
-footer is Ollie being an otter; it changes every time and means nothing.
+## Findings and verdicts
 
-## The four levels
+| Level | Meaning | Blocks approval? |
+| --- | --- | --- |
+| 🔴 critical | Security exposure, irreversible data loss, main-path outage | yes |
+| 🟠 major | A reachable bug or unmet requirement that would ship broken | yes |
+| 🟡 minor | An actionable edge case with limited impact | three outstanding require human approval |
+| 🔵 nitpick | Maintainability with no runtime impact | no; opt-in only |
 
-| Level | Dot | Meaning | Effect on the verdict |
-| --- | --- | --- | --- |
-| critical | 🔴 | Security exposure, data loss, or an outage on the main path | Request Changes |
-| major | 🟠 | A clear bug or unmet requirement that would ship broken | Request Changes |
-| minor | 🟡 | An edge case, gap, or accidental behavior unlikely to bite soon | Comment Only |
-| nitpick | 🔵 | Maintainability or consistency, no runtime effect | none |
+Every verified blocker is posted, plus at most four new inline minors. Nitpicks appear
+only with `--maintainability`, at most two on an initial review without human
+approval or a critical. Minor counts never turn a review into Request Changes.
+Comments explain the trigger, consequence, code evidence and smallest fix;
+exact mechanical edits may include an applyable suggestion block.
 
-Ollie budgets its own volume so a review is something you can act on in one
-sitting: every critical and major is posted, but below that it keeps at most
-five minors and three nitpicks, and posts no nitpicks when there is a
-critical. Anything over the budget is dropped, not saved for
-later. If a finding feels wrong, say so in the thread; Ollie will re-check
-and withdraw it if you are right.
+- **Ship It:** no open verified blockers, at most two counted minors that are
+  demonstrably safe to address after merge, and every approval rule passed.
+- **Request Changes:** a verified critical or major remains open.
+- **Comment Only:** no blocking finding, but approval is unavailable. The root
+  starts with "Not approving because" and identifies the failed rules.
 
-The counts matter. One to three open minors is Comment Only. Four or more open
-minors is Request Changes, because that many gaps in one change means it is
-not ready. Deferring a minor to a ticket takes it out of the count, but more
-than two deferrals on one PR means Ollie asks a human to approve instead.
+Three or more distinct verified outstanding minors yield Comment Only,
+requesting human approval. The count includes prior rounds, verified human
+findings and verified overflow beyond the four inline comments. Ollie records
+overflow minors visibly under Advisory Findings, with code evidence and a
+fix, and preserves their IDs in metadata for subsequent reviews.
+The root explains when this count differs from the linked Advisory Findings
+list. Three outstanding minors still withhold approval; a fourth identified
+minor may be verified for useful feedback within the time budget. Ollie never
+searches for issues just to fill the four slots.
 
-## The verdicts
+Deferring a minor or closing its thread does not remove its risk. A minor
+leaves the count only when evidence shows it fixed or inapplicable, or a human
+reviewer other than the author explicitly approves that specific risk for
+merge. Generic approval and bare `@ollie accept` are not such evidence. Deferred
+minors keep their status even when a human approves the risk.
 
-- **Ship It.** Ollie approved. Nothing above minor is open, at most three
-  minors are open, and every approval rule passed. Any open minors are posted
-  inline as non-blocking suggestions you can take before or after merge.
-- **Comment Only.** Ollie is not blocking and not approving. Nothing blocking
-  is open, but an approval rule failed; the summary starts with "Not approving
-  because" and says which:
-  the change alters who is authenticated or authorized, how secrets are
-  handled, something irreversible outside the system such as moving money or
-  deleting user data, a migration that cannot be rolled back, or what CI
-  deploys; another reviewer has requested changes; a
-  critical was fixed but has no covering test yet; or a linked requirement was
-  not readable. Adding a log line or a test in one of those areas does not
-  count. Mergeable at the team's discretion.
+One or two minors still need concrete, limited consequences to permit
+auto-approval. Unresolved potentially serious impact yields Comment Only;
+a demonstrated serious failure, including interacting minor issues, yields
+Request Changes according to its actual severity.
 
-If your PR has a merge conflict, Ollie does not review it at all yet; it
-leaves a one-line note and picks the PR up once the conflict is resolved,
-since code that is about to change is not worth a full pass. A failing check
-does not stop the review: Ollie reviews as normal, mentions the failing check
-in the summary, and leaves merge eligibility to branch protection.
-- **Request Changes.** At least one critical or major is open, or four or more
-  minors. Fix it, or explain in the thread why it does not apply.
+Approval safeguards remain: no self-approval or draft approval, no active
+human request for changes, stable reviewed head, required sources accessible,
+prior blockers resolved with evidence, and covering tests for prior criticals.
+Changes to authentication/authorization, secrets, irreversible external
+operations, destructive migrations or production deployment behavior need
+human approval. Mere wording, tests or pinned-version changes in these areas
+do not trigger that restriction. An authorized human reviewer other than the
+author can satisfy a sensitive-change gate by explicitly approving the exact
+behavior at the reviewed head. Verified blockers still require resolution.
+Incomplete review or `--no-approve` prevents approval; the review round and
+number of deferrals do not independently block it.
 
-A missing test for the behavior you changed shows up as an ordinary `tests`
-finding on the code, not as a reason to withhold approval, so you can fix it
-like anything else.
+Conflicted PRs wait for resolution. Unchanged content skips another review.
+`--force` overrides these exits, but keeps approval safeguards. A human-approved
+PR gets only blocker review, with no post if clean unless Ollie must update
+its own stale decision. Failing or pending relevant checks permit approval
+only when Ollie confirms those exact checks prevent merging on the target
+branch, and no demonstrated defect or independent evidence gap remains.
+Unknown enforcement means Comment Only. Unrelated optional checks do not
+create automatic holds, and repositories without CI can use direct evidence.
+Ollie reports outstanding checks without waiting for them; a new result can
+trigger gate reassessment on the same commit.
 
-Ollie never approves its own PRs or drafts, and never approves while a human
-has requested changes. Dependency-bot PRs (dependabot, renovate) are approved
-when the bump stays within the same major version, the release notes show no
-breaking change on an API the repository uses, declared ranges still resolve,
-and checks are green; anything else gets an ordinary finding.
+## Replies and later pushes
 
-## How to reply
+Reply naturally, or use:
 
-Reply in the thread on the finding. Ollie reads every reply on the next pass.
-Plain language works; these conventions remove ambiguity:
-
-| Reply | Use it when |
+| Command | Meaning |
 | --- | --- |
-| `@ollie fixed` | you addressed the finding |
-| `@ollie accept <reason>` | the finding does not apply, and here is why |
-| `@ollie defer <ticket>` | you will address it in a follow-up |
+| `@ollie fixed` | Ask Ollie to verify a fix |
+| `@ollie accept [reason]` | Ask Ollie to accept an explanation that the finding does not apply (existing behavior) |
+| `@ollie reject [reason]` | Dispute a finding; Ollie rechecks and withdraws it if incorrect |
+| `@ollie defer [reason]` | Propose follow-up work and explain why it should wait |
 
-Ollie always verifies critical and major findings in the code, whatever the
-reply says. Deferral is available for minor and nitpick only. Resolving a
-thread yourself is fine for a minor or nitpick; for a critical or major, Ollie
-will reopen it if the code still has the problem.
+For example, `@ollie defer Waiting for the upstream SDK fix` preserves your
+reason in Ollie's response. No ticket is required for minors or nitpicks.
+You may include a link in the reason if helpful. Reject never silently
+dismisses a
+real issue: Ollie explains the evidence when a finding remains open.
 
-## What happens when you push
+Critical and major findings are checked against code,
+even when someone resolved the thread. They cannot be deferred. A fix that
+removes the risk counts even if it differs from Ollie's suggestion.
 
-Ollie reviews only the new commits, re-checks each open thread against the new
-code, and replies on each one with `fixed in <sha>`, `still open as of
-<sha>`, `accepted`, `deferred`, or `withdrawn`. Fixed threads are resolved.
-A new root comment summarizes the delta, and Ollie's review state updates so a
-previous Request Changes stops blocking once the blockers are gone.
+Bare `@ollie accept`, `@ollie reject`, `@ollie defer`, and `@ollie fixed`
+all get a response
+when Ollie is invoked on that comment. If acceptance needs an explanation or
+a deferral needs clarification of its reason, Ollie asks in the thread. It checks
+fixes in code and never defers blockers. Responses keep Ollie's personality
+footer and are not repeated for the same command.
 
-Ollie only raises new findings on lines changed since its last review and
-never adds nitpicks after the first round. Its fourth review of the same PR
-and onward raises only criticals, and a clean fourth review is a Comment Only
-that asks a human to take it from there. A fix that removes the risk counts even when it is not the fix Ollie
-suggested. Ollie does not post the same finding twice and does not re-raise a
-finding that was resolved. If you see something that looks like a repeat, it is a
-regression of a critical, and the reply will say so.
+A comment-triggered invocation works even without a new commit. New evidence
+that clears a finding or satisfies a gate triggers a bounded reassessment of
+all approval criteria using the completed code review. A thread resolution
+alone is insufficient. When the decision changes, Ollie updates its review and
+clears its own stale approval or Request Changes state, leaving humans alone. Your host automation must invoke Ollie for
+mentions; the skill itself does not install a listener.
+
+On the next effective code change Ollie reviews the interdiff, verifies prior
+blockers and checks affected threads or new replies. It replies only when a
+status changes, new evidence matters, or a question needs an answer. Fixed
+threads are resolved; unchanged still-open findings still affect the verdict
+without another notification. Human threads are never edited or resolved.
+
+New findings normally anchor to the interdiff; missed blockers elsewhere in
+the PR are acknowledged as missed earlier. No new nitpicks on re-review. Every round can approve when all gates pass;
+Ollie avoids repeating settled investigations, and still reports verified
+blockers in later rounds. A regressed critical is discussed on its original thread.
+
+Ollie's footer is personality, not evidence or a verdict. The otter stays;
+the review aims to give you less to read and more you can act on.
+
+Policy updates trigger reassessment of affected review requirements; changing
+Ollie's jokes does not. After two attempts make no verification progress on
+unchanged evidence, automatic investigation pauses with a specific explanation
+and resume condition. New commands and stale-approval cleanup still run. New
+relevant evidence or an explicit retry resumes the affected scope; a pause
+never means approval or completed coverage.

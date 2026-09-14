@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# Normalize an evidenced review snapshot into a verdict and readiness state.
+# No network, filesystem writes, code execution, or host actions.
+set -euo pipefail
+usage() {
+  cat <<'EOF'
+Usage: decide --blockers N --minors N --coverage complete|incomplete|unknown
+  --context current|stale|unknown --evidence adequate|inadequate|unknown
+  --gates pass|hold|unknown --ci ready|waiting|unknown
+  --host ready|waiting|unknown [--dry-run]
+
+Every field is required; counts are distinct outstanding verified defects.
+Gates includes all other review gates, including no-approve and CI enforcement.
+CI and host describe remaining merge conditions, not just review eligibility.
+Outputs JSON only. This helper trusts normalized inputs; it does not verify them.
+--dry-run is identical: this command never changes state.
+EOF
+}
+fail() { printf 'decide: %s\n' "$1" >&2; exit 2; }
+seen=' '
+while (($#)); do
+  case "$1" in
+    --help|-h) usage; exit 0 ;;
+    --dry-run) shift; continue ;;
+    --blockers|--minors|--coverage|--context|--evidence|--gates|--ci|--host)
+      key=${1#--}
+      [[ "$seen" != *" $key "* ]] || fail "duplicate field: $key"
+      (($# >= 2)) || fail "missing value: $key"
+      value=$2
+      case "$key:$value" in
+        blockers:*|minors:*)
+          [[ "$value" =~ ^(0|[1-9][0-9]*)$ && ${#value} -le 6 ]] || fail "invalid count: $key" ;;
+        coverage:complete|coverage:incomplete|coverage:unknown|context:current|context:stale|context:unknown|evidence:adequate|evidence:inadequate|evidence:unknown|gates:pass|gates:hold|gates:unknown|ci:ready|ci:waiting|ci:unknown|host:ready|host:waiting|host:unknown) ;;
+        *) fail "invalid value: $key" ;;
+      esac
+      # Key is from the allowlist, value is validated; never evaluate input.
+      printf -v "$key" '%s' "$value"
+      seen+="$key "
+      shift 2 ;;
+    *) fail 'unknown option' ;;
+  esac
+done
+for key in blockers minors coverage context evidence gates ci host; do
+  [[ "$seen" == *" $key "* ]] || fail "missing field: $key"
+done
+reasons=()
+if ((blockers > 0)); then
+  verdict=request-changes
+  readiness=blocked
+  reasons+=(verified_blockers)
+else
+  [[ "$coverage" == complete ]] || reasons+=(incomplete_coverage)
+  [[ "$context" == current ]] || reasons+=(unverified_context)
+  [[ "$evidence" == adequate ]] || reasons+=(insufficient_evidence)
+  [[ "$gates" == pass ]] || reasons+=(review_gates)
+  ((minors < 3)) || reasons+=(minor_threshold)
+  if ((${#reasons[@]})); then
+    verdict=comment-only
+    readiness=waiting
+  else
+    verdict=ship-it
+    if [[ "$ci" == ready && "$host" == ready ]]; then
+      readiness=ready-to-merge
+    elif [[ "$ci" == waiting || "$host" == waiting ]]; then
+      readiness=waiting
+    else
+      readiness=review-passed
+    fi
+    [[ "$ci" == ready ]] || reasons+=(ci_not_ready)
+    [[ "$host" == ready ]] || reasons+=(host_not_ready)
+  fi
+fi
+printf '{"verdict":"%s","readiness":"%s","reasons":[' "$verdict" "$readiness"
+sep=''
+if ((${#reasons[@]})); then
+  for reason in "${reasons[@]}"; do
+    printf '%s"%s"' "$sep" "$reason"
+    sep=','
+  done
+fi
+printf ']}\n'

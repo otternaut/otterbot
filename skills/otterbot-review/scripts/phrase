@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# Random personality footer; read-only and compatible with Bash 3.
+set -euo pipefail
+SKILL_ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+excluded=()
+dry_run=false
+requested=1
+count_seen=false
+while (($#)); do
+  case "$1" in
+    --help|-h) printf 'Usage: phrase [--count N] [--exclude TEXT ...] [--dry-run]\n'; exit 0 ;;
+    --dry-run) dry_run=true; shift ;;
+    --count)
+      (($# >= 2)) || { printf 'Missing count\n' >&2; exit 2; }
+      [[ "$count_seen" == false && "$2" =~ ^[1-9][0-9]{0,3}$ ]] || {
+        printf 'Count must be supplied once, as an integer from 1 to 9999\n' >&2; exit 2;
+      }
+      requested=$2; count_seen=true; shift 2 ;;
+    --exclude)
+      (($# >= 2)) || { printf 'Missing exclusion\n' >&2; exit 2; }
+      excluded+=("$2"); shift 2 ;;
+    *) printf 'Unknown option\n' >&2; exit 2 ;;
+  esac
+done
+pool=()
+eligible=()
+while IFS= read -r phrase || [[ -n "$phrase" ]]; do
+  [[ -n "$phrase" ]] || continue
+  pool+=("$phrase")
+  skip=false
+  if ((${#excluded[@]})); then
+    for used in "${excluded[@]}"; do
+      [[ "$used" != "$phrase" ]] || skip=true
+    done
+  fi
+  if [[ "$skip" == false ]]; then eligible+=("$phrase"); fi
+done < "$SKILL_ROOT/assets/phrases.txt"
+((${#pool[@]} > 0)) || { printf 'Empty phrase pool\n' >&2; exit 1; }
+if ((${#eligible[@]} == 0)); then eligible=("${pool[@]}"); fi
+((${#pool[@]} <= 32768)) || { printf 'Phrase pool too large\n' >&2; exit 1; }
+if [[ "$dry_run" == true ]]; then
+  printf 'Would randomly choose %s phrases without replacement; reset after exhaustion.\n' "$requested"
+  exit 0
+fi
+for ((i=0; i<requested; i++)); do
+  if ((${#eligible[@]} == 0)); then eligible=("${pool[@]}"); fi
+  count=${#eligible[@]}
+  # Rejection sampling avoids modulo bias in RANDOM's 0..32767 range.
+  limit=$((32768 - 32768 % count))
+  while :; do
+    draw=$RANDOM
+    if ((draw < limit)); then break; fi
+  done
+  chosen=$((draw % count))
+  printf '%s\n' "${eligible[$chosen]}"
+  # Compact the array for Bash 3, which has no mapfile or associative arrays.
+  remaining=()
+  for ((j=0; j<count; j++)); do
+    if ((j != chosen)); then remaining+=("${eligible[$j]}"); fi
+  done
+  eligible=()
+  if ((${#remaining[@]})); then eligible=("${remaining[@]}"); fi
+done

@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Check batch cycles, exclusions and argument validation without host writes.
+set -euo pipefail
+SCRIPT_ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+phrase_tool="$SCRIPT_ROOT/phrase"
+pool_file="$SCRIPT_ROOT/../assets/phrases.txt"
+result=$("$phrase_tool" --count 96)
+[[ $(printf '%s\n' "$result" | wc -l | tr -d ' ') == 96 ]]
+for start in 1 49; do
+  end=$((start + 47))
+  cycle=$(printf '%s\n' "$result" | sed -n "${start},${end}p" | LC_ALL=C sort)
+  [[ "$cycle" == "$(LC_ALL=C sort "$pool_file")" ]]
+done
+exclusions=()
+last=''
+while IFS= read -r line; do
+  if [[ -n "$last" ]]; then exclusions+=(--exclude "$last"); fi
+  last=$line
+done < "$pool_file"
+[[ $("$phrase_tool" --count 1 "${exclusions[@]}") == "$last" ]]
+# Crossing the remaining one-item cycle resets to a fresh complete pool.
+result=$("$phrase_tool" --count 49 "${exclusions[@]}")
+[[ "${result%%$'\n'*}" == "$last" ]]
+[[ $(printf '%s\n' "$result" | sed -n '2,49p' | LC_ALL=C sort) == "$(LC_ALL=C sort "$pool_file")" ]]
+exclusions+=(--exclude "$last")
+[[ $("$phrase_tool" --count 48 "${exclusions[@]}" | LC_ALL=C sort) == "$(LC_ALL=C sort "$pool_file")" ]]
+for value in 0 -1 01 1.5 10000 invalid; do
+  if "$phrase_tool" --count "$value" >/dev/null 2>&1; then
+    printf 'Accepted invalid count: %s\n' "$value" >&2; exit 1
+  fi
+done
+if "$phrase_tool" --count >/dev/null 2>&1 ||
+   "$phrase_tool" --count 1 --count 2 >/dev/null 2>&1; then
+  printf 'Accepted missing/duplicate count\n' >&2; exit 1
+fi
+[[ $("$phrase_tool" | wc -l | tr -d ' ') == 1 ]]
+[[ $("$phrase_tool" --count 48 --dry-run) == 'Would randomly choose 48 phrases without replacement; reset after exhaustion.' ]]
+printf 'Phrase batching, cycle reset, exclusions and invalid-input checks passed.\n'

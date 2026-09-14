@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "otterbot-review-orchestrator https://github.com/acme/widgets",
-      "expected_output": "The coordinator captures one UTC run time and a fixed 14-day cutoff, fully paginates candidate PRs and labels, and includes only PRs with state OPEN, isDraft false, reviewDecision REVIEW_REQUIRED or non-required only because of Ollie's own latest review, no case-insensitive exact stale label, updatedAt strictly after the cutoff, and no attributable Ollie review already covering the current effective revision. It compares the newest reviewed and current heads using full SHAs plus tree OIDs or conclusive compare metadata, and fails closed when change cannot be verified. It visibly announces sweep start after access verification, the validated snapshot, each host-confirmed worker launch, each terminal transition, and a lifecycle-based heartbeat at least every 30 seconds while work is queued or running. Each eligible PR that still passes preflight receives one distinct fresh-context subagent; the worker rechecks eligibility and otterbot-review's changed-revision gate before analysis and delivery. The concise, non-collapsible final report is titled `🦦 Review Orchestrator · owner/repo`, starts with a plain-language outcome, then shows a `📊 Review Summary` and `📋 Results` with brief linked PR cards. Delivered cards use Ollie's exact verdict headings—🚢 Ship It, 💬 Comment Only, or ⚠️ Request Changes—rather than a generic delivered status. The report lists only nonzero exclusion reasons and final statuses, and includes only the fields relevant to each PR's terminal status.",
+      "expected_output": "Paginate candidates, classify code/context/gate jobs from current metadata and attributable coverage/state. Apply ordinary strict filters and documented recovery exceptions. One isolated worker per PR, normalized causes/options only, no coordinator diff inspection. Preserve lifecycle updates; report verdict and readiness separately. Unchanged head alone never excludes work.",
       "files": []
     },
     {
@@ -45,56 +45,56 @@
     },
     {
       "id": 8,
-      "prompt": "scan https://github.com/acme/widgets; PR #8 is open, fresh, REVIEW_REQUIRED, and a draft",
-      "expected_output": "PR #8 is excluded as Draft before scheduling and no subagent inspects or reviews it. Its exclusion contributes only to the aggregate draft count.",
+      "prompt": "scan https://github.com/acme/widgets; PR #8 is open, fresh, REVIEW_REQUIRED, and a draft; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
+      "expected_output": "PR #8 is excluded as Draft before scheduling and no subagent inspects or reviews it. Its exclusion contributes only to the aggregate draft count. These exclusions apply to this ordinary job; context invalidation and targeted recovery use documented exceptions.",
       "files": []
     },
     {
       "id": 9,
-      "prompt": "scan https://github.com/acme/widgets; PR #9 is open and fresh but reviewDecision is APPROVED because a human reviewer approved it",
-      "expected_output": "PR #9 is excluded because its host review decision is APPROVED and that decision comes from a human, so the review requirement is already satisfied. The coordinator does not infer that another review might be useful and creates no worker for it.",
+      "prompt": "scan https://github.com/acme/widgets; PR #9 is open and fresh but reviewDecision is APPROVED because a human reviewer approved it; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
+      "expected_output": "PR #9 is excluded because its host review decision is APPROVED and that decision comes from a human, so the review requirement is already satisfied. The coordinator does not infer that another review might be useful and creates no worker for it. These exclusions apply to this ordinary job; context invalidation and targeted recovery use documented exceptions.",
       "files": []
     },
     {
       "id": 10,
-      "prompt": "scan https://github.com/acme/widgets; PR #10 has reviewDecision CHANGES_REQUESTED from a human reviewer",
-      "expected_output": "PR #10 is excluded as human review decision present. The orchestrator does not run a re-review while the host decision is changes-requested because of a human; only Ollie's own prior state is allowed to keep a PR eligible.",
+      "prompt": "scan https://github.com/acme/widgets; PR #10 has reviewDecision CHANGES_REQUESTED from a human reviewer; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
+      "expected_output": "Skip unsolicited new review because of active human Request Changes. A separate evidenced recovery job could reconcile Ollie state without overriding human decision; none exists in this case.",
       "files": []
     },
     {
       "id": 11,
-      "prompt": "scan https://github.com/acme/widgets; PR #11's reviewDecision field is null",
-      "expected_output": "The coordinator fails closed and excludes PR #11 as review decision unavailable. It does not infer REVIEW_REQUIRED from requested reviewers, review counts, mergeability, or missing approvals.",
+      "prompt": "scan https://github.com/acme/widgets; PR #11's reviewDecision field is null; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
+      "expected_output": "The coordinator fails closed and excludes PR #11 as review decision unavailable. It does not infer REVIEW_REQUIRED from requested reviewers, review counts, mergeability, or missing approvals. These exclusions apply to this ordinary job; context invalidation and targeted recovery use documented exceptions.",
       "files": []
     },
     {
       "id": 12,
-      "prompt": "scan https://github.com/acme/widgets; PR #12 is REVIEW_REQUIRED and updated today but has label ' StAlE '",
-      "expected_output": "After trimming whitespace and comparing case-insensitively, the stale label excludes PR #12. No worker is created for it.",
+      "prompt": "scan https://github.com/acme/widgets; PR #12 is REVIEW_REQUIRED and updated today but has label ' StAlE '; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
+      "expected_output": "After trimming whitespace and comparing case-insensitively, the stale label excludes PR #12. No worker is created for it. These exclusions apply to this ordinary job; context invalidation and targeted recovery use documented exceptions.",
       "files": []
     },
     {
       "id": 13,
-      "prompt": "run starts 2026-07-20T15:00:00Z; PR #13 is REVIEW_REQUIRED and updated 2026-07-05T15:00:00Z",
-      "expected_output": "The fixed cutoff is 2026-07-06T15:00:00Z, so PR #13 is excluded as inactive for 14 days or more. Queue duration cannot make the cutoff drift.",
+      "prompt": "run starts 2026-07-20T15:00:00Z; PR #13 is REVIEW_REQUIRED and updated 2026-07-05T15:00:00Z; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
+      "expected_output": "The fixed cutoff is 2026-07-06T15:00:00Z, so PR #13 is excluded as inactive for 14 days or more. Queue duration cannot make the cutoff drift. These exclusions apply to this ordinary job; context invalidation and targeted recovery use documented exceptions.",
       "files": []
     },
     {
       "id": 14,
-      "prompt": "run starts 2026-07-20T15:00:00Z; PR #14 is REVIEW_REQUIRED and updated exactly 2026-07-06T15:00:00Z",
-      "expected_output": "PR #14 is stale because updatedAt is exactly on the cutoff, meaning it has had no activity for 14 days. It is excluded even if every other condition passes.",
+      "prompt": "run starts 2026-07-20T15:00:00Z; PR #14 is REVIEW_REQUIRED and updated exactly 2026-07-06T15:00:00Z; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
+      "expected_output": "PR #14 is stale because updatedAt is exactly on the cutoff, meaning it has had no activity for 14 days. It is excluded even if every other condition passes. These exclusions apply to this ordinary job; context invalidation and targeted recovery use documented exceptions.",
       "files": []
     },
     {
       "id": 15,
-      "prompt": "eligible PR #15 becomes a draft while waiting in the worker queue",
-      "expected_output": "The coordinator's immediate preflight detects isDraft true, records PR #15 as Skipped after snapshot, and does not start a worker for it.",
+      "prompt": "eligible PR #15 becomes a draft while waiting in the worker queue; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
+      "expected_output": "The coordinator's immediate preflight detects isDraft true, records PR #15 as Skipped after snapshot, and does not start a worker for it. These exclusions apply to this ordinary job; context invalidation and targeted recovery use documented exceptions.",
       "files": []
     },
     {
       "id": 16,
-      "prompt": "worker for PR #16 finishes analysis, but a human approval flips reviewDecision to APPROVED before delivery",
-      "expected_output": "The worker's mandatory final eligibility check detects the satisfied review decision and posts nothing. It returns Skipped with the failed condition; the coordinator does not claim a verdict or delivery.",
+      "prompt": "worker for PR #16 finishes analysis, but a human approval flips reviewDecision to APPROVED before delivery; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
+      "expected_output": "The worker's mandatory final eligibility check detects the satisfied review decision and posts nothing. It returns Skipped with the failed condition; the coordinator does not claim a verdict or delivery. These exclusions apply to this ordinary job; context invalidation and targeted recovery use documented exceptions.",
       "files": []
     },
     {
@@ -106,13 +106,13 @@
     {
       "id": 18,
       "prompt": "run the orchestrator again tomorrow on https://github.com/acme/widgets",
-      "expected_output": "The new run takes a fresh filtered snapshot. Only PRs currently reporting REVIEW_REQUIRED and passing every other gate receive workers. A previously reviewed PR is eligible only when its current head differs from the newest attributable reviewed head and read-only tree or compare evidence proves an effective content change; unchanged, APPROVED, or CHANGES_REQUESTED PRs are not reviewed.",
+      "expected_output": "Fresh metadata comparison routes new code, missing coverage, changed base and decision evidence. No unconditional skip of unchanged or human-reviewed PRs when targeted recovery applies. One worker per job, no raw content instructions.",
       "files": []
     },
     {
       "id": 19,
-      "prompt": "https://github.com/acme/quiet-repo has two drafts, one PR with an APPROVED review decision, and one PR inactive for 20 days",
-      "expected_output": "No PR passes the gate. The coordinator returns the aggregate exclusion audit, states that no pull requests require an Otterbot review, and exits successfully immediately. It creates or waits for no workers, invokes no otterbot-review skill, inspects no diff, and performs no delivery.",
+      "prompt": "https://github.com/acme/quiet-repo has two drafts, one PR with an APPROVED review decision, and one PR inactive for 20 days; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
+      "expected_output": "No PR passes the gate. The coordinator returns the aggregate exclusion audit, states that no pull requests require an Otterbot review, and exits successfully immediately. It creates or waits for no workers, invokes no otterbot-review skill, inspects no diff, and performs no delivery. These exclusions apply to this ordinary job; context invalidation and targeted recovery use documented exceptions.",
       "files": []
     },
     {
@@ -136,13 +136,13 @@
     {
       "id": 23,
       "prompt": "scan https://github.com/acme/widgets; PR #23 is REVIEW_REQUIRED but its current head equals the newest attributable Otterbot reviewed head",
-      "expected_output": "The coordinator excludes PR #23 as already reviewed and unchanged before worker creation. It records the existing review reference in its audit metadata, increments the unchanged count, and does not inspect the diff or create a subagent.",
+      "expected_output": "Same head alone is insufficient. If complete coverage, base/context, decision key and delivery match, skip with existing review reference. Missing state or changed evidence routes recovery; coordinator reads metadata only.",
       "files": []
     },
     {
       "id": 24,
       "prompt": "scan https://github.com/acme/widgets; PR #24 has a different head SHA after a rebase but the prior and current commit tree OIDs match",
-      "expected_output": "Equal root tree OIDs prove that the effective content is unchanged. The coordinator excludes PR #24, does not treat a SHA or updatedAt change alone as review-worthy, and creates no worker or duplicate review.",
+      "expected_output": "Equal PR trees avoid code reread only with reusable coverage and unchanged base/context/decision evidence. A rebase onto new base routes context review, even equal resulting PR trees.",
       "files": []
     },
     {
@@ -154,31 +154,31 @@
     {
       "id": 26,
       "prompt": "scan https://github.com/acme/widgets; PR #26 has a prior attributable legacy Otterbot review but its reviewed head is unavailable",
-      "expected_output": "The coordinator fails closed because it cannot prove which revision was reviewed or that an effective change occurred. It excludes PR #26 as change unverified and creates no worker or new review.",
+      "expected_output": "Unknown legacy revision cannot support approval or Ready. For otherwise eligible PR, route coverage reconstruction when current snapshot can be reviewed; if classification cannot be made, report recovery needed rather than clean unchanged.",
       "files": []
     },
     {
       "id": 27,
-      "prompt": "every candidate in https://github.com/acme/widgets is excluded or already reviewed unchanged",
-      "expected_output": "After rendering deterministic aggregate exclusion counts, the coordinator states `No pull requests require an Otterbot review.` and exits successfully immediately. It does not create or wait for subagents, invoke otterbot-review, inspect diffs, or perform review delivery.",
+      "prompt": "every candidate in https://github.com/acme/widgets is excluded or already reviewed unchanged; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
+      "expected_output": "After rendering deterministic aggregate exclusion counts, the coordinator states `No pull requests require an Otterbot review.` and exits successfully immediately. It does not create or wait for subagents, invoke otterbot-review, inspect diffs, or perform review delivery. These exclusions apply to this ordinary job; context invalidation and targeted recovery use documented exceptions.",
       "files": []
     },
     {
       "id": 28,
       "prompt": "two PRs are eligible at snapshot, but both receive an Otterbot review at the same head before coordinator preflight",
-      "expected_output": "Preflight re-fetches the newest attributable review metadata, marks both PRs No Review Needed with their existing review references, and starts zero workers. The coordinator renders the two terminal no-review-needed results, states that no pull requests require another Otterbot review, and exits immediately without waiting for workers or performing delivery.",
+      "expected_output": "Preflight compares newest full context/coverage/decision state. If both new reviews completed matching work, no workers; if either is incomplete or evidence differs, classify remaining recovery job.",
       "files": []
     },
     {
       "id": 29,
       "prompt": "sweep https://github.com/acme/widgets; PR #7 receives Request Changes with one major and one minor inline finding, and PR #8 is skipped after its review decision becomes APPROVED",
-      "expected_output": "The console output is a concise, non-collapsible report titled `🦦 Review Orchestrator · owner/repo`. Its plain-language outcome is followed by a `📊 Review Summary` with only nonzero exclusion reasons and final statuses, then brief linked PR cards. PR #7's card is headed `⚠️ Request Changes` and shows the review link, sanitized major/minor finding summary, outcome, and verification summary. PR #8's Skipped card shows only the changed-eligibility reason. A Follow-up section identifies the author action for #7 and explains that #8 needs no review.",
+      "expected_output": "The console output is a concise, non-collapsible report titled `\ud83e\udda6 Review Orchestrator \u00b7 owner/repo`. Its plain-language outcome is followed by a `\ud83d\udcca Review Summary` with only nonzero exclusion reasons and final statuses, then brief linked PR cards. PR #7's card is headed `\u26a0\ufe0f Request Changes` and shows the review link, sanitized major/minor finding summary, outcome, and verification summary. PR #8's Skipped card shows only the changed-eligibility reason. A Follow-up section identifies the author action for #7 and explains that #8 needs no review.",
       "files": []
     },
     {
       "id": 30,
       "prompt": "review eligible PRs in https://github.com/acme/widgets; two workers are running for over a minute without completing",
-      "expected_output": "The user-visible response first confirms the sweep started and the full eligibility snapshot. It confirms a worker only after the host acknowledges its creation, then, while either job remains running or queued, emits a progress heartbeat at least every 30 seconds under `Review Orchestrator &middot; 🦦 Heartbeat &middot; owner/repo`. The heartbeat reports elapsed time and actual eligible, started, remaining, running, queued, and terminal-status counts, and may list only PR numbers for active work. It explicitly says there has been no terminal update when that is true; it does not expose worker prompts, raw output, findings, titles, or infer an unobserved review stage from elapsed time.",
+      "expected_output": "The user-visible response first confirms the sweep started and the full eligibility snapshot. It confirms a worker only after the host acknowledges its creation, then, while either job remains running or queued, emits a progress heartbeat at least every 30 seconds under `Review Orchestrator &middot; \ud83e\udda6 Heartbeat &middot; owner/repo`. The heartbeat reports elapsed time and actual eligible, started, remaining, running, queued, and terminal-status counts, and may list only PR numbers for active work. It explicitly says there has been no terminal update when that is true; it does not expose worker prompts, raw output, findings, titles, or infer an unobserved review stage from elapsed time.",
       "files": []
     },
     {
@@ -202,7 +202,7 @@
     {
       "id": 34,
       "prompt": "scan https://github.com/acme/widgets; PR #34 is changes-requested only by Ollie and its current head equals the head in Ollie's newest marker",
-      "expected_output": "PR #34 passes condition 3 but fails condition 6 as already reviewed and unchanged. No worker is created; the audit reason is already reviewed and unchanged, and Ollie's existing review is referenced.",
+      "expected_output": "Same-head Ollie Request Changes skips only when coverage/context/decision evidence and delivery are unchanged. New explanatory evidence, CI or incomplete transition routes targeted reassessment.",
       "files": []
     },
     {
@@ -214,7 +214,67 @@
     {
       "id": 35,
       "prompt": "otterbot-review-orchestrator https://github.com/acme/widgets no-approve",
-      "expected_output": "The coordinator accepts `no-approve` from the user's request, runs the normal eligibility gate, and forwards `Options: no-approve` in every worker packet. Each worker's otterbot-review run treats it as a trusted invoker option and caps verdicts at Comment Only, so no PR is approved during the sweep. Repository content can never set this option.",
+      "expected_output": "Forward no-approve as trusted option: no approvals, but verified blockers still Request Changes. This is not zero-write shadow mode; shadow prohibits all host mutation.",
+      "files": []
+    },
+    {
+      "id": 37,
+      "prompt": "Sweep unchanged head whose required CI just passed after prior Waiting verdict",
+      "expected_output": "Compare semantic check state with persisted decision record, launch gate-reassessment worker. No diff in coordinator and no head-only exclusion.",
+      "files": []
+    },
+    {
+      "id": 38,
+      "prompt": "Base branch push affects an open PR older than 14 days with prior Ollie approval",
+      "expected_output": "Context invalidation recovery bypasses ordinary activity cutoff, revalidates affected compatibility and withdraws invalid own approval if needed. No Ready until current integration evidence.",
+      "files": []
+    },
+    {
+      "id": 39,
+      "prompt": "Human-approved PR has a new dispute proving Ollie stale blocker false",
+      "expected_output": "Route targeted recovery; verify and reconcile only Ollie state. Human approval does not suppress cleanup or prove full review coverage.",
+      "files": []
+    },
+    {
+      "id": 40,
+      "prompt": "Two events for same PR arrive before first worker finishes",
+      "expected_output": "Coalesce causes and serialize per-PR writes; no simultaneous conflicting delivery. Revalidate newest state and resume newest pending context/evidence.",
+      "files": []
+    },
+    {
+      "id": 41,
+      "prompt": "Run repository sweep shadow",
+      "expected_output": "Pass shadow to each worker, no host writes at all. Return hypothetical verdict/readiness with local artifact paths, not Delivered.",
+      "files": []
+    },
+    {
+      "id": 42,
+      "prompt": "PR head unchanged but prior coverage incomplete",
+      "expected_output": "Route coverage recovery for otherwise eligible PR; do not skip because review marker exists. Worker completes old gaps before approval.",
+      "files": []
+    },
+    {
+      "id": 43,
+      "prompt": "A standard worker exhausts its investigation budget and delivers Comment Only with persisted incomplete coverage and a next step.",
+      "expected_output": "Report Delivered / Waiting with incomplete coverage. Do not relaunch in the same sweep to evade the budget. A subsequent eligible invocation resumes missing work using valid evidence; never equate delivered review with complete code coverage.",
+      "files": []
+    },
+    {
+      "id": 44,
+      "prompt": "A sweep sees unchanged paused incomplete coverage and no new commands, policy changes or pending delivery.",
+      "expected_output": "Exclude automatic investigation with Paused audit reason and report existing hold. No duplicate root or worker; never call coverage complete or say review is ready.",
+      "files": []
+    },
+    {
+      "id": 45,
+      "prompt": "A paused PR has a detected stale Ollie approval and a newly edited command.",
+      "expected_output": "Schedule targeted recovery/command work despite paused code scope. Reconcile own approval and respond once per source revision; do not restart unrelated stalled work or approve incomplete coverage.",
+      "files": []
+    },
+    {
+      "id": 46,
+      "prompt": "A paused PR has the same head but its stored review policy revision differs from the trusted current policy.",
+      "expected_output": "Route policy reassessment and affected verification, preserving independent valid evidence. A paused investigation cannot suppress policy invalidation.",
       "files": []
     }
   ]
