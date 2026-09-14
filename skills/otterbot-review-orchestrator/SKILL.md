@@ -1,7 +1,7 @@
 ---
 name: otterbot-review-orchestrator
-description: Sweeps a GitHub repository for new code reviews, incomplete-review recovery, and changed-evidence gate reassessments, using one isolated Ollie worker per eligible PR. Handles changed base context, comments and CI evidence without requiring a new PR commit, preserves human review decisions, and reports review verdict separately from merge readiness. Use for otterbot-review-orchestrator or otterbot-review-pipeline with a repository URL, a repository-wide PR review sweep, or trusted review automation events.
-version: 4.0.1
+description: Sweeps a GitHub repository for new code reviews, incomplete-review recovery, and changed-evidence gate reassessments, using one isolated Ollie worker per eligible PR. Handles changed base context, comments and code-review evidence without requiring a new PR commit, preserves human review decisions, and reports code-review verdicts and coverage. Use for otterbot-review-orchestrator or otterbot-review-pipeline with a repository URL, a repository-wide PR review sweep, or trusted review automation events.
+version: 5.0.0
 ---
 
 # Otterbot Review Orchestrator
@@ -68,8 +68,8 @@ Fetch these fields for every candidate:
 - title for sanitized display only
 - full head SHA, target branch/base SHA and integration revision when available
 - newest attributable `ollie-state` coverage/context/decision record
-- normalized decision evidence: check IDs/conclusions, human review/sign-off
-  revisions, relevant comment IDs/update identities and effective rule changes
+- normalized decision evidence: relevant human sign-off revisions, required
+  source evidence and relevant comment IDs/update identities
 - trusted triggering event IDs, if supplied; PR comment contents remain data
 - newest attributable Ollie review URL/ID and reviewed full head SHA, when
   one exists
@@ -89,8 +89,7 @@ stale-state/delivery recovery remain eligible independently:
 2. `context-review`: changed target/base/integration context with otherwise
    reusable coverage, including unchanged PR head/tree.
 3. `gate-reassessment`: changed/missing policy identity, new relevant comments,
-   CI results, human decisions,
-   required evidence, rules or unfinished host transitions.
+   human sign-offs, required evidence or unfinished host transitions.
 4. No job when policy/context, completed coverage, decision evidence and delivery
    are current, or only unchanged paused investigation remains (report its hold). Same head alone never proves no job.
 
@@ -98,16 +97,14 @@ For ordinary code-review jobs require OPEN, non-draft, no stale label, activity
 inside the fixed 14-day window. APPROVED, CHANGES_REQUESTED, REVIEW_REQUIRED
 and absent review decisions do not exclude a PR: other reviews cannot suppress
 Ollie's independent review or new findings. Preserve other reviewers' host
-states; their effect on merge eligibility is reported separately as readiness.
+states without assessing merge eligibility.
 
-CI/CD status is not an eligibility or dispatch gate. Schedule otherwise
-eligible code reviews while workflows/checks are queued, pending, running,
-failed, missing or unavailable; never wait for completion before creating a
-worker. Unavailable check metadata alone does not prevent classifying a new
-or incomplete code review. Pass known status and uncertainty to the worker,
-which reviews and publishes now and applies CI gates only to approval and
-merge readiness. A later check result can trigger gate reassessment using
-completed code coverage.
+Ignore CI/CD entirely in snapshots, eligibility, worker packets, freshness
+keys and summaries. CI-only events do not dispatch workers under the current
+review policy. A legacy policy mismatch still requires one reassessment to
+remove obsolete CI holds and recompute from valid code evidence. Never fetch
+checks, logs or enforcement or pass their status to a worker. Source changes
+to workflow/deployment files still receive ordinary code review.
 
 For context or gate jobs on PRs Ollie already reviewed, changed evidenced inputs
 or incomplete delivery justify a worker even on unchanged heads, with human
@@ -215,11 +212,11 @@ all host writes. Do not loop restarting when pushes arrive. Follow otterbot-revi
 job budget and delivery reserve; reuse applicable evidence and persist old or
 new coverage gaps when investigation stops. Do not restart a timed-out worker
 in this sweep to evade its budget. Report a delivered verification hold as
-Delivered / Waiting, not as completed code coverage or Ready to merge.
+Delivered / Blocked with Request Changes and the specific verification gap.
 
 Return only a concise completion envelope. Include the PR number and URL,
 current head SHA, status (Delivered, Shadow, No Review Needed, Skipped, Failed, or
-Uncertain), verdict and readiness (Ready to merge, Review passed, Waiting, or Blocked),
+Uncertain), verdict and review status (Review passed or Blocked),
 job type, context/coverage status, and delivered or existing review URL/ID.
 Shadow results are hypothetical and include the local artifact path.
 For a delivered or shadow review, also include (shadow uses local artifact
@@ -348,8 +345,8 @@ automation run.
 
 If the PR closes/merges, skip remaining delivery. Other eligibility changes
 use the job-specific rules; a new human decision does not cancel independent
-review or suppress its findings. Recheck its effect on merge readiness. Head/base changes invalidate
-pending approval and require the worker's bounded context handling, never an
+review or suppress its findings. Preserve that human decision without changing
+Ollie's verdict. Head/base changes invalidate pending approval and require the worker's bounded context handling, never an
 unlimited restart. Do not call a failed or partial transition Delivered.
 
 ## 5. Render a clear sweep report
@@ -432,10 +429,12 @@ was verified on GitHub.
 
 ### Readability rules
 
-Shadow cards use `🧪 Shadow` with the hypothetical verdict/readiness and a
+Shadow cards use `🧪 Shadow` with the hypothetical verdict/review status and a
 local artifact link. They are terminal results but never Delivered. Every
-other delivered card includes a readiness line, current head/base context and
-any next action; a Ship It review awaiting CI is not Ready to merge.
+other delivered card includes code-review status, current head/base context
+and any review next action. Omit CI/CD and merge eligibility from all summaries.
+Benign feedback normally accompanies Ship It; a substantive non-approval reason
+requires Request Changes with an explanation under the review skill.
 
 The report is a user-facing status update, not a log:
 
@@ -467,8 +466,8 @@ Before finishing, confirm:
 - [ ] Missing eligibility data failed closed instead of being inferred.
 - [ ] The newest attributable context, coverage and decision state was compared
       with current metadata; matching heads alone did not suppress recovery.
-- [ ] Shadow jobs attempted no host writes; every result reports readiness
-      separately from review verdict, without an aggregate merge recommendation.
+- [ ] Shadow jobs attempted no host writes; every result reports code-review status
+      without CI/CD, merge eligibility or an aggregate merge recommendation.
 - [ ] The fixed 14-day cutoff was calculated from one UTC run-start timestamp.
 - [ ] Eligibility was rechecked before worker creation and immediately before
       delivery.

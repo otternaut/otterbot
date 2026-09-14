@@ -9,7 +9,7 @@ and reassessment sections only when applicable.
 in the marker's `gate` field.
 
 These gates govern approval, not whether to perform or publish the review.
-Outstanding CI/CD workflows never delay code inspection or findings delivery.
+CI/CD state is excluded from every approval decision and output.
 
 - Every requirement source the correctness depends on, such as a linked
   ticket or spec, was accessible and read.
@@ -22,17 +22,11 @@ Outstanding CI/CD workflows never delay code inspection or findings delivery.
   Ollie read or ran, or was withdrawn.
 - The current head, target branch and base/integration context match the
   verified review state; changed context was assessed before approval.
-- The PR is not a draft. Other reviewers' review states affect host merge
-  readiness, not Ollie's independent approval decision.
+- The PR is not a draft. Other reviewers' review states do not affect Ollie's independent
+  approval decision.
 - Each consequential changed behavior has adequate evidence under
-  `references/verification.md`; no material coverage claim rests on green
-  checks, human assurance or presumed caller behavior alone.
-- Required and behavior-relevant CI checks pass at the reviewed head, or
-  every outstanding relevant check is confirmed enforced by the target's
-  merge rules and no verified defect or independent evidence gap remains.
-  Unknown enforcement cannot justify approving past a failed/pending check.
-  No-CI repositories may use adequate direct verification; no blanket CI
-  requirement is invented. See `references/verification.md` for exact cases.
+  `references/verification.md`; no material coverage claim rests on
+  human assurance or presumed caller behavior alone.
 - The author is not the reviewing identity. A bot author such as dependabot
   or renovate is not a failure on its own: its dependency bump is approved
   when the compatibility check is clean and every other rule holds, and a bot
@@ -51,12 +45,23 @@ Outstanding CI/CD workflows never delay code inspection or findings delivery.
   Verify reviewer authority from repository rules or host permissions. A
   generic approval without clear coverage is insufficient; changed behavior
   invalidates prior sign-off. Human sign-off never waives verified blockers.
-- `no-approve` is not set.
 - Fewer than three verified outstanding minors count under the approval
   accounting rules, and every remaining minor is demonstrably safe to address
   after merge. No material uncertainty about serious impact remains.
 - The selected review scope was completed, and nothing in the verdict rests
   on an author assertion Ollie could not confirm in code.
+
+A failed code-review gate or incomplete assessment yields Request Changes.
+Explain the specific defect, risk threshold or verification gap and what must
+change or be established to clear it. A verification gap is not a proven bug;
+do not invent a defect or severity to justify the verdict.
+
+Benign feedback accompanies Ship It when all gates pass. Never use Comment Only
+with a "Not approving because" explanation: convert that outcome to Request
+Changes. The explicit `--no-approve` option suppresses only a passing review's
+approval action, yielding Comment Only / Review passed with a short explanation
+of the requested delivery mode. A host's inability to submit a verdict is a
+delivery limitation; retain the intended verdict in the banner.
 
 ## Minor accounting
 
@@ -74,10 +79,11 @@ nitpicks and unverified candidates do not count as minor defects.
 - Zero counted minors permits Ship It only when all other gates pass.
 - One or two permits Ship It only when consequences are concrete, limited,
   and safe to address after merge, and all other gates pass.
-- Three or more yields Comment Only, not Request Changes on count alone.
+- Three or more yields Request Changes; explain the outstanding minor count
+  and the fixes needed without inflating individual severities.
 - A concrete unresolved concern about serious data, authorization or
   compatibility impact prevents auto-approval even if provisionally called
-  minor or question. Investigate or state the uncertainty in Comment Only;
+  minor or question. Investigate or state the uncertainty in Request Changes;
   do not manufacture a blocker from speculation.
 - When several minors combine into a demonstrated major/critical failure,
   report that combined defect at its actual severity without double-counting
@@ -149,13 +155,12 @@ on the root; process those just like inline findings without inventing threads.
 ## Bounded gate reassessment
 
 Code-review freshness and decision freshness are separate. New evidence from
-a reply, a required source, CI results/enforcement, a human sign-off, or an
-explicit request to
+a reply, a required source, a human sign-off, or an explicit request to
 reassess gates may change the decision without a new commit. Reuse the prior
 completed code review only when its head, target/base context and affected
 evidence remain current under `readiness.md`. Fetch the
-latest findings/statuses, ledger, behavior evidence and mutable gate metadata,
-including CI enforcement when required by `verification.md`.
+latest findings/statuses, ledger, behavior evidence and mutable review-gate
+metadata. Ignore CI-only changes.
 Reverify disputed or affected claims and evaluate every approval gate. Do not
 repeat the whole diff or investigate already settled issues merely to count
 a new review round. An incomplete prior review cannot be treated as complete.

@@ -36,7 +36,7 @@ Match findings by demonstrated root cause, not exact title or category spelling.
 
 Report counts and denominators by risk class:
 
-- Serious defects detected and missed; unsafe Ready-to-merge decisions.
+- Serious defects detected and missed; unsafe code approvals.
 - Incorrect findings and unjustified holds on clean controls.
 - Correct fixes that reach readiness without unrelated new demands.
 - Correct rejection/deferral commands and persistent unresolved risks.
@@ -62,7 +62,7 @@ The skill does not provision automation, change branch protection, or merge PRs.
 
 Before asserting a speedup, collect at least 12 representative snapshot cases:
 four initial reviews (small, standard, sensitive, large), four changed-code
-re-reviews (including a fixed blocker and a changed dependency), two comment/CI
+re-reviews (including a fixed blocker and a changed dependency), two comment/source-evidence
 reassessments, one unchanged skip and one incomplete-review recovery. Include
 buggy, clean and corrected controls. Capture the same raw source, paginated
 host facts and initial review state for both skill versions; isolate their

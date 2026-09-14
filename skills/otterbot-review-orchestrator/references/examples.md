@@ -1,8 +1,8 @@
 These examples illustrate formatting. Unchanged exclusions assume completed
 coverage, unchanged head/base context and decision evidence, and no unfinished
 delivery. Human-review exclusions refer to unsolicited new-review jobs, not
-targeted recovery. Every delivered card also reports readiness; Ship It alone
-is not a Ready-to-merge claim. Shadow cards reference local artifacts only.
+targeted recovery. Every delivered card reports code-review status and omits CI/CD and merge
+eligibility. Shadow cards reference local artifacts only.
 
 # Worked examples
 
@@ -51,7 +51,7 @@ The webhook path can still deliver the same event twice after a retry.
 
 #### 🚢 Ship It · [PR #104 · Remove legacy retry worker](https://github.com/acme/widgets/pull/104)
 
-- **Readiness:** Ready to merge — complete review, required checks passed and host eligibility verified for the current head/base.
+- **Review status:** Review passed — code review complete at the current head/base.
 
 The removal preserves the remaining retry path.
 
@@ -133,7 +133,7 @@ One review was posted. PR #22 no longer needs review, and PR #30 needs a retry.
 
 ### 📋 Results
 
-#### 💬 Comment Only · [PR #21 · Add payout reconciliation](https://github.com/acme/payhub/pull/21)
+#### ⚠️ Request Changes · [PR #21 · Add payout reconciliation](https://github.com/acme/payhub/pull/21)
 
 The reconciliation path is acceptable; one non-blocking note was posted.
 

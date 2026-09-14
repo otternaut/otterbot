@@ -36,4 +36,16 @@ for invalid in missing duplicate negative unknown; do
     printf 'Accepted invalid input: %s\n' "$invalid" >&2; exit 1
   fi
 done
-printf '%s decision cases and 4 invalid-input cases passed.\n' "$count"
+# Current callers need no CI/host inputs; benign feedback still approves.
+review=(--blockers 0 --minors 1 --coverage complete --context current --evidence adequate --gates pass)
+result=$("$SKILL_ROOT/scripts/decide" "${review[@]}")
+[[ "$result" == '{"verdict":"ship-it","readiness":"review-passed","reasons":[]}' ]]
+result=$("$SKILL_ROOT/scripts/decide" "${review[@]}" --no-approve)
+[[ "$result" == '{"verdict":"comment-only","readiness":"review-passed","reasons":["approval_opt_out"]}' ]]
+# Delivery opt-out must not downgrade real review holds or blockers.
+for blockers in 0 1; do
+  result=$("$SKILL_ROOT/scripts/decide" --blockers "$blockers" --minors 0 \
+    --coverage incomplete --context current --evidence adequate --gates pass --no-approve)
+  [[ "$result" == *'"verdict":"request-changes"'* ]]
+done
+printf '%s decision cases, 4 delivery cases and 4 invalid-input cases passed.\n'  "$count"

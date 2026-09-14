@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "otterbot-review-orchestrator https://github.com/acme/widgets",
-      "expected_output": "Paginate candidates, classify code/context/gate jobs from current metadata and attributable coverage/state. Apply ordinary strict filters and documented recovery exceptions. One isolated worker per PR, normalized causes/options only, no coordinator diff inspection. Preserve lifecycle updates; report verdict and readiness separately. Unchanged head alone never excludes work.",
+      "expected_output": "Paginate candidates, classify code/context/gate jobs from current metadata and attributable coverage/state. Apply ordinary strict filters and documented recovery exceptions. One isolated worker per PR, normalized causes/options only, no coordinator diff inspection. Preserve lifecycle updates; report code-review verdict and coverage. Unchanged head alone never excludes work.",
       "files": []
     },
     {
@@ -52,19 +52,19 @@
     {
       "id": 9,
       "prompt": "scan https://github.com/acme/widgets; PR #9 is open and fresh but reviewDecision is APPROVED because a human reviewer approved it; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
-      "expected_output": "Schedule an independent review when other ordinary filters pass. Human APPROVED does not exclude the PR or limit findings. Preserve human state and report readiness separately.",
+      "expected_output": "Schedule an independent review when other ordinary filters pass. Human APPROVED does not exclude the PR or limit findings. Preserve human state and report code-review status.",
       "files": []
     },
     {
       "id": 10,
       "prompt": "scan https://github.com/acme/widgets; PR #10 has reviewDecision CHANGES_REQUESTED from a human reviewer; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
-      "expected_output": "Schedule an independent review when other ordinary filters pass. Human CHANGES_REQUESTED does not suppress Ollie review or determine its verdict; host readiness still reflects the blocking review.",
+      "expected_output": "Schedule an independent review when other ordinary filters pass. Human CHANGES_REQUESTED does not suppress Ollie review or determine its verdict; host merge eligibility is outside the report.",
       "files": []
     },
     {
       "id": 11,
       "prompt": "scan https://github.com/acme/widgets; PR #11's reviewDecision field is null; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
-      "expected_output": "An absent reviewDecision alone does not exclude the PR. Apply open, draft, stale and activity filters and coverage freshness normally; unknown host requirements cannot justify Ready.",
+      "expected_output": "An absent reviewDecision alone does not exclude the PR. Apply open, draft, stale and activity filters and coverage freshness normally; host merge requirements are not review inputs.",
       "files": []
     },
     {
@@ -94,7 +94,7 @@
     {
       "id": 16,
       "prompt": "worker for PR #16 finishes analysis, but a human approval flips reviewDecision to APPROVED before delivery; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
-      "expected_output": "Continue delivery of independently verified findings and Ollie verdict after final context checks. A new human approval does not cancel the job or suppress findings. Preserve human state and refresh readiness.",
+      "expected_output": "Continue delivery of independently verified findings and Ollie verdict after final context checks. A new human approval does not cancel the job or suppress findings. Preserve human state and verify Ollie's review state.",
       "files": []
     },
     {
@@ -154,7 +154,7 @@
     {
       "id": 26,
       "prompt": "scan https://github.com/acme/widgets; PR #26 has a prior attributable legacy Otterbot review but its reviewed head is unavailable",
-      "expected_output": "Unknown legacy revision cannot support approval or Ready. For otherwise eligible PR, route coverage reconstruction when current snapshot can be reviewed; if classification cannot be made, report recovery needed rather than clean unchanged.",
+      "expected_output": "Unknown legacy revision cannot support approval. For otherwise eligible PR, route coverage reconstruction when current snapshot can be reviewed; if classification cannot be made, report recovery needed rather than clean unchanged.",
       "files": []
     },
     {
@@ -202,7 +202,7 @@
     {
       "id": 34,
       "prompt": "scan https://github.com/acme/widgets; PR #34 is changes-requested only by Ollie and its current head equals the head in Ollie's newest marker",
-      "expected_output": "Same-head Ollie Request Changes skips only when coverage/context/decision evidence and delivery are unchanged. New explanatory evidence, CI or incomplete transition routes targeted reassessment.",
+      "expected_output": "Same-head Ollie Request Changes skips only when coverage/context/decision evidence and delivery are unchanged. New explanatory evidence or incomplete transition routes targeted reassessment.",
       "files": []
     },
     {
@@ -220,13 +220,13 @@
     {
       "id": 37,
       "prompt": "Sweep unchanged head whose required CI just passed after prior Waiting verdict",
-      "expected_output": "Compare semantic check state with persisted decision record, launch gate-reassessment worker. No diff in coordinator and no head-only exclusion.",
+      "expected_output": "With current review policy, ignore CI-only changes; no worker or host write. If prior state has an obsolete policy and CI-only hold, route one policy migration that discards the hold and recomputes the verdict from code evidence.",
       "files": []
     },
     {
       "id": 38,
       "prompt": "Base branch push affects an open PR older than 14 days with prior Ollie approval",
-      "expected_output": "Context invalidation recovery bypasses ordinary activity cutoff, revalidates affected compatibility and withdraws invalid own approval if needed. No Ready until current integration evidence.",
+      "expected_output": "Context invalidation recovery bypasses ordinary activity cutoff, revalidates affected compatibility and withdraws invalid own approval if needed. No approval until affected code compatibility is verified.",
       "files": []
     },
     {
@@ -244,7 +244,7 @@
     {
       "id": 41,
       "prompt": "Run repository sweep shadow",
-      "expected_output": "Pass shadow to each worker, no host writes at all. Return hypothetical verdict/readiness with local artifact paths, not Delivered.",
+      "expected_output": "Pass shadow to each worker, no host writes at all. Return hypothetical verdict/review status with local artifact paths, not Delivered.",
       "files": []
     },
     {
@@ -255,8 +255,8 @@
     },
     {
       "id": 43,
-      "prompt": "A standard worker exhausts its investigation budget and delivers Comment Only with persisted incomplete coverage and a next step.",
-      "expected_output": "Report Delivered / Waiting with incomplete coverage. Do not relaunch in the same sweep to evade the budget. A subsequent eligible invocation resumes missing work using valid evidence; never equate delivered review with complete code coverage.",
+      "prompt": "A standard worker exhausts its investigation budget and delivers Request Changes with persisted incomplete coverage and a next step.",
+      "expected_output": "Report Delivered / Blocked with Request Changes with incomplete coverage. Do not relaunch in the same sweep to evade the budget. A subsequent eligible invocation resumes missing work using valid evidence; never equate delivered review with complete code coverage.",
       "files": []
     },
     {
@@ -280,13 +280,13 @@
     {
       "id": 47,
       "prompt": "Sweep https://github.com/acme/widgets. Three otherwise eligible new PRs have required tests running, deployment queued, and a failed workflow respectively.",
-      "expected_output": "Classify all three as code-review and dispatch an isolated worker for each within concurrency limits. CI/CD state excludes none and does not delay dispatch. Workers publish reviews now; check status affects approval and readiness separately.",
+      "expected_output": "Dispatch all otherwise eligible PRs within concurrency limits. Ignore CI/CD completely: no checks retrieval, status in packets or summaries, or approval gates based on workflows.",
       "files": []
     },
     {
       "id": 48,
       "prompt": "Sweep https://github.com/acme/widgets. An otherwise eligible PR has incomplete code coverage and accessible head/base metadata, but its checks API is unavailable.",
-      "expected_output": "Route coverage recovery and dispatch a worker with explicit CI uncertainty. Missing check metadata alone must not exclude or postpone code review. Worker publishes available findings and actual coverage, withholding unsupported approval/readiness claims.",
+      "expected_output": "Route coverage recovery using accessible code-review metadata. Ignore checks API availability and pass no CI uncertainty. Worker decides from actual code coverage and independent evidence, explaining review gaps in Request Changes.",
       "files": []
     }
   ]

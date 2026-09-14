@@ -31,8 +31,15 @@ Replace the empty ledger with current outstanding overflow records from
 `approval.md` when applicable; retain an explicit empty list when none remain.
 
 Normally keep the body within 60 words, excluding marker, banner, findings index and footer.
-Comment Only opens with `Not approving because` and names every failed gate;
-use extra words only when essential. For Request Changes, `gate: -` means
+Benign comments normally accompany Ship It and an approval. If approval is
+withheld for a review concern, use Request Changes and name the reason plus
+what clears it; distinguish verified bugs from incomplete verification.
+Comment Only is reserved for an explicit `--no-approve` on an otherwise passing
+review. Explain that delivery choice without suggesting a code-review failure.
+Never emit a Comment Only "Not approving because" summary. Omit CI/CD status,
+check names/results/enforcement, waiting-on-workflow text and merge readiness
+from all output, including hidden markers and the conversation summary.
+Use extra words only when essential. For Request Changes, `gate: -` means
 blockers decided the verdict before approval was considered. The collapsible `Advisory Findings` section is required whenever Ollie has
 current or prior findings on the PR, including a clean re-review with only
 resolved findings. Omit it when there are none; never render a zero-findings

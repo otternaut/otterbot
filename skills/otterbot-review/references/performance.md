@@ -30,8 +30,8 @@ Do not start a tool operation whose known duration exceeds remaining analysis
 time. Use tool timeouts/cancellation when available; skill instructions cannot
 preempt an uninterruptible host call or guarantee wall-clock latency.
 
-Exhaustion is never proof: incomplete scope/evidence yields Comment Only,
-unless a verified blocker requires Request Changes. Publish every already
+Exhaustion is never proof: incomplete scope/evidence yields Request Changes
+with the exact verification gap, without inventing a defect. Publish every already
 verified blocker, preserve outstanding minor accounting, and record specific
 holds with owner, clearing condition and resume trigger. Preserve completed
 coverage and the next investigation step; do not restart on the next invocation.

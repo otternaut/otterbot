@@ -1,27 +1,30 @@
 #!/usr/bin/env bash
-# Normalize an evidenced review snapshot into a verdict and readiness state.
+# Normalize an evidenced review snapshot into a verdict and code-review status.
 # No network, filesystem writes, code execution, or host actions.
 set -euo pipefail
 usage() {
   cat <<'EOF'
 Usage: decide --blockers N --minors N --coverage complete|incomplete|unknown
   --context current|stale|unknown --evidence adequate|inadequate|unknown
-  --gates pass|hold|unknown --ci ready|waiting|unknown
-  --host ready|waiting|unknown [--dry-run]
+  --gates pass|hold|unknown [--no-approve] [--dry-run]
+  [--ci ready|waiting|unknown] [--host ready|waiting|unknown]
 
-Every field is required; counts are distinct outstanding verified defects.
-Gates includes all other review gates, including no-approve and CI enforcement.
-CI and host describe remaining merge conditions, not just review eligibility.
+The six review fields are required; counts are distinct outstanding verified defects.
+Gates includes other code-review gates, never CI/CD or merge eligibility.
+Legacy CI and host arguments are optional and ignored.
+--no-approve suppresses approval only for an otherwise passing review.
 Outputs JSON only. This helper trusts normalized inputs; it does not verify them.
 --dry-run is identical: this command never changes state.
 EOF
 }
 fail() { printf 'decide: %s\n' "$1" >&2; exit 2; }
 seen=' '
+no_approve=false
 while (($#)); do
   case "$1" in
     --help|-h) usage; exit 0 ;;
     --dry-run) shift; continue ;;
+    --no-approve) no_approve=true; shift; continue ;;
     --blockers|--minors|--coverage|--context|--evidence|--gates|--ci|--host)
       key=${1#--}
       [[ "$seen" != *" $key "* ]] || fail "duplicate field: $key"
@@ -40,7 +43,7 @@ while (($#)); do
     *) fail 'unknown option' ;;
   esac
 done
-for key in blockers minors coverage context evidence gates ci host; do
+for key in blockers minors coverage context evidence gates; do
   [[ "$seen" == *" $key "* ]] || fail "missing field: $key"
 done
 reasons=()
@@ -55,19 +58,15 @@ else
   [[ "$gates" == pass ]] || reasons+=(review_gates)
   ((minors < 3)) || reasons+=(minor_threshold)
   if ((${#reasons[@]})); then
-    verdict=comment-only
-    readiness=waiting
+    verdict=request-changes
+    readiness=blocked
   else
     verdict=ship-it
-    if [[ "$ci" == ready && "$host" == ready ]]; then
-      readiness=ready-to-merge
-    elif [[ "$ci" == waiting || "$host" == waiting ]]; then
-      readiness=waiting
-    else
-      readiness=review-passed
+    readiness=review-passed
+    if [[ "$no_approve" == true ]]; then
+      verdict=comment-only
+      reasons+=(approval_opt_out)
     fi
-    [[ "$ci" == ready ]] || reasons+=(ci_not_ready)
-    [[ "$host" == ready ]] || reasons+=(host_not_ready)
   fi
 fi
 printf '{"verdict":"%s","readiness":"%s","reasons":[' "$verdict" "$readiness"

@@ -14,19 +14,17 @@ Dots indicate status here; inline dots indicate severity. It is omitted only
 when there are no findings.
 Every comment keeps Ollie's otter footer and reviewed commit.
 
-## What readiness means
+## What review status means
 
-The review verdict is separate from readiness. **Review passed** means Ollie's
-review gates passed; **Waiting** names checks, evidence or human actions still
-needed; **Blocked** means verified defects remain. **Ready to merge** requires
-complete review, passing required checks and verified host eligibility for the
-exact PR head and target/base context. It is not an automatic merge action.
-Every hold states what clears it, who acts next and what triggers reassessment.
+**Review passed** means Ollie's code-review gates passed. **Blocked** means a
+review concern or verification gap needs resolution. Each request for changes
+explains why approval is withheld and what clears it. This skill does not
+assess merge eligibility or report CI/CD status.
 
 Ollie records completed and incomplete review areas. Fixing listed findings
-cannot bypass old coverage gaps. A base-branch advance can invalidate readiness
+cannot bypass old coverage gaps. A base-branch advance can invalidate review evidence
 even without a PR commit; only affected integration evidence is reassessed.
-Replies, CI results and human decisions can update gates without rereading
+Replies, required sources and human sign-offs can update gates without rereading
 unchanged code when coverage and context remain valid.
 
 `--shadow` produces a local hypothetical review with no host writes;
@@ -39,13 +37,13 @@ until the pool is exhausted, and stays unchanged on edits/retries.
 
 One integrated review covers correctness, security, reliability, relevant
 tests and interfaces. Ollie reads direct callers and contracts as needed,
-comments only on changed code or problems it newly triggers, and uses passing
-CI as evidence without rerunning the suite. Missing tests alone are not a
+comments only on changed code or problems it newly triggers, and uses source
+inspection and bounded local verification as evidence. Missing tests alone are not a
 finding: a comment needs a specific failure scenario and consequence.
 Consequential changes also need a relevant test, targeted reproduction, or
 concrete code-path argument establishing the behavior. Without adequate
 evidence, Ollie explains the gap and withholds approval rather than inventing
-a defect. Green CI and human sign-off alone do not prove coverage.
+a defect. Human sign-off alone does not prove coverage.
 
 Docs and wording changes get a quick read. Dependency bumps get compatibility
 checks against used APIs and declared ranges. Large reviews prioritize risk
@@ -73,17 +71,18 @@ assigned in batches without repeats until the pool is exhausted.
 
 Every verified blocker is posted, plus at most four new inline minors. Nitpicks appear
 only with `--maintainability`, at most two on an initial review without
-a critical. Minor counts never turn a review into Request Changes.
+a critical. Three outstanding minors require Request Changes without inflating severity.
 Comments explain the trigger, consequence, code evidence and smallest fix;
 exact mechanical edits may include an applyable suggestion block.
 
 - **Ship It:** no open verified blockers, at most two counted minors that are
   demonstrably safe to address after merge, and every approval rule passed.
-- **Request Changes:** a verified critical or major remains open.
-- **Comment Only:** no blocking finding, but approval is unavailable. The root
-  starts with "Not approving because" and identifies the failed rules.
+- **Request Changes:** a blocker, three outstanding minors, failed review gate
+  or incomplete assessment prevents approval; the root explains what clears it.
+- **Comment Only:** an explicit `--no-approve` suppresses approval on otherwise
+  passing code. Benign feedback normally accompanies Ship It and approval.
 
-Three or more distinct verified outstanding minors yield Comment Only,
+Three or more distinct verified outstanding minors yield Request Changes,
 based on Ollie's own review. The count includes prior rounds, independently
 discovered duplicates and verified overflow beyond the four inline comments. Ollie records
 overflow minors visibly under Advisory Findings, with code evidence and a
@@ -99,7 +98,7 @@ reviewer's approval or risk acceptance does not clear it. Bare `@ollie accept`
 still requires evidence that the finding does not apply.
 
 One or two minors still need concrete, limited consequences to permit
-auto-approval. Unresolved potentially serious impact yields Comment Only;
+auto-approval. Unresolved potentially serious impact yields Request Changes;
 a demonstrated serious failure, including interacting minor issues, yields
 Request Changes according to its actual severity.
 
@@ -119,16 +118,10 @@ Conflicted PRs wait for resolution. Unchanged content skips another review.
 `--force` overrides these exits, but keeps approval safeguards. Other reviewers'
 approvals, rejections and comments never suppress review or new findings.
 Ollie discovers and verifies its own candidates before checking existing
-threads for duplicate posts. Its verdict follows its own evidence; host review
-requirements affect merge readiness separately. Ollie performs and publishes
-the review regardless of whether CI/CD is queued, running, finished or
-unavailable. Failing or pending relevant checks permit approval
-only when Ollie confirms those exact checks prevent merging on the target
-branch, and no demonstrated defect or independent evidence gap remains.
-Unknown enforcement means Comment Only. Unrelated optional checks do not
-create automatic holds, and repositories without CI can use direct evidence.
-Ollie reports outstanding checks without waiting for them; a new result can
-trigger gate reassessment on the same commit.
+threads for duplicate posts. Its verdict follows its own evidence. Ollie ignores CI/CD status, logs and
+enforcement completely, including in summaries and decision metadata. Pending,
+failed or unavailable workflows never withhold approval or trigger re-review.
+Workflow/deployment source changes still receive ordinary behavioral review.
 
 ## Replies and later pushes
 
