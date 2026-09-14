@@ -950,6 +950,24 @@
       "prompt": "A proposed Comment Only root says Not approving because the changed consumer contract could not be verified.",
       "expected_output": "Convert to Request Changes, explain the exact missing consumer-contract evidence and what clears the hold. Do not invent a proven code defect.",
       "files": []
+    },
+    {
+      "id": 158,
+      "prompt": "Prepare a hosted review with two independently verified safe minors, no existing matching threads, complete coverage and passing gates. The prior root used ✅ Ollie's Verdict · Ship It.",
+      "expected_output": "Use 🚢 Ollie's Verdict · Ship It and approve. Publish both minors as inline findings with evidence and fixes, index them in Advisory Findings and verify their returned comments. Do not preserve the old success icon or omit findings because the verdict passes.",
+      "files": []
+    },
+    {
+      "id": 159,
+      "prompt": "You are the PR worker assigned by the repository sweep coordinator. Your independent review verifies one major and one distinct minor with no duplicate threads. Complete the authorized hosted review.",
+      "expected_output": "The PR worker submits Request Changes with both inline findings and the root index, verifies delivery and returns the completion envelope. Do not wait for or delegate posting to the sweep coordinator; optional deep specialists cannot post.",
+      "files": []
+    },
+    {
+      "id": 160,
+      "prompt": "A host accepted the root review but final verification finds one of two intended inline findings published and the other still pending. One bounded attempt to publish the missing comment fails.",
+      "expected_output": "Preserve the published comment and avoid resubmitting the whole review. Put the missing finding's trigger, consequence, source evidence and fix visibly in the root index if writable; otherwise show it in conversation. Report partial delivery, retain unfinished recovery and do not claim both inline findings were published.",
+      "files": []
     }
   ]
 }

@@ -15,6 +15,17 @@ explicit opt-out for otherwise passing code. A host limitation can require a
 plain comment carrying the intended verdict; never mislabel it Comment Only.
 Ignore all CI/CD metadata during retrieval, submission and final verification.
 
+Prepare the root and eligible inline findings together, regardless of verdict.
+During final verification, match every intended new inline finding to a
+published comment by marker or anchor; a successful root review or approval
+alone does not establish finding delivery. Pending draft comments are not
+published findings. Recover only missing comments within the recovery limit,
+preserving deduplication. If inline publication remains unavailable, include
+each missing finding's trigger, consequence, evidence and fix visibly in the
+root index, or in conversation if host writes fail. Report the delivery
+limitation and retain unfinished delivery for recovery; never silently drop
+findings or mark delivery complete while comments remain pending.
+
 
 | Verdict | GitHub | GitLab | Bitbucket Cloud |
 | --- | --- | --- | --- |

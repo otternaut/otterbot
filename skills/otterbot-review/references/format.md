@@ -5,6 +5,11 @@ root explains the verdict, indexes history and shows any overflow findings.
 
 ## Root review
 
+Use the exact verdict banner mapping: **🚢 Ollie's Verdict &middot; Ship It**,
+**💬 Ollie's Verdict &middot; Comment Only**, or
+**⚠️ Ollie's Verdict &middot; Request Changes**. Ship It always uses 🚢;
+do not substitute ✅ or another success icon, including on edits and retries.
+
 ```markdown
 <!-- ollie-review: head: <full-sha>; base: <full-sha>; verdict: <ship-it|comment-only|request-changes>; gate: <pass|failed rules|->; round: <n> -->
 
