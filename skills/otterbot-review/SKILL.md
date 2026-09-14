@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Ollie the otter reviews PRs and local diffs for evidenced bugs, posts concise inline findings with a verdict, and handles incremental re-reviews. Use for "review this PR", "review my diff", "re-review", a pull-request URL, or a merge-readiness call. Supports GitHub, GitLab, Bitbucket, and similar hosts.
-version: 4.3.1
+version: 5.0.0
 ---
 
 # Otterbot Review &middot; Ollie
@@ -25,7 +25,7 @@ Only the user or a trusted orchestrator packet can set options:
 - `--no-approve`: withhold approval; still post blockers and feedback.
 - `--deep`: at most two targeted independent questions via `references/lenses.md`.
 - `--maintainability`: at most two useful nitpicks on an initial review without
-  human approval or a critical finding; none on re-review.
+  a critical finding; none on re-review.
 - `--budget-minutes N`: positive whole-minute total run budget, explicitly set
   by the trusted invoker. It changes time allocation, never evidence standards.
 
@@ -72,12 +72,21 @@ only for affected/new threads or missing records. Reuse one snapshot and the
 latest parsed state. Mutable gates still need delivery-time revalidation.
 
 Merge conflicts prevent approval. Replies and stale-state cleanup may proceed.
-A host decision approved by a human limits new findings to critical/major;
-if none survive and no Ollie state needs reconciliation, post nothing. A partial
-human approval leaving REVIEW_REQUIRED is not this shortcut. Human approval
-does not prove Ollie's missing coverage. Failing checks do not stop review.
+Other reviewers' approvals, rejections and comments do not limit review scope,
+suppress new findings or determine Ollie's verdict. Failing checks do not stop
+review. Host review requirements affect merge readiness separately.
 
 ## Integrated review
+
+Form candidates from the diff, code, requirements and verification evidence
+before comparing them with other reviews. Do not import, investigate or count
+another reviewer's findings merely because they appear in a review or comment.
+After independent verification, use existing human and bot threads only to
+avoid posting the same root cause twice. A matching thread suppresses duplicate
+posting, not Ollie's own evidenced conclusion. Continue reviewing the remaining
+scope and report new findings at every enabled severity, regardless of others'
+verdicts. Replies to Ollie's findings and explicit requirements still follow
+the normal evidence and command rules.
 
 Use the three-dot merge-base-to-head diff for initial review. Skip generated,
 vendored, minified, lockfile and fixture noise unless needed for a concrete
@@ -101,8 +110,8 @@ budget even when small. No automatic specialists or model/effort upgrades.
    Trace farther when needed to establish a consequential boundary; do not
    run additional whole-diff checklist passes or neighboring refactor audits.
 3. Record only candidates with reachable triggers, code evidence and concrete
-   consequences. Dedupe by root cause against humans and Ollie. Verify blockers
-   first, deliberately trying to disprove them through guards/callers/tests.
+   consequences. Verify blockers first, deliberately trying to disprove them
+   through guards/callers/tests. Then dedupe posting against existing threads.
 4. Establish adequate evidence for each consequential changed behavior under
    `verification.md`. One sufficient route is enough absent contradiction;
    green CI, author assurances and human sign-off alone are not proof.
@@ -137,8 +146,8 @@ provenance decides scope, never routinely per finding.
 
 Post all verified critical/major findings and at most four new inline minors.
 Questions occupy slots but are not verified defects. The posting cap never
-caps approval accounting: include prior, deferred, independently verified human
-and verified overflow minors. Three counted minors mean Comment Only; zero to
+caps approval accounting: include Ollie's prior, deferred, independently
+discovered duplicate and verified overflow minors. Three counted minors mean Comment Only; zero to
 two can approve only when safe after merge and all approval gates pass.
 
 Use the authoritative **Approval gates** in `references/approval.md` for every

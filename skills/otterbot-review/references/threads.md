@@ -19,8 +19,8 @@ and compatibility notes for threads created by v2 of this skill.
 3. Classify with the table below. Reply only for a changed status, material new
    evidence, or an unanswered developer question. Resolve/reopen Ollie's
    threads as needed, without repeating unchanged still-open replies.
-4. Human threads support deduplication and independently verified blockers;
-   never resolve, reopen, edit or duplicate them.
+4. Other reviewers' threads serve only to deduplicate independently discovered
+   findings; never import their claims or resolve, reopen, edit or duplicate them.
 
 ## Classes
 
@@ -50,8 +50,7 @@ accepted &middot; <the author's reason restated in one clause, plus the code or 
 
 ```markdown
 <!-- ollie-status: deferred -->
-deferred &middot; <supplied reason or rationale from context>; <remaining limited impact>. For a minor, it still counts toward auto-approval unless a human reviewer
-explicitly approves that risk.
+deferred &middot; <supplied reason or rationale from context>; <remaining limited impact>. For a minor, it still counts toward auto-approval.
 ```
 
 ```markdown
@@ -93,7 +92,7 @@ withdrawn &middot; my mistake: <what Ollie got wrong and the code that shows it>
   accepted is never available; if the author is right that it is not a
   critical, the correct class is withdrawn, with Ollie's reasoning.
 - **Accepted minors need evidence too.** Show that the concern does not apply;
-  willingness to live with it is deferral or explicit human risk approval,
+  willingness to live with it is deferral,
   not evidence that it was false. See `approval.md` for counting rules.
 - **Deferral records the reason.** Neither minors nor nitpicks require a
   ticket. Preserve any optional link as part of the supplied explanation. A critical or major
@@ -106,12 +105,11 @@ withdrawn &middot; my mistake: <what Ollie got wrong and the code that shows it>
   could be critical or major must be investigated, not waved through as a
   harmless question. If it cannot be settled, withhold auto-approval and name
   the uncertainty. Request Changes requires a verified blocker.
-- **Human threads.** Ollie never resolves, reopens, or edits them. When a human
-  raised an issue Ollie independently confirmed, Ollie posts no duplicate
-  comment; the root indexes only Ollie's findings. The verdict counts the issue only because Ollie
-  verified it in the code, never because the thread exists; an unconfirmed
-  human thread has no weight in the verdict. When it counts, the blurb may
-  say that existing threads cover it.
+- **Other reviewers' threads.** Use them only after forming and verifying
+  Ollie's own candidates, to suppress duplicate posts by root cause. Never
+  adopt their findings or verdicts. Independently discovered duplicates still
+  count on Ollie's evidence; link the existing thread in the root explanation.
+  Leave others' threads and review states untouched, and surface new findings.
 - **Root comment replies and mentions.** Answered where they were made, in one
   or two sentences. Never answered by posting a new root comment.
 

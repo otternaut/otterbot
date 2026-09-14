@@ -62,7 +62,8 @@ exceed the reserve; report the overrun instead of silently raising the budget.
 - Use complete lightweight thread identities, anchors and revision metadata
   for deduplication/invalidation. Fetch new/edited/affected bodies. If the host
   lacks reliable change metadata or cached attribution, fetch the needed full
-  history with pagination. Never assume unseen human findings do not exist.
+  history with pagination. Compare others' bodies only after independently
+  verifying candidates; use them for posting deduplication, never discovery.
 - Parse newest attributable state once; retain compact records locally through
   the run. Reuse verified unchanged evidence under `readiness.md`. Do not send
   repeated public Markdown history through reasoning just to rebuild an index.

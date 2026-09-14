@@ -33,7 +33,8 @@ reply marker alone does not prove a gate update completed. Multi-process hosts
 need an actual lock/lease or queue guarantee; absent one, revalidate before
 writes and disclose the residual race, rather than claiming serialization.
 
-Ordinary new-review filtering may skip human-approved/draft/stale PRs. An open
+Ordinary new-review filtering may skip draft/stale PRs, never PRs merely
+because another reviewer approved or requested changes. An open
 PR with changed evidence that invalidates Ollie's prior approval still needs
 cleanup, regardless of those filters. Never dismiss a human review, approve a
 draft, or change another reviewer state. A targeted comment response does not

@@ -61,12 +61,12 @@ assigned in batches without repeats until the pool is exhausted.
 | --- | --- | --- |
 | 🔴 critical | Security exposure, irreversible data loss, main-path outage | yes |
 | 🟠 major | A reachable bug or unmet requirement that would ship broken | yes |
-| 🟡 minor | An actionable edge case with limited impact | three outstanding require human approval |
+| 🟡 minor | An actionable edge case with limited impact | three outstanding withhold Ollie approval |
 | 🔵 nitpick | Maintainability with no runtime impact | no; opt-in only |
 
 Every verified blocker is posted, plus at most four new inline minors. Nitpicks appear
-only with `--maintainability`, at most two on an initial review without human
-approval or a critical. Minor counts never turn a review into Request Changes.
+only with `--maintainability`, at most two on an initial review without
+a critical. Minor counts never turn a review into Request Changes.
 Comments explain the trigger, consequence, code evidence and smallest fix;
 exact mechanical edits may include an applyable suggestion block.
 
@@ -77,8 +77,8 @@ exact mechanical edits may include an applyable suggestion block.
   starts with "Not approving because" and identifies the failed rules.
 
 Three or more distinct verified outstanding minors yield Comment Only,
-requesting human approval. The count includes prior rounds, verified human
-findings and verified overflow beyond the four inline comments. Ollie records
+based on Ollie's own review. The count includes prior rounds, independently
+discovered duplicates and verified overflow beyond the four inline comments. Ollie records
 overflow minors visibly under Advisory Findings, with code evidence and a
 fix, and preserves their IDs in metadata for subsequent reviews.
 The root explains when this count differs from the linked Advisory Findings
@@ -87,18 +87,17 @@ minor may be verified for useful feedback within the time budget. Ollie never
 searches for issues just to fill the four slots.
 
 Deferring a minor or closing its thread does not remove its risk. A minor
-leaves the count only when evidence shows it fixed or inapplicable, or a human
-reviewer other than the author explicitly approves that specific risk for
-merge. Generic approval and bare `@ollie accept` are not such evidence. Deferred
-minors keep their status even when a human approves the risk.
+leaves the count only when evidence shows it fixed or inapplicable. Another
+reviewer's approval or risk acceptance does not clear it. Bare `@ollie accept`
+still requires evidence that the finding does not apply.
 
 One or two minors still need concrete, limited consequences to permit
 auto-approval. Unresolved potentially serious impact yields Comment Only;
 a demonstrated serious failure, including interacting minor issues, yields
 Request Changes according to its actual severity.
 
-Approval safeguards remain: no self-approval or draft approval, no active
-human request for changes, stable reviewed head, required sources accessible,
+Approval safeguards remain: no self-approval or draft approval,
+stable reviewed head, required sources accessible,
 prior blockers resolved with evidence, and covering tests for prior criticals.
 Changes to authentication/authorization, secrets, irreversible external
 operations, destructive migrations or production deployment behavior need
@@ -110,9 +109,11 @@ Incomplete review or `--no-approve` prevents approval; the review round and
 number of deferrals do not independently block it.
 
 Conflicted PRs wait for resolution. Unchanged content skips another review.
-`--force` overrides these exits, but keeps approval safeguards. A human-approved
-PR gets only blocker review, with no post if clean unless Ollie must update
-its own stale decision. Failing or pending relevant checks permit approval
+`--force` overrides these exits, but keeps approval safeguards. Other reviewers'
+approvals, rejections and comments never suppress review or new findings.
+Ollie discovers and verifies its own candidates before checking existing
+threads for duplicate posts. Its verdict follows its own evidence; host review
+requirements affect merge readiness separately. Failing or pending relevant checks permit approval
 only when Ollie confirms those exact checks prevent merging on the target
 branch, and no demonstrated defect or independent evidence gap remains.
 Unknown enforcement means Comment Only. Unrelated optional checks do not

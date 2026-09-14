@@ -64,7 +64,7 @@
     {
       "id": 11,
       "prompt": "review https://github.com/acme/widgets/pull/63; another reviewer has already requested changes",
-      "expected_output": "Verify any human-raised blocker independently and dedupe. Active human changes-requested state prevents approval even when no blocker is independently established; use Comment Only with gate reason in that case.",
+      "expected_output": "Review independently without importing the other review or its comments. A rejection alone does not block Ollie approval; with complete clean evidence and other gates passing, Ship It while reporting the host review hold in readiness. Surface any independently discovered new bugs and preserve the other review.",
       "files": []
     },
     {
@@ -100,7 +100,7 @@
     {
       "id": 17,
       "prompt": "review https://github.com/acme/widgets/pull/68, which a human reviewer has already approved; Ollie finds two minors and a nitpick",
-      "expected_output": "Host human-approved decision limits new findings to blockers. With only minors/nitpick and no stale Ollie decision to reconcile, post nothing. A stale Ollie Request Changes must be reconciled after concerns are verified cleared; individual approval leaving REVIEW_REQUIRED is not shortcut.",
+      "expected_output": "Report both independently verified new minors; omit the nitpick without maintainability opt-in. Human approval does not suppress findings. Decide from Ollie evidence and approval gates, preserving the human review.",
       "files": []
     },
     {
@@ -208,7 +208,7 @@
     {
       "id": 35,
       "prompt": "re-review https://github.com/acme/widgets/pull/85, a human-approved PR whose author pushed one more commit",
-      "expected_output": "Effective head change allows interdiff review; human-approved shortcut limits new findings to blockers. If clean, post nothing unless Ollie needs to clear its own stale decision. Human reviews remain untouched.",
+      "expected_output": "Review the interdiff, affected context and old gaps. Report independently discovered new findings at every enabled severity and deliver Ollie own verdict. Preserve human reviews.",
       "files": []
     },
     {
@@ -358,7 +358,7 @@
     {
       "id": 60,
       "prompt": "Re-review three minors; reviewer other than author explicitly approved one specific deferred risk for current behavior",
-      "expected_output": "Explicit current risk sign-off by authorized non-author reviewer excludes that minor while retaining deferred status. Two count; approve if limited impact and all remaining gates pass. No separate deferral-count gate; generic approval is insufficient.",
+      "expected_output": "All three Ollie minors still count; another reviewer risk acceptance does not clear a defect. Comment Only with deferred status preserved.",
       "files": []
     },
     {
@@ -394,7 +394,7 @@
     {
       "id": 66,
       "prompt": "Re-review a PR with two independently verified human minor threads and one Ollie minor, with no explicit human risk approval",
-      "expected_output": "Deduplicate and count three, Comment Only. Advisory Findings links only Ollie thread; root explains total includes existing human threads. Never mutate or duplicate human threads.",
+      "expected_output": "Establish independent discovery provenance. If Ollie discovered all three before comparing threads, count three and Comment Only, linking matching threads without duplicate posts. If the two were imported from human reviews, exclude those inherited claims and re-review affected scope independently before deciding.",
       "files": []
     },
     {
@@ -448,7 +448,7 @@
     {
       "id": 75,
       "prompt": "Three deferred minors have specific human sign-offs, no blockers, all gates otherwise pass",
-      "expected_output": "Exclude approved risks from count and approve; no obsolete greater-than-two deferrals gate. Retain deferred statuses and decision evidence.",
+      "expected_output": "All three deferred Ollie minors still count. Comment Only; sign-offs do not erase defects or change Ollie independent verdict.",
       "files": []
     },
     {
@@ -889,6 +889,18 @@
       "id": 147,
       "prompt": "Malformed state claims a negative no-progress count and a future unknown policy identity.",
       "expected_output": "Do not trust state for a skip or cached approval. Reconstruct relevant scope and assess current requirements; report unknowns rather than interpreting invalid counters as a valid pause.",
+      "files": []
+    },
+    {
+      "id": 148,
+      "prompt": "Review a PR where other human and bot reviews contain five alleged bugs and request changes. Ollie independently completes the diff and finds one different minor; all other review gates pass.",
+      "expected_output": "Do not import or investigate the five review-derived claims. Report the new minor and decide from own complete evidence: Ship It if safe after merge, with host blocking review state reflected separately in readiness.",
+      "files": []
+    },
+    {
+      "id": 149,
+      "prompt": "Review an approved PR. Before reading review comments, Ollie verifies a major bug and a distinct minor. An existing review thread already describes the major.",
+      "expected_output": "Count the independently discovered major in Request Changes and link its existing thread without posting a duplicate. Post the distinct new minor. Prior approval cannot suppress findings or dictate the verdict.",
       "files": []
     }
   ]

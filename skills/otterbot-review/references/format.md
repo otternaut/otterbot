@@ -44,8 +44,8 @@ carry their current status: fixed in `<sha>`, accepted, deferred, still open,
 superseded or withdrawn. Reuse known statuses for unaffected minor threads;
 indexing history does not require another investigation or reply. A regressed
 critical keeps its original thread link and updated status. Do not list human
-findings in the index. Link approval-affecting human findings in the root
-explanation. Do not repeat full evidence for findings already linked inline. Historical entries
+findings in the index. Link existing threads covering independently discovered duplicates in the
+root explanation; never import other reviewers' findings. Do not repeat full evidence for findings already linked inline. Historical entries
 do not consume this round's new-finding budget. The index counts distinct Ollie findings, including visible overflow, not
 necessarily the approval total. State a three-minor threshold or uncertain
 impact gate failure in the blurb independently of the four-new-minor inline

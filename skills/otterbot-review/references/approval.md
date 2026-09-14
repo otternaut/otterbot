@@ -19,8 +19,8 @@ in the marker's `gate` field.
   Ollie read or ran, or was withdrawn.
 - The current head, target branch and base/integration context match the
   verified review state; changed context was assessed before approval.
-- The PR is not a draft, and no human reviewer has an active
-  changes-requested state.
+- The PR is not a draft. Other reviewers' review states affect host merge
+  readiness, not Ollie's independent approval decision.
 - Each consequential changed behavior has adequate evidence under
   `references/verification.md`; no material coverage claim rests on green
   checks, human assurance or presumed caller behavior alone.
@@ -59,8 +59,9 @@ in the marker's `gate` field.
 
 The inline posting budget is four new minors. The approval count is independent
 of that budget and includes every distinct verified outstanding minor known
-at the reviewed head, including prior rounds, human findings independently
-verified by Ollie, and verified findings not posted inline. Deduplicate by
+at the reviewed head from Ollie's own review, including prior rounds and
+independently discovered findings not posted inline because of duplication or
+the posting cap. Do not import findings from other reviews or comments. Deduplicate by
 root cause, including between ledger entries and existing threads. Questions,
 nitpicks and unverified candidates do not count as minor defects.
 
@@ -95,18 +96,14 @@ incomplete assessment and do not approve.
 - Fixed/superseded: code evidence shows the consequence is removed.
 - Withdrawn/accepted: evidence shows the finding was incorrect or inapplicable.
 - Deferred: still counted despite ticket creation or thread resolution.
-- Human-approved risk: an authorized human reviewer other than the PR author explicitly
-  approves that specific minor risk for merge. Link their decision, ensure it
-  applies to the current behavior, and exclude that risk from the threshold.
-  Verify their review authority from repository rules or host permissions.
-  A generic approval, an author saying "accept", or a resolved thread is not
-  this evidence. Keep its actual thread status; approval is not a code fix.
+- Another reviewer's approval or risk acceptance does not clear an Ollie
+  finding or remove it from the count.
 
 Recheck affected code, new replies and purported clearing evidence. Reuse
 prior verified evidence only if the relevant behavior and context are
 unchanged. If that cannot be established, verify again or withhold approval
-for incomplete assessment. These exceptions apply only to minors and never
-waive blocker or sensitive-change gates. Use this unified risk count; there
+for incomplete assessment. Minor accounting never
+waives blocker or sensitive-change gates. Use this unified risk count; there
 is no separate deferral-count or review-round approval limit.
 
 ## Visible accounting and continuity
@@ -117,8 +114,8 @@ minors as compact entries in Advisory Findings, with their stable IDs and
 status. These entries are not hidden solely in metadata and remain visible
 on subsequent rounds. Link an existing thread when available; otherwise use
 a reviewed-commit code link or plain `file:line`, never an invented thread URL.
-Existing human findings are linked in the root's approval explanation rather
-than duplicated as Ollie's findings. Explain when the approval count differs
+Existing threads covering Ollie's independently discovered duplicates are
+linked in the root's approval explanation, without reposting their findings. Explain when the approval count differs
 from Ollie's index count. Historical/overflow entries do not consume new
 inline slots; only newly introduced claims must satisfy interdiff scope.
 
@@ -142,8 +139,8 @@ absence alone proves neither outstanding risk nor clearance. If records needed
 to decide approval cannot be recovered, explain incomplete accounting and
 withhold approval. Deduplicate ledger entries against findings now in threads.
 
-Persist specific human risk decisions as linked evidence in the thread or
-root when used to clear a gate. Commands can reference visible overflow IDs
+Persist required sensitive-behavior sign-offs as linked evidence in the thread
+or root when used to clear that gate; they never erase findings. Commands can reference visible overflow IDs
 on the root; process those just like inline findings without inventing threads.
 
 ## Bounded gate reassessment
@@ -174,8 +171,8 @@ gate reasons, accounting nor host state needs updating, reply only and reuse
 the existing review. Deduplicate repeated source comment IDs/evidence; a prior
 response does not excuse an unfinished gate update after partial delivery.
 
-A human-approved shortcut does not leave a stale Ollie Request Changes in
-place after its concerns are disproven. Reconcile Ollie's state while leaving
+Do not leave a stale Ollie Request Changes in place after its concerns are
+disproven, regardless of other reviewers' decisions. Reconcile Ollie's state while leaving
 human reviews untouched. Root updates and thread replies retain the personality
 footer. Automated sweeps need to supply changed decision evidence to trigger
 this path; it does not install a comment listener or change sweep eligibility.

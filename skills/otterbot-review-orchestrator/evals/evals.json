@@ -52,19 +52,19 @@
     {
       "id": 9,
       "prompt": "scan https://github.com/acme/widgets; PR #9 is open and fresh but reviewDecision is APPROVED because a human reviewer approved it; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
-      "expected_output": "PR #9 is excluded because its host review decision is APPROVED and that decision comes from a human, so the review requirement is already satisfied. The coordinator does not infer that another review might be useful and creates no worker for it. These exclusions apply to this ordinary job; context invalidation and targeted recovery use documented exceptions.",
+      "expected_output": "Schedule an independent review when other ordinary filters pass. Human APPROVED does not exclude the PR or limit findings. Preserve human state and report readiness separately.",
       "files": []
     },
     {
       "id": 10,
       "prompt": "scan https://github.com/acme/widgets; PR #10 has reviewDecision CHANGES_REQUESTED from a human reviewer; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
-      "expected_output": "Skip unsolicited new review because of active human Request Changes. A separate evidenced recovery job could reconcile Ollie state without overriding human decision; none exists in this case.",
+      "expected_output": "Schedule an independent review when other ordinary filters pass. Human CHANGES_REQUESTED does not suppress Ollie review or determine its verdict; host readiness still reflects the blocking review.",
       "files": []
     },
     {
       "id": 11,
       "prompt": "scan https://github.com/acme/widgets; PR #11's reviewDecision field is null; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
-      "expected_output": "The coordinator fails closed and excludes PR #11 as review decision unavailable. It does not infer REVIEW_REQUIRED from requested reviewers, review counts, mergeability, or missing approvals. These exclusions apply to this ordinary job; context invalidation and targeted recovery use documented exceptions.",
+      "expected_output": "An absent reviewDecision alone does not exclude the PR. Apply open, draft, stale and activity filters and coverage freshness normally; unknown host requirements cannot justify Ready.",
       "files": []
     },
     {
@@ -94,7 +94,7 @@
     {
       "id": 16,
       "prompt": "worker for PR #16 finishes analysis, but a human approval flips reviewDecision to APPROVED before delivery; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
-      "expected_output": "The worker's mandatory final eligibility check detects the satisfied review decision and posts nothing. It returns Skipped with the failed condition; the coordinator does not claim a verdict or delivery. These exclusions apply to this ordinary job; context invalidation and targeted recovery use documented exceptions.",
+      "expected_output": "Continue delivery of independently verified findings and Ollie verdict after final context checks. A new human approval does not cancel the job or suppress findings. Preserve human state and refresh readiness.",
       "files": []
     },
     {
@@ -172,13 +172,13 @@
     {
       "id": 29,
       "prompt": "sweep https://github.com/acme/widgets; PR #7 receives Request Changes with one major and one minor inline finding, and PR #8 is skipped after its review decision becomes APPROVED",
-      "expected_output": "The console output is a concise, non-collapsible report titled `\ud83e\udda6 Review Orchestrator \u00b7 owner/repo`. Its plain-language outcome is followed by a `\ud83d\udcca Review Summary` with only nonzero exclusion reasons and final statuses, then brief linked PR cards. PR #7's card is headed `\u26a0\ufe0f Request Changes` and shows the review link, sanitized major/minor finding summary, outcome, and verification summary. PR #8's Skipped card shows only the changed-eligibility reason. A Follow-up section identifies the author action for #7 and explains that #8 needs no review.",
+      "expected_output": "The console output is a concise, non-collapsible report titled `🦦 Review Orchestrator · owner/repo`. Its plain-language outcome is followed by a `📊 Review Summary` with only nonzero exclusion reasons and final statuses, then brief linked PR cards. PR #7's card is headed `⚠️ Request Changes` and shows the review link, sanitized major/minor finding summary, outcome, and verification summary. PR #8's Skipped card shows only the changed-eligibility reason. A Follow-up section identifies the author action for #7 and explains that #8 needs no review.",
       "files": []
     },
     {
       "id": 30,
       "prompt": "review eligible PRs in https://github.com/acme/widgets; two workers are running for over a minute without completing",
-      "expected_output": "The user-visible response first confirms the sweep started and the full eligibility snapshot. It confirms a worker only after the host acknowledges its creation, then, while either job remains running or queued, emits a progress heartbeat at least every 30 seconds under `Review Orchestrator &middot; \ud83e\udda6 Heartbeat &middot; owner/repo`. The heartbeat reports elapsed time and actual eligible, started, remaining, running, queued, and terminal-status counts, and may list only PR numbers for active work. It explicitly says there has been no terminal update when that is true; it does not expose worker prompts, raw output, findings, titles, or infer an unobserved review stage from elapsed time.",
+      "expected_output": "The user-visible response first confirms the sweep started and the full eligibility snapshot. It confirms a worker only after the host acknowledges its creation, then, while either job remains running or queued, emits a progress heartbeat at least every 30 seconds under `Review Orchestrator &middot; 🦦 Heartbeat &middot; owner/repo`. The heartbeat reports elapsed time and actual eligible, started, remaining, running, queued, and terminal-status counts, and may list only PR numbers for active work. It explicitly says there has been no terminal update when that is true; it does not expose worker prompts, raw output, findings, titles, or infer an unobserved review stage from elapsed time.",
       "files": []
     },
     {
@@ -208,7 +208,7 @@
     {
       "id": 36,
       "prompt": "scan https://github.com/acme/widgets; the repository requires two approvals, PR #36 already has one approval from a human reviewer, and reviewDecision is still REVIEW_REQUIRED",
-      "expected_output": "PR #36 stays eligible. The host decision REVIEW_REQUIRED is the source of truth: an individual human approval that has not satisfied the required count never excludes a PR. A fresh worker runs otterbot-review with the full finding set, and the worker's pre-delivery gate passes for the same reason unless the decision changes to APPROVED or CHANGES_REQUESTED before delivery.",
+      "expected_output": "A partial human approval does not exclude the PR, and neither would a completed approval or rejection. Run the independent review under ordinary eligibility and freshness rules; report host review requirements separately.",
       "files": []
     },
     {
