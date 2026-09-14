@@ -50,8 +50,9 @@ inputs; the coordinator maps verified evidence into its flags:
   decision may be Review passed until Ollie's own approval is delivered.
 
 Use the result to choose delivery. After transitions, reevaluate readiness with
-observed host state; update the root readiness and links in one bounded edit
-when supported. Never overwrite failure reasons with a generic clean message.
+observed host state; update ollie-state and Advisory Findings links in one
+bounded root edit when supported. Never overwrite failure reasons with a
+generic clean message.
 
 ## Persistent state
 

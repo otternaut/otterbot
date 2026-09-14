@@ -10,8 +10,6 @@ root explains the verdict, indexes history and shows any overflow findings.
 
 **<🚢|💬|⚠️> Ollie's Verdict &middot; <Ship It|Comment Only|Request Changes>**
 
-**Readiness:** <Review passed|Waiting|Blocked|Ready to merge>
-
 <Two sentences explaining the verdict, evidence, and actionable holds.>
 
 <details>

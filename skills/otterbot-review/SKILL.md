@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Ollie the otter reviews PRs and local diffs for evidenced bugs, posts concise inline findings with a verdict, and handles incremental re-reviews. Use for "review this PR", "review my diff", "re-review", a pull-request URL, or a merge-readiness call. Supports GitHub, GitLab, Bitbucket, and similar hosts.
-version: 4.3.0
+version: 4.3.1
 ---
 
 # Otterbot Review &middot; Ollie
@@ -199,7 +199,7 @@ edits/retries and the guide links on inline comments/replies.
 Refresh head, target/base/integration and mutable gates before submission.
 Never relabel analysis with a moved head or restart in a loop. Batch root and
 inline findings where supported; reconcile Ollie's own stale review states,
-verify delivery/effective state once, and back-fill links/readiness in one
+verify delivery/effective state once, and back-fill links in one
 bounded root update using `hosts.md`. Detected invalid approval is withdrawn;
 never claim uncertain delivery or recovery succeeded. Reserve time for these
 steps; an exhausted analysis budget cannot bypass them.
