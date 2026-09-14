@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Ollie the otter reviews PRs and local diffs for evidenced bugs, posts concise inline findings with a verdict, and handles incremental re-reviews. Use for "review this PR", "review my diff", "re-review", a pull-request URL, or a merge-readiness call. Supports GitHub, GitLab, Bitbucket, and similar hosts.
-version: 5.0.0
+version: 5.1.0
 ---
 
 # Otterbot Review &middot; Ollie
@@ -200,7 +200,8 @@ Root blurb normally at most 60 words; inline prose 100, excluding markers,
 code, advisory index and footer. Replies are one or two sentences plus footer.
 Use `format.md` templates. Retain the collapsible **Advisory Findings** index
 of all current and historical Ollie findings, original links and current
-statuses; visible overflow includes evidence and fix. Generate it from retained
+statuses, grouped with status dots and counts per `format.md`; visible overflow
+includes evidence and fix. Generate it from retained
 records, not repeated rereading of history. Omit only when there are no findings.
 Batch random phrase selection for prepared new comments; preserve phrases on
 edits/retries and the guide links on inline comments/replies.

@@ -13,9 +13,11 @@ root explains the verdict, indexes history and shows any overflow findings.
 <Two sentences explaining the verdict, evidence, and actionable holds.>
 
 <details>
-<summary>Advisory Findings &middot; <count or status tally></summary>
+<summary>Advisory Findings &middot; <colored status tally></summary>
 
-- **<category>(<level>)** &middot; [<short summary>](<original-thread-url>) &middot; <status for a prior finding>
+**<status dot> <status label> &middot; <count>**
+
+- **<category>(<level>)** &middot; [<short summary>](<original-thread-url>) &middot; <fix SHA or relevant status detail, when known>
 
 </details>
 
@@ -53,9 +55,48 @@ limit. Prior findings and verified overflow can also affect the approval count.
 Keep overflow evidence and fixes visible; preserve the supplementary ledger from `approval.md` in the root,
 including during link back-fill; do not invent thread links for its entries.
 
-On an initial review the summary shows the finding count. On re-review use
-nonzero status counts, for example `2 fixed &middot; 1 still open &middot; 1
-new`. Counts must match the entries. Use known prior thread URLs immediately;
+Group entries by current status, with active findings first, in this order:
+🟠 **Open**, 🔵 **New**, 🟡 **Deferred**, 🟢 **Fixed**, 🟣 **Accepted**,
+⚪ **Superseded**, ⚪ **Withdrawn**. Omit empty groups. Open displays the
+existing `still open` status; New is for findings first raised this round.
+These are display labels, not changes to stored statuses or approval rules.
+Keep each finding in exactly one group; a regressed finding returns to Open.
+Fixed entries retain their verified fix SHA when known. Accepted, superseded
+and withdrawn findings keep separate groups and must not be labeled fixed.
+
+Use colored dots only for status group labels and the summary in this index;
+keep category/level as text on entries. Inline comments retain their severity
+dots. Always pair a status dot with its text label so color is not the only cue.
+
+The collapsed summary shows nonzero status counts in group order, including
+on initial review (for example `🔵 3 new`). Counts must match the entries.
+When every finding is verified fixed, use `🟢 All <count> findings fixed`
+(singular `finding` for one); retain the Fixed group and original links inside.
+For mixed statuses, use the tally even if no findings remain open.
+
+Example with known thread links (the URLs below are placeholders):
+
+```markdown
+<details>
+<summary>Advisory Findings &middot; 🟠 1 open &middot; 🟡 1 deferred &middot; 🟢 2 fixed</summary>
+
+**🟠 Open &middot; 1**
+
+- **correctness(major)** &middot; [Missing retry limit](<original-thread-url>)
+
+**🟡 Deferred &middot; 1**
+
+- **observability(minor)** &middot; [Missing timeout logging](<original-thread-url>)
+
+**🟢 Fixed &middot; 2**
+
+- **correctness(minor)** &middot; [Missing null guard](<original-thread-url>) &middot; fixed in `a1b2c3d`
+- **reliability(major)** &middot; [Duplicate event delivery](<original-thread-url>) &middot; fixed in `e4f5a6b`
+
+</details>
+```
+
+Use known prior thread URLs immediately;
 new findings temporarily use plain `file:line` text until delivery returns
 URLs. Never invent a link. Back-fill all new links in one root edit as described
 in `hosts.md`; if unsupported or unsuccessful retain locations and disclose
