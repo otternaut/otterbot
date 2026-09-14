@@ -19,15 +19,13 @@ do not substitute ✅ or another success icon, including on edits and retries.
 <Two sentences explaining the verdict, evidence, and actionable holds.>
 
 <details>
-<summary>Advisory Findings &middot; <colored status tally></summary>
+<summary>Advisory Findings &nbsp; <colored status tally></summary>
 
 <br>
 
-> **<status dot> <lowercase status label> · <level>(<category>)**
->
-> **[<short summary>](<original-thread-url>)**
->
-> `<file>:<line>`
+> <sub>**<status dot> <lowercase status label> · <severity dot> <category>(<level>)**</sub>
+> <sub>[<short summary>](<original-thread-url>)</sub>
+> <sub>`<file>:<line>`</sub>
 
 </details>
 
@@ -88,15 +86,15 @@ Open. Fixed entries retain their verified fix SHA when known. Accepted,
 superseded and withdrawn findings retain their own status and must not be
 labeled fixed.
 
-Start each blockquote with
-`**<status dot> <lowercase status label> · <level>(<category>)**`
-(for example `**🔵 new · major(correctness)**`), then a quoted blank line (`>`),
-then the bold linked title. Bold the entire first line, including the status
-and `level(category)`. Lowercase all entry status labels and use plain emoji dots
-without subscript formatting. Keep summary dots as shown below. Use
-colored dots only for status in this index and its collapsed summary; inline
-comments retain their severity dots. Always pair an entry's status dot with
-its label. Use normal spaces and Markdown paragraphs so content can wrap
+Use three consecutive blockquoted `<sub>` lines per finding: a bold status line,
+a linked short summary, then a code-formatted file reference. The status line is
+`**<status dot> <lowercase status label> · <severity dot> <category>(<level>)**`
+(for example `**🔵 new · 🟠 correctness(major)**`). The first dot denotes
+status; the second denotes severity: 🔴 critical, 🟠 major, 🟡 minor or 🔵
+nitpick. Lowercase all entry status labels and use plain emoji dots without
+subscript formatting. Keep summary dots as shown below. The collapsed summary
+uses status dots only. Always pair an entry's status dot with its label. Use
+normal spaces and Markdown paragraphs so content can wrap
 naturally; no non-breaking spaces, HTML line breaks within entries or custom
 CSS. The single `<br>` below the section title is only a spacer.
 
@@ -104,18 +102,18 @@ For fixed entries with a verified fix SHA, append `` · fixed in `<sha>` `` to
 the first line, inside its bold formatting, as shown below. Omit this suffix
 when the fix SHA is unknown; do not repeat it below the title.
 
-Every entry follows this order: bold status line, description, file reference.
-Use the bold linked short summary as the description; include any necessary
-status note in that description. End with a code-formatted `file:line`
-reference, separated by a quoted blank line. Retain this reference after
-thread links are back-filled. For historical findings, reuse the original
-location; if unavailable, say “File reference unavailable” rather than invent
-one. For threadless overflow, use a plain bold summary and include the stable
-ID, trigger/consequence and fix in the description, with the supporting code
-reference last. Prefix every paragraph and blank line within an entry with `>`.
+Every entry follows this order: bold status line, linked description, file
+reference. Include any necessary status note in the linked description. Retain
+this reference after thread links are back-filled. For historical findings,
+reuse the original location; if unavailable, say “File reference unavailable”
+rather than invent one. For threadless overflow, use a plain summary and
+include the stable ID, trigger/consequence and fix in the description, with the
+supporting code reference last. Prefix all three lines with `> ` and wrap each
+line in `<sub>`.
 
-The collapsed summary shows nonzero status counts in entry order, including
-on initial review (for example `🔵 3 new`). Counts must match the entries.
+The collapsed summary starts with `Advisory Findings &nbsp;` and shows nonzero
+status counts in entry order, separated with `&nbsp;` (for example
+`<summary>Advisory Findings &nbsp; 🔵 1 new</summary>`). Counts must match the entries.
 When every finding is verified fixed, use `🟢 All <count> findings fixed`
 (singular `finding` for one); retain the Fixed entries and original links inside.
 For mixed statuses, use the tally even if no findings remain open.
@@ -124,39 +122,31 @@ Example with known thread links (the URLs below are placeholders):
 
 ```markdown
 <details>
-<summary>Advisory Findings &middot; 🟠 1 open &middot; 🟡 1 deferred &middot; 🟢 2 fixed</summary>
+<summary>Advisory Findings &nbsp; 🟠 1 open &nbsp; 🟡 1 deferred &nbsp; 🟢 2 fixed</summary>
 
 <br>
 
-> **🟠 open · major(correctness)**
->
-> **[Missing retry limit](<original-thread-url>)**
->
-> `src/jobs/worker.ts:84`
+> <sub>**🟠 open · 🟠 correctness(major)**</sub>
+> <sub>[Missing retry limit](<original-thread-url>)</sub>
+> <sub>`src/jobs/worker.ts:84`</sub>
 
 ---
 
-> **🟡 deferred · minor(observability)**
->
-> **[Missing timeout logging](<original-thread-url>)** — awaiting logging follow-up.
->
-> `src/network/client.ts:112`
+> <sub>**🟡 deferred · 🟡 observability(minor)**</sub>
+> <sub>[Missing timeout logging](<original-thread-url>) — awaiting logging follow-up.</sub>
+> <sub>`src/network/client.ts:112`</sub>
 
 ---
 
-> **🟢 fixed · minor(correctness) · fixed in `a1b2c3d`**
->
-> **[Missing null guard](<original-thread-url>)**
->
-> `src/users/profile.ts:37`
+> <sub>**🟢 fixed · 🟡 correctness(minor) · fixed in `a1b2c3d`**</sub>
+> <sub>[Missing null guard](<original-thread-url>)</sub>
+> <sub>`src/users/profile.ts:37`</sub>
 
 ---
 
-> **🟢 fixed · major(reliability) · fixed in `e4f5a6b`**
->
-> **[Duplicate event delivery](<original-thread-url>)**
->
-> `src/events/consumer.ts:96`
+> <sub>**🟢 fixed · 🟠 reliability(major) · fixed in `e4f5a6b`**</sub>
+> <sub>[Duplicate event delivery](<original-thread-url>)</sub>
+> <sub>`src/events/consumer.ts:96`</sub>
 
 </details>
 ```
