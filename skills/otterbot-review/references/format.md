@@ -15,9 +15,9 @@ root explains the verdict, indexes history and shows any overflow findings.
 <details>
 <summary>Advisory Findings &middot; <colored status tally></summary>
 
-**<status dot> <status label> &middot; <count>**
-
-- **<category>(<level>)** &middot; [<short summary>](<original-thread-url>) &middot; <fix SHA or relevant status detail, when known>
+| Status | Finding | Details |
+|---|---|---|
+| <status dot>&nbsp;<status label> | <sub><category> · <level></sub><br>**[<short summary>](<original-thread-url>)** | <fix SHA or relevant status detail; — if none> |
 
 </details>
 
@@ -36,7 +36,7 @@ use extra words only when essential. For Request Changes, `gate: -` means
 blockers decided the verdict before approval was considered. The collapsible `Advisory Findings` section is required whenever Ollie has
 current or prior findings on the PR, including a clean re-review with only
 resolved findings. Omit it when there are none; never render a zero-findings
-section. Keep the blank line after `</summary>` so bullets render correctly.
+section. Keep the blank line after `</summary>` so the table renders correctly.
 
 Include each distinct Ollie finding once, linking to its original thread
 when one exists. Overflow findings without threads are visible entries with
@@ -55,23 +55,35 @@ limit. Prior findings and verified overflow can also affect the approval count.
 Keep overflow evidence and fixes visible; preserve the supplementary ledger from `approval.md` in the root,
 including during link back-fill; do not invent thread links for its entries.
 
-Group entries by current status, with active findings first, in this order:
+Use one table with columns **Status**, **Finding**, **Details**, in that order.
+Sort rows by current status, with active findings first, in this order:
 🟠 **Open**, 🔵 **New**, 🟡 **Deferred**, 🟢 **Fixed**, 🟣 **Accepted**,
-⚪ **Superseded**, ⚪ **Withdrawn**. Omit empty groups. Open displays the
-existing `still open` status; New is for findings first raised this round.
+⚪ **Superseded**, ⚪ **Withdrawn**. Do not add status headings or count rows.
+Open displays the existing `still open` status; New is for findings first
+raised this round.
 These are display labels, not changes to stored statuses or approval rules.
-Keep each finding in exactly one group; a regressed finding returns to Open.
+Keep each finding in exactly one row; a regressed finding returns to Open.
 Fixed entries retain their verified fix SHA when known. Accepted, superseded
-and withdrawn findings keep separate groups and must not be labeled fixed.
+and withdrawn findings retain their own status and must not be labeled fixed.
 
-Use colored dots only for status group labels and the summary in this index;
-keep category/level as text on entries. Inline comments retain their severity
-dots. Always pair a status dot with its text label so color is not the only cue.
+Use colored dots only in the Status column and collapsed summary; inline
+comments retain their severity dots. Always pair a status dot with its label.
+Replace every space within a Status cell with `&nbsp;`, including between the
+dot and label and within multiword labels. This lets the column size to its
+longest unbroken status without a fixed width; do not rely on custom CSS in
+host comments. Renderer overrides may still affect wrapping.
 
-The collapsed summary shows nonzero status counts in group order, including
+In Finding, put `<sub><category> · <level></sub>` above the bold linked title,
+separated by `<br>`. Put fix SHAs and relevant status notes in Details; use `—`
+when there is no additional detail, rather than repeating the status. For
+threadless overflow, use a plain bold title and retain the stable ID, code
+reference, trigger/consequence and fix visibly in the row. Escape literal
+pipes in cell content as `\|` and use `<br>` for line breaks within cells.
+
+The collapsed summary shows nonzero status counts in row order, including
 on initial review (for example `🔵 3 new`). Counts must match the entries.
 When every finding is verified fixed, use `🟢 All <count> findings fixed`
-(singular `finding` for one); retain the Fixed group and original links inside.
+(singular `finding` for one); retain the Fixed rows and original links inside.
 For mixed statuses, use the tally even if no findings remain open.
 
 Example with known thread links (the URLs below are placeholders):
@@ -80,18 +92,12 @@ Example with known thread links (the URLs below are placeholders):
 <details>
 <summary>Advisory Findings &middot; 🟠 1 open &middot; 🟡 1 deferred &middot; 🟢 2 fixed</summary>
 
-**🟠 Open &middot; 1**
-
-- **correctness(major)** &middot; [Missing retry limit](<original-thread-url>)
-
-**🟡 Deferred &middot; 1**
-
-- **observability(minor)** &middot; [Missing timeout logging](<original-thread-url>)
-
-**🟢 Fixed &middot; 2**
-
-- **correctness(minor)** &middot; [Missing null guard](<original-thread-url>) &middot; fixed in `a1b2c3d`
-- **reliability(major)** &middot; [Duplicate event delivery](<original-thread-url>) &middot; fixed in `e4f5a6b`
+| Status | Finding | Details |
+|---|---|---|
+| 🟠&nbsp;Open | <sub>correctness · major</sub><br>**[Missing retry limit](<original-thread-url>)** | — |
+| 🟡&nbsp;Deferred | <sub>observability · minor</sub><br>**[Missing timeout logging](<original-thread-url>)** | Awaiting logging follow-up. |
+| 🟢&nbsp;Fixed | <sub>correctness · minor</sub><br>**[Missing null guard](<original-thread-url>)** | Fixed in `a1b2c3d` |
+| 🟢&nbsp;Fixed | <sub>reliability · major</sub><br>**[Duplicate event delivery](<original-thread-url>)** | Fixed in `e4f5a6b` |
 
 </details>
 ```

@@ -3,9 +3,11 @@
 Ollie 🦦 leaves a concise first-pass review with evidenced bugs and concrete
 fixes. Findings are inline or visibly summarized under Advisory Findings; the root explains the verdict in about two
 sentences. A collapsible **Advisory Findings** section links to each current
-and prior Ollie finding, grouped by status with active items first:
+and prior Ollie finding in a Status / Finding / Details table. Category and
+severity sit above each linked title; status labels use non-breaking spaces.
+Rows are sorted by status with active items first:
 🟠 Open, 🔵 New, 🟡 Deferred, 🟢 Fixed, 🟣 Accepted, ⚪ Superseded and
-⚪ Withdrawn. The collapsed summary shows counts for each nonempty group;
+⚪ Withdrawn. The collapsed summary shows counts for each nonzero status;
 when all findings are verified fixed, it says **🟢 All N findings fixed**.
 Fixed entries show the fix commit when known and retain their original links.
 Dots indicate status here; inline dots indicate severity. It is omitted only

@@ -304,7 +304,7 @@
     {
       "id": 51,
       "prompt": "Re-review a clean PR with two fixed and one withdrawn prior Ollie findings; no new findings",
-      "expected_output": "Render Advisory Findings with all three original thread links and accurate fixed/withdrawn statuses and tally. Do not omit the section because nothing is open. No new inline findings or redundant thread replies. Preserve footer; no link edit if prior URLs are known. Use separate 🟢 Fixed and ⚪ Withdrawn groups with matching colored summary counts; never claim all findings fixed when one is withdrawn.",
+      "expected_output": "Render Advisory Findings with all three original thread links and accurate fixed/withdrawn statuses and tally. Do not omit the section because nothing is open. No new inline findings or redundant thread replies. Preserve footer; no link edit if prior URLs are known. Use separate 🟢 Fixed and ⚪ Withdrawn rows in a Status / Finding / Details table with matching colored summary counts; never claim all findings fixed when one is withdrawn.",
       "files": []
     },
     {
@@ -906,13 +906,13 @@
     {
       "id": 150,
       "prompt": "Re-review a PR whose only two Ollie findings are now verified fixed in commits a1b2c3d and e4f5a6b. Both original thread URLs are known.",
-      "expected_output": "Keep the collapsible Advisory Findings section with summary 🟢 All 2 findings fixed and one 🟢 Fixed group of two entries. Preserve each original thread link and verified fix SHA, omit empty groups and severity dots from index entries, and retain the root footer. No redundant replies or invented URLs.",
+      "expected_output": "Keep the collapsible Advisory Findings section with summary 🟢 All 2 findings fixed and a Status / Finding / Details table of two 🟢 Fixed rows. Preserve each original thread link and verified fix SHA, use non-breaking spaces throughout status cells and category/level in sub above each bold linked title; omit status headings and severity dots, and retain the root footer. No redundant replies or invented URLs.",
       "files": []
     },
     {
       "id": 151,
       "prompt": "Render a re-review index with one still-open regressed critical, one new minor, one deferred minor, one fixed minor, one accepted finding, one superseded finding and one withdrawn finding. The deferred minor is visible overflow without a thread; all other original URLs are known.",
-      "expected_output": "Render seven distinct entries in 🟠 Open, 🔵 New, 🟡 Deferred, 🟢 Fixed, 🟣 Accepted, ⚪ Superseded and ⚪ Withdrawn groups in that order, with matching nonzero colored summary counts. Preserve original links including the regressed critical, fix SHA when known and visible overflow ID, code evidence, consequence and fix without inventing a thread URL. Pair dots with status text, keep severity textual in the index, and preserve ledger and approval counting rules.",
+      "expected_output": "Render seven distinct rows in one Status / Finding / Details table, sorted 🟠 Open, 🔵 New, 🟡 Deferred, 🟢 Fixed, 🟣 Accepted, ⚪ Superseded and ⚪ Withdrawn in that order, with matching nonzero colored summary counts. Preserve original links including the regressed critical, fix SHA when known and visible overflow ID, code evidence, consequence and fix without inventing a thread URL. Use &nbsp; for every space in status cells, including the dot-label separator; place category and severity in sub above the bold title with br, omit repeated status headings, use — for absent details, and preserve ledger and approval counting rules.",
       "files": []
     }
   ]
