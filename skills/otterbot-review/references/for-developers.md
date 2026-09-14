@@ -120,7 +120,9 @@ Conflicted PRs wait for resolution. Unchanged content skips another review.
 approvals, rejections and comments never suppress review or new findings.
 Ollie discovers and verifies its own candidates before checking existing
 threads for duplicate posts. Its verdict follows its own evidence; host review
-requirements affect merge readiness separately. Failing or pending relevant checks permit approval
+requirements affect merge readiness separately. Ollie performs and publishes
+the review regardless of whether CI/CD is queued, running, finished or
+unavailable. Failing or pending relevant checks permit approval
 only when Ollie confirms those exact checks prevent merging on the target
 branch, and no demonstrated defect or independent evidence gap remains.
 Unknown enforcement means Comment Only. Unrelated optional checks do not

@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Ollie the otter reviews PRs and local diffs for evidenced bugs, posts concise inline findings with a verdict, and handles incremental re-reviews. Use for "review this PR", "review my diff", "re-review", a pull-request URL, or a merge-readiness call. Supports GitHub, GitLab, Bitbucket, and similar hosts.
-version: 5.1.1
+version: 5.1.2
 ---
 
 # Otterbot Review &middot; Ollie
@@ -73,8 +73,13 @@ latest parsed state. Mutable gates still need delivery-time revalidation.
 
 Merge conflicts prevent approval. Replies and stale-state cleanup may proceed.
 Other reviewers' approvals, rejections and comments do not limit review scope,
-suppress new findings or determine Ollie's verdict. Failing checks do not stop
-review. Host review requirements affect merge readiness separately.
+suppress new findings or determine Ollie's verdict. CI/CD status never blocks
+starting, completing or publishing the code review: queued, pending, running,
+failed, missing or unavailable workflows/checks are not review prerequisites.
+Review the available code and evidence now; do not wait, poll or defer delivery
+until workflows finish. Apply check status only to approval and merge readiness
+under `verification.md`, naming any specific evidence gaps. Host review
+requirements affect merge readiness separately.
 
 ## Integrated review
 

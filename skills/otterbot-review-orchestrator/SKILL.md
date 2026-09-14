@@ -1,7 +1,7 @@
 ---
 name: otterbot-review-orchestrator
 description: Sweeps a GitHub repository for new code reviews, incomplete-review recovery, and changed-evidence gate reassessments, using one isolated Ollie worker per eligible PR. Handles changed base context, comments and CI evidence without requiring a new PR commit, preserves human review decisions, and reports review verdict separately from merge readiness. Use for otterbot-review-orchestrator or otterbot-review-pipeline with a repository URL, a repository-wide PR review sweep, or trusted review automation events.
-version: 4.0.0
+version: 4.0.1
 ---
 
 # Otterbot Review Orchestrator
@@ -99,6 +99,15 @@ inside the fixed 14-day window. APPROVED, CHANGES_REQUESTED, REVIEW_REQUIRED
 and absent review decisions do not exclude a PR: other reviews cannot suppress
 Ollie's independent review or new findings. Preserve other reviewers' host
 states; their effect on merge eligibility is reported separately as readiness.
+
+CI/CD status is not an eligibility or dispatch gate. Schedule otherwise
+eligible code reviews while workflows/checks are queued, pending, running,
+failed, missing or unavailable; never wait for completion before creating a
+worker. Unavailable check metadata alone does not prevent classifying a new
+or incomplete code review. Pass known status and uncertainty to the worker,
+which reviews and publishes now and applies CI gates only to approval and
+merge readiness. A later check result can trigger gate reassessment using
+completed code coverage.
 
 For context or gate jobs on PRs Ollie already reviewed, changed evidenced inputs
 or incomplete delivery justify a worker even on unchanged heads, with human

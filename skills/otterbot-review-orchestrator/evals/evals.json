@@ -276,6 +276,18 @@
       "prompt": "A paused PR has the same head but its stored review policy revision differs from the trusted current policy.",
       "expected_output": "Route policy reassessment and affected verification, preserving independent valid evidence. A paused investigation cannot suppress policy invalidation.",
       "files": []
+    },
+    {
+      "id": 47,
+      "prompt": "Sweep https://github.com/acme/widgets. Three otherwise eligible new PRs have required tests running, deployment queued, and a failed workflow respectively.",
+      "expected_output": "Classify all three as code-review and dispatch an isolated worker for each within concurrency limits. CI/CD state excludes none and does not delay dispatch. Workers publish reviews now; check status affects approval and readiness separately.",
+      "files": []
+    },
+    {
+      "id": 48,
+      "prompt": "Sweep https://github.com/acme/widgets. An otherwise eligible PR has incomplete code coverage and accessible head/base metadata, but its checks API is unavailable.",
+      "expected_output": "Route coverage recovery and dispatch a worker with explicit CI uncertainty. Missing check metadata alone must not exclude or postpone code review. Worker publishes available findings and actual coverage, withholding unsupported approval/readiness claims.",
+      "files": []
     }
   ]
 }

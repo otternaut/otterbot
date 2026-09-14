@@ -914,6 +914,24 @@
       "prompt": "Render a re-review index with one still-open regressed critical, one new minor, one deferred minor, one fixed minor, one accepted finding, one superseded finding and one withdrawn finding. The deferred minor is visible overflow without a thread; all other original URLs are known.",
       "expected_output": "Render seven distinct rows in one Status / Finding / Details table, sorted 🟠 Open, 🔵 New, 🟡 Deferred, 🟢 Fixed, 🟣 Accepted, ⚪ Superseded and ⚪ Withdrawn in that order, with matching nonzero colored summary counts. Preserve original links including the regressed critical, fix SHA when known and visible overflow ID, code evidence, consequence and fix without inventing a thread URL. Use &nbsp; for every space in status cells, including the dot-label separator; place category and severity in sub above the bold title with br, omit repeated status headings, use — for absent details, and preserve ledger and approval counting rules.",
       "files": []
+    },
+    {
+      "id": 152,
+      "prompt": "Review a new PR while its required CI tests are in progress and deployment is queued. The diff contains a verifiable major bug.",
+      "expected_output": "Complete code inspection and publish Request Changes with the verified major now. Do not wait for workflows, poll checks, or defer findings delivery. Report outstanding CI separately and persist actual code coverage.",
+      "files": []
+    },
+    {
+      "id": 153,
+      "prompt": "Review a new PR while relevant CI is running and check enforcement cannot be verified. Code inspection completes with adequate direct behavior evidence and no findings.",
+      "expected_output": "Complete and publish the review now as Comment Only / Waiting under existing CI approval gates. Name the outstanding check and unknown enforcement, persist complete code coverage, and do not describe the code review as incomplete solely because CI is running. A later result permits gate reassessment without repeating completed inspection.",
+      "files": []
+    },
+    {
+      "id": 154,
+      "prompt": "Review a PR whose diff and head/base context are accessible but the checks API is unavailable.",
+      "expected_output": "Perform and publish the available code review without waiting for checks metadata. Report CI uncertainty separately; do not claim checks passed or merge readiness. Apply approval gates and persist actual inspected scope and any independent evidence gaps.",
+      "files": []
     }
   ]
 }

@@ -8,6 +8,9 @@ and reassessment sections only when applicable.
 **Approval gate.** Every rule must hold. A failure is named in the blurb and
 in the marker's `gate` field.
 
+These gates govern approval, not whether to perform or publish the review.
+Outstanding CI/CD workflows never delay code inspection or findings delivery.
+
 - Every requirement source the correctness depends on, such as a linked
   ticket or spec, was accessible and read.
 - No open Ollie finding above minor, and every prior Ollie critical or

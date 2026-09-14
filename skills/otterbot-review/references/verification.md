@@ -58,6 +58,12 @@ unresolved properties as verification holds rather than lowering the standard.
 
 ## CI decision
 
+These are approval and merge-readiness gates, never prerequisites for code
+review or delivery. Complete the available review and publish findings and a
+verdict even while CI/CD workflows are queued or running, or check metadata is
+unavailable. Report outstanding checks and specific evidence gaps without
+waiting for results; a CI hold does not mean code coverage is incomplete.
+
 Inspect check results for the reviewed head and their relevance to changed
 behavior. Branch protection/rulesets or host merge settings must be read only
 when approval would rely on them to hold a pending/failed check. Use effective
