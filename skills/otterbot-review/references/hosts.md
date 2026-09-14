@@ -9,8 +9,9 @@ use the listed fallback and say so in the conversation summary.
 ## Review states
 
 Select the verdict under `approval.md` before choosing the host operation.
-Benign comments accompany an approval. Any substantive non-approval reason
-requires Request Changes with a clear explanation; Comment Only is only an
+Benign comments accompany an approval. Human Review Needed carries the human-only
+hold defined in approval.md; other substantive non-approval reasons require
+Request Changes with a clear explanation. Comment Only is only an
 explicit opt-out for otherwise passing code. A host limitation can require a
 plain comment carrying the intended verdict; never mislabel it Comment Only.
 Ignore all CI/CD metadata during retrieval, submission and final verification.
@@ -31,7 +32,13 @@ findings or mark delivery complete while comments remain pending.
 | --- | --- | --- | --- |
 | Ship It | review event `APPROVE` | approve the merge request | approve the pull request |
 | Comment Only | `COMMENT` plus reconcile prior Ollie state | note plus reconcile prior Ollie state | comment plus reconcile prior Ollie state |
+| Human Review Needed | review event `REQUEST_CHANGES` with the 🧑‍⚖️ banner | same blocking action/fallback as Request Changes with the 🧑‍⚖️ banner | request changes with the 🧑‍⚖️ banner |
 | Request Changes | review event `REQUEST_CHANGES` | request changes where the version supports it; otherwise unapprove and post the root note | request changes |
+
+Human Review Needed uses the same blocking host operations and state transitions
+as Request Changes throughout this file; preserve `requires-human` in Ollie
+markers and reports. When the required current-head sign-off arrives, reassess
+all gates and clear/supersede Ollie's prior request before reporting approval.
 
 Where a host cannot express a state, post the root comment as a plain comment
 and state the limitation; the verdict banner already carries the verdict.

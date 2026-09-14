@@ -48,4 +48,7 @@ for blockers in 0 1; do
     --coverage incomplete --context current --evidence adequate --gates pass --no-approve)
   [[ "$result" == *'"verdict":"request-changes"'* ]]
 done
-printf '%s decision cases, 4 delivery cases and 4 invalid-input cases passed.\n'  "$count"
+result=$("$SKILL_ROOT/scripts/decide" --blockers 0 --minors 0 \
+  --coverage complete --context current --evidence adequate --gates human-required --no-approve)
+[[ "$result" == '{"verdict":"requires-human","readiness":"requires-human","reasons":["human_review_required"]}' ]]
+printf '%s decision cases, 5 delivery cases and 4 invalid-input cases passed.\n'  "$count"

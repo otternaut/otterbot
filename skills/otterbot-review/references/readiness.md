@@ -10,11 +10,14 @@ Do not assess merge eligibility or merge a PR as a side effect of this skill.
 Apply in order; every review input needs evidence or is unknown:
 
 1. Verified outstanding critical/major: Request Changes / Blocked.
-2. Incomplete review, stale/unknown context, any failed review gate or three
-   counted minors: Request Changes / Blocked. Name each unmet gate and what
+2. Complete review, current context, adequate evidence, no outstanding findings
+   and only an explicit required human review/sign-off missing: Human Review Needed
+   / Human Review Needed. Record the exact human action needed.
+3. Outside the human-only case above, incomplete review, stale/unknown context,
+   any failed review gate or three counted minors: Request Changes / Blocked. Name each unmet gate and what
    clears it; distinguish verification gaps from verified defects.
-3. All review gates pass: Ship It / Review passed, including benign comments.
-4. For an otherwise passing review only, explicit `--no-approve` selects
+4. All review gates pass: Ship It / Review passed, including benign comments.
+5. For an otherwise passing review only, explicit `--no-approve` selects
    Comment Only / Review passed. Explain the requested approval-action opt-out.
 
 `--shadow` leaves the hypothetical decision unchanged but prohibits every host
@@ -34,6 +37,12 @@ credentials or network state and trusts evidence established by the reviewer:
 - context: current only after verifying head, target/base and integration context.
 - evidence: adequate only after consequential-behavior verification.
 - gates: pass only when every other code-review gate passes, including sign-offs.
+  Use `human-required` only when an explicit required human review/sign-off is
+  the sole unmet gate; use hold/unknown for other failed/unverified gates.
+  The helper selects `requires-human` for both verdict and readiness only with
+  zero blockers/minors, complete coverage, current context and adequate evidence.
+  Any other outstanding finding also rules out this verdict; normalize that
+  combination as hold. Persist `readiness: "requires-human"` with a human hold.
 - no-approve: optional delivery opt-out, never a code-review gate.
 
 Legacy `--ci` and `--host` inputs are optional and ignored for compatibility;
@@ -48,7 +57,7 @@ Each root review includes an attributable `ollie-state` JSON marker alongside
 existing finding and approval markers. Schema version 1 fields:
 
 ```json
-{"schema":1,"policy_revision":"3","resume":{"input_key":"<relevant-input-digest>","position":"<remaining-scope-id>","no_progress_attempts":0,"last_attempt_id":"<unique-attempt-id-or-null>"},"head":"<sha>","target":"<branch>","base":"<sha>","integration":"<sha-or-null>","coverage":{"complete":false,"areas":[{"path":"<path>","status":"reviewed|excluded|incomplete","reason":"<scope or justified exclusion>","evidence":["<test/code reference>"]}]},"decision_key":"<stable digest of relevant gate inputs>","events":["<processed event id>"],"readiness":"blocked","holds":[{"kind":"defect|verification|human|context|delivery","reason":"<specific gap>","clears_when":"<observable acceptance condition>","owner":"author|ollie|authorized-reviewer","trigger":"<event causing reassessment>"}]}
+{"schema":1,"policy_revision":"4","resume":{"input_key":"<relevant-input-digest>","position":"<remaining-scope-id>","no_progress_attempts":0,"last_attempt_id":"<unique-attempt-id-or-null>"},"head":"<sha>","target":"<branch>","base":"<sha>","integration":"<sha-or-null>","coverage":{"complete":false,"areas":[{"path":"<path>","status":"reviewed|excluded|incomplete","reason":"<scope or justified exclusion>","evidence":["<test/code reference>"]}]},"decision_key":"<stable digest of relevant gate inputs>","events":["<processed event id>"],"readiness":"blocked","holds":[{"kind":"defect|verification|human|context|delivery","reason":"<specific gap>","clears_when":"<observable acceptance condition>","owner":"author|ollie|authorized-reviewer","trigger":"<event causing reassessment>"}]}
 ```
 
 Coverage areas may group tightly related files with an explicit path list.
@@ -70,12 +79,16 @@ older nonempty state. Retain visible history in Advisory Findings.
 
 ## Policy identity
 
-The current review policy revision is **3**. This is the authoritative value;
+The current review policy revision is **4**. This is the authoritative value;
 record it as `policy_revision` in every new root state. It is independent of
 the skill release version. Increment it when approval criteria, required
 verification, scope, evidence reuse or recovery semantics change. Phrase,
 formatting and wording-only changes do not increment it. A policy change must
 identify affected requirements here so existing evidence can be reassessed.
+Revision 4 distinguishes a completed review with no outstanding findings and
+only a required human review/sign-off missing as Human Review Needed. Reassess
+legacy human-only Request Changes holds using valid existing coverage; retain
+the blocking host action until the sign-off and all other gates pass.
 Revision 3 removes all CI/CD evidence, holds, freshness inputs and merge-readiness
 claims. Discard legacy CI-only holds without querying checks; reuse valid code
 coverage. Recalculate old Comment Only decisions: approve benign feedback when

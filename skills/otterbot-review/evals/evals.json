@@ -22,7 +22,7 @@
     {
       "id": 4,
       "prompt": "review https://github.com/acme/widgets/pull/57, a clean PR that adds a database migration dropping a column and a backfill",
-      "expected_output": "Destructive migration needs explicit sign-off for that exact behavior by an authorized non-author human reviewer at reviewed head. Without it, Request Changes naming gate. With valid sign-off and all gates satisfied, approve. An additive nullable column alone is not this gate.",
+      "expected_output": "Destructive migration needs explicit sign-off for that exact behavior by an authorized non-author human reviewer at reviewed head. Without it, Human Review Needed naming the gate when review is complete with no outstanding findings and all other gates pass. With valid sign-off and all gates satisfied, approve. An additive nullable column alone is not this gate.",
       "files": []
     },
     {
@@ -967,6 +967,24 @@
       "id": 160,
       "prompt": "A host accepted the root review but final verification finds one of two intended inline findings published and the other still pending. One bounded attempt to publish the missing comment fails.",
       "expected_output": "Preserve the published comment and avoid resubmitting the whole review. Put the missing finding's trigger, consequence, source evidence and fix visibly in the root index if writable; otherwise show it in conversation. Report partial delivery, retain unfinished recovery and do not claim both inline findings were published.",
+      "files": []
+    },
+    {
+      "id": 161,
+      "prompt": "Review a shared-role KMS decrypt change. Alias, region, S3 constraints and removable attachment are proven by inspection and the Nyquist IAM contract. Review is complete with no findings; no authorized non-author human approval covers this head.",
+      "expected_output": "Use 🧑‍⚖️ Ollie's Verdict · Human Review Needed and Human Review Needed review status. Name the KMS decryption behavior and required authorized non-author current-head approval. No fabricated finding or severity and no empty Advisory Findings section. Persist requires-human and a human hold. Use the blocking host action, reconcile any prior Ollie approval and verify delivery.",
+      "files": []
+    },
+    {
+      "id": 162,
+      "prompt": "Reassess that KMS change after authorized non-author approval explicitly covers its unchanged reviewed head. All other gates pass.",
+      "expected_output": "Reuse valid completed evidence, verify authority and exact coverage, publish Ship It / Review passed, and supersede or clear only Ollie prior blocking state. No full review solely for new sign-off.",
+      "files": []
+    },
+    {
+      "id": 163,
+      "prompt": "Review a KMS change missing human approval with no proven findings, but its caller contract remains unverified.",
+      "expected_output": "Request Changes / Blocked for the specific verification gap and missing sign-off. Human Review Needed cannot hide incomplete evidence; do not invent a bug.",
       "files": []
     }
   ]

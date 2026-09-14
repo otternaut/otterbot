@@ -288,6 +288,12 @@
       "prompt": "Sweep https://github.com/acme/widgets. An otherwise eligible PR has incomplete code coverage and accessible head/base metadata, but its checks API is unavailable.",
       "expected_output": "Route coverage recovery using accessible code-review metadata. Ignore checks API availability and pass no CI uncertainty. Worker decides from actual code coverage and independent evidence, explaining review gaps in Request Changes.",
       "files": []
+    },
+    {
+      "id": 49,
+      "prompt": "A worker delivers requires-human / requires-human for a complete KMS review with zero findings, missing authorized non-author sign-off, and verified host REQUEST_CHANGES.",
+      "expected_output": "Render 🧑‍⚖️ Human Review Needed in the delivered PR card and Human Review Needed review status, with the exact sign-off needed and delivered review link. Count job as Delivered. Do not relabel as Request Changes from the host event, invent findings, or include CI or merge eligibility.",
+      "files": []
     }
   ]
 }

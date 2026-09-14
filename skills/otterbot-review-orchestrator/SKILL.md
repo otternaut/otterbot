@@ -1,7 +1,7 @@
 ---
 name: otterbot-review-orchestrator
 description: Sweeps a GitHub repository for new code reviews, incomplete-review recovery, and changed-evidence gate reassessments, using one isolated Ollie worker per eligible PR. Handles changed base context, comments and code-review evidence without requiring a new PR commit, preserves human review decisions, and reports code-review verdicts and coverage. Use for otterbot-review-orchestrator or otterbot-review-pipeline with a repository URL, a repository-wide PR review sweep, or trusted review automation events.
-version: 5.0.0
+version: 5.1.1
 ---
 
 # Otterbot Review Orchestrator
@@ -216,7 +216,7 @@ Delivered / Blocked with Request Changes and the specific verification gap.
 
 Return only a concise completion envelope. Include the PR number and URL,
 current head SHA, status (Delivered, Shadow, No Review Needed, Skipped, Failed, or
-Uncertain), verdict and review status (Review passed or Blocked),
+Uncertain), verdict and review status (Review passed, Human Review Needed, or Blocked),
 job type, context/coverage status, and delivered or existing review URL/ID.
 Shadow results are hypothetical and include the local artifact path.
 For a delivered or shadow review, also include (shadow uses local artifact
@@ -417,7 +417,7 @@ Use this shape, omitting fields that are unavailable or do not apply:
 ```
 
 For delivered reviews, use Ollie's verdict emojis exactly: 🚢 **Ship It**,
-💬 **Comment Only**, and ⚠️ **Request Changes**. Do not use a generic
+💬 **Comment Only**, 🧑‍⚖️ **Human Review Needed**, and ⚠️ **Request Changes**. Do not use a generic
 `Delivered` label or `✅` on a delivered PR card. Use `⏭️`, `⏸️`, `❌`, and
 `⚠️` for No Review Needed, Skipped, Failed, and Uncertain respectively. In the
 queue, list only nonzero exclusion reasons and nonzero final statuses; omit the
@@ -433,8 +433,11 @@ Shadow cards use `🧪 Shadow` with the hypothetical verdict/review status and a
 local artifact link. They are terminal results but never Delivered. Every
 other delivered card includes code-review status, current head/base context
 and any review next action. Omit CI/CD and merge eligibility from all summaries.
-Benign feedback normally accompanies Ship It; a substantive non-approval reason
-requires Request Changes with an explanation under the review skill.
+Report a worker's human-only hold as 🧑‍⚖️ Human Review Needed, with the exact
+required human action and no invented finding. Preserve this verdict even
+when the underlying host event is REQUEST_CHANGES.
+Benign feedback normally accompanies Ship It; other substantive non-approval
+reasons require Request Changes with an explanation under the review skill.
 
 The report is a user-facing status update, not a log:
 

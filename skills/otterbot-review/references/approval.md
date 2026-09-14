@@ -51,14 +51,30 @@ CI/CD state is excluded from every approval decision and output.
 - The selected review scope was completed, and nothing in the verdict rests
   on an author assertion Ollie could not confirm in code.
 
-A failed code-review gate or incomplete assessment yields Request Changes.
+Use **🧑‍⚖️ Human Review Needed** when review coverage is complete, context is current,
+behavior has adequate evidence, no outstanding findings remain, and the only
+unmet gate is an explicitly required human review or sign-off. Name the
+behavior, who must review it, and the approval needed for the current head.
+Record a human hold, not a finding: do not assign severity, invent an inline
+defect, or add an empty Advisory Findings section. Historical resolved findings
+remain indexed. Do not invent a human-review requirement from uncertainty or
+an unrelated host reviewer quota.
+
+For example, inspected alias, region, S3 and removable-attachment constraints
+plus the Nyquist IAM contract can establish correctness, while granting a
+shared role KMS decryption still requires explicit approval covering this head
+from an authorized non-author human. With no outstanding findings or other
+gaps, that outcome is Human Review Needed.
+
+Outstanding findings, another failed code-review gate or incomplete assessment
+yield Request Changes when approval is withheld.
 Explain the specific defect, risk threshold or verification gap and what must
 change or be established to clear it. A verification gap is not a proven bug;
 do not invent a defect or severity to justify the verdict.
 
 Benign feedback accompanies Ship It when all gates pass. Never use Comment Only
-with a "Not approving because" explanation: convert that outcome to Request
-Changes. The explicit `--no-approve` option suppresses only a passing review's
+with a "Not approving because" explanation: select Human Review Needed for the
+human-only case above, otherwise Request Changes. The explicit `--no-approve` option suppresses only a passing review's
 approval action, yielding Comment Only / Review passed with a short explanation
 of the requested delivery mode. A host's inability to submit a verdict is a
 delivery limitation; retain the intended verdict in the banner.

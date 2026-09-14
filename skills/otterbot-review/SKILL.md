@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Ollie the otter reviews PRs and local diffs for evidenced bugs, posts concise inline findings with a verdict, and handles incremental re-reviews. Use for "review this PR", "review my diff", "re-review", a pull-request URL, or a code-review verdict request. Supports GitHub, GitLab, Bitbucket, and similar hosts.
-version: 6.0.9
+version: 6.1.1
 ---
 
 # Otterbot Review &middot; Ollie
@@ -162,7 +162,9 @@ approval gates pass.
 
 Use the authoritative **Approval gates** in `references/approval.md` for every
 host verdict. Request Changes takes precedence for verified blockers; otherwise
-failed review gates or incomplete assessment mean Request Changes, with the
+a completed review with no outstanding findings and only a required human
+review/sign-off missing means 🧑‍⚖️ Human Review Needed. Other failed review gates
+or incomplete assessment mean Request Changes, with the
 specific reason and what resolves it. Benign comments accompany Ship It when
 gates pass; Comment Only is reserved for an explicit approval-action opt-out.
 Never approve because time expired, the old findings were fixed, or the round count is high.
@@ -170,7 +172,8 @@ Never approve because time expired, the old findings were fixed, or the round co
 Use `references/readiness.md` and `scripts/decide` after establishing inputs;
 the helper calculates policy, not code correctness. If Bash is unavailable,
 apply the same table and disclose the fallback. Use **Review passed** for passing code reviews and **Blocked** for requests
-for changes. These describe only the review, never host merge eligibility.
+for changes, and **Human Review Needed** for the human-only hold. These describe
+only the review, never host merge eligibility.
 Local mode reports blocking findings or no blocking findings plus any gaps;
 it never claims host approval.
 

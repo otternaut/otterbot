@@ -22,7 +22,9 @@ Every comment keeps Ollie's otter footer and reviewed commit.
 ## What review status means
 
 **Review passed** means Ollie's code-review gates passed. **Blocked** means a
-review concern or verification gap needs resolution. Each request for changes
+review concern or verification gap needs resolution. **🧑‍⚖️ Human Review Needed**
+means no outstanding findings remain and only an explicitly required human
+review or sign-off is missing from an otherwise complete review. Each hold
 explains why approval is withheld and what clears it. This skill does not
 assess merge eligibility or report CI/CD status.
 
@@ -82,7 +84,10 @@ exact mechanical edits may include an applyable suggestion block.
 
 - **Ship It:** no open verified blockers, at most two counted minors that are
   demonstrably safe to address after merge, and every approval rule passed.
-- **Request Changes:** a blocker, three outstanding minors, failed review gate
+- **🧑‍⚖️ Human Review Needed:** no outstanding findings, complete verified review,
+  and only a required human review/sign-off missing. The root names who must
+  approve which behavior at this head; the host review remains blocking.
+- **Request Changes:** a blocker, three outstanding minors, other failed review gate
   or incomplete assessment prevents approval; the root explains what clears it.
 - **Comment Only:** an explicit `--no-approve` suppresses approval on otherwise
   passing code. Benign feedback normally accompanies Ship It and approval.

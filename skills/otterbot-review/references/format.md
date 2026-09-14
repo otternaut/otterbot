@@ -6,14 +6,15 @@ root explains the verdict, indexes history and shows any overflow findings.
 ## Root review
 
 Use the exact verdict banner mapping: **🚢 Ollie's Verdict &middot; Ship It**,
-**💬 Ollie's Verdict &middot; Comment Only**, or
+**💬 Ollie's Verdict &middot; Comment Only**,
+**🧑‍⚖️ Ollie's Verdict &middot; Human Review Needed**, or
 **⚠️ Ollie's Verdict &middot; Request Changes**. Ship It always uses 🚢;
 do not substitute ✅ or another success icon, including on edits and retries.
 
 ```markdown
-<!-- ollie-review: head: <full-sha>; base: <full-sha>; verdict: <ship-it|comment-only|request-changes>; gate: <pass|failed rules|->; round: <n> -->
+<!-- ollie-review: head: <full-sha>; base: <full-sha>; verdict: <ship-it|comment-only|requires-human|request-changes>; gate: <pass|failed rules|->; round: <n> -->
 
-**<🚢|💬|⚠️> Ollie's Verdict &middot; <Ship It|Comment Only|Request Changes>**
+**<🚢|💬|🧑‍⚖️|⚠️> Ollie's Verdict &middot; <Ship It|Comment Only|Human Review Needed|Request Changes>**
 
 <Two sentences explaining the verdict, evidence, and actionable holds.>
 
@@ -41,7 +42,9 @@ Replace the empty ledger with current outstanding overflow records from
 
 Normally keep the body within 60 words, excluding marker, banner, findings index and footer.
 Benign comments normally accompany Ship It and an approval. If approval is
-withheld for a review concern, use Request Changes and name the reason plus
+withheld solely for required human review with no outstanding findings and
+otherwise passing gates, use 🧑‍⚖️ Human Review Needed and name the exact approval
+needed. For other review concerns, use Request Changes and name the reason plus
 what clears it; distinguish verified bugs from incomplete verification.
 Comment Only is reserved for an explicit `--no-approve` on an otherwise passing
 review. Explain that delivery choice without suggesting a code-review failure.

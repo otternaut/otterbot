@@ -6,11 +6,12 @@ usage() {
   cat <<'EOF'
 Usage: decide --blockers N --minors N --coverage complete|incomplete|unknown
   --context current|stale|unknown --evidence adequate|inadequate|unknown
-  --gates pass|hold|unknown [--no-approve] [--dry-run]
+  --gates pass|human-required|hold|unknown [--no-approve] [--dry-run]
   [--ci ready|waiting|unknown] [--host ready|waiting|unknown]
 
 The six review fields are required; counts are distinct outstanding verified defects.
 Gates includes other code-review gates, never CI/CD or merge eligibility.
+human-required means only explicit human review/sign-off is missing.
 Legacy CI and host arguments are optional and ignored.
 --no-approve suppresses approval only for an otherwise passing review.
 Outputs JSON only. This helper trusts normalized inputs; it does not verify them.
@@ -33,7 +34,7 @@ while (($#)); do
       case "$key:$value" in
         blockers:*|minors:*)
           [[ "$value" =~ ^(0|[1-9][0-9]*)$ && ${#value} -le 6 ]] || fail "invalid count: $key" ;;
-        coverage:complete|coverage:incomplete|coverage:unknown|context:current|context:stale|context:unknown|evidence:adequate|evidence:inadequate|evidence:unknown|gates:pass|gates:hold|gates:unknown|ci:ready|ci:waiting|ci:unknown|host:ready|host:waiting|host:unknown) ;;
+        coverage:complete|coverage:incomplete|coverage:unknown|context:current|context:stale|context:unknown|evidence:adequate|evidence:inadequate|evidence:unknown|gates:pass|gates:human-required|gates:hold|gates:unknown|ci:ready|ci:waiting|ci:unknown|host:ready|host:waiting|host:unknown) ;;
         *) fail "invalid value: $key" ;;
       esac
       # Key is from the allowlist, value is validated; never evaluate input.
@@ -51,6 +52,11 @@ if ((blockers > 0)); then
   verdict=request-changes
   readiness=blocked
   reasons+=(verified_blockers)
+elif ((minors == 0)) && [[ "$coverage" == complete && "$context" == current &&
+  "$evidence" == adequate && "$gates" == human-required ]]; then
+  verdict=requires-human
+  readiness=requires-human
+  reasons+=(human_review_required)
 else
   [[ "$coverage" == complete ]] || reasons+=(incomplete_coverage)
   [[ "$context" == current ]] || reasons+=(unverified_context)
