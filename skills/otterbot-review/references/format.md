@@ -167,67 +167,62 @@ the limitation. Preserve the conditional root footer rule during link back-fill.
 <!-- ollie-finding: <root-cause-slug>; level: <level>; category: <category>; head: <full-sha> -->
 <dot> **<category>(<level>)** &middot; <short behavioral summary>
 
-### Ollie’s Concern
+#### Ollie’s Concern
 
 <Reachable trigger, incorrect behavior and concrete user/caller impact.>
 
-### Supporting Evidence
+#### Supporting Evidence
 
 - <Linked file:line and symbol> — <observed fact and what it proves.>
 - <Additional decisive location when needed> — <next causal step.>
 
-### Suggested Fix
+#### Suggested Fix
 
 <Concrete change, affected components and essential implementation constraints.>
 
-**Verify:** <Failure scenario that must stop and valid behavior to preserve.>
+**Verify** &middot; <Failure scenario that must stop and valid behavior to preserve.>
 
 <sub>🦦 Ollie reviewed `<short-sha>` &middot; <phrase> &middot; [how Ollie reviews](<developer-guide-url>)</sub>
 ```
 
-Keep all three headings and their contents visible, without heading emojis or
-mandatory disclosures. Preserve the category/severity header, finding marker,
-reviewed commit and existing otter tagline/footer. The title summarizes the
-behavioral failure; Ollie’s Concern gives enough context to understand it
-without opening every evidence link. Explain the trigger, actual versus
-expected behavior and concrete impact in a short paragraph, normally 1–2
-sentences. Do not repeat the same consequence in each section.
+Keep all three headings and their contents visible at `####`, without heading
+emojis or mandatory disclosures. Preserve the category/severity header,
+finding marker, reviewed commit and existing otter tagline/footer.
 
-Supporting Evidence normally uses 1–3 bullets, with more when the causal chain
-requires them. Each bullet pairs an exact source location and relevant symbol
-with the fact it establishes. Use links pinned to the reviewed commit where
-supported, or precise file:line references locally. Cover the decisive path
-from trigger through faulty behavior to consequence, including cross-file
-callers or lifecycle transitions when they are necessary to prove reachability.
-A list of filenames, identifiers or unsupported assertions is not evidence.
-For a claimed missing guard/reset, cite the relevant inspected path and explain
-why it allows the failure. Include a short code excerpt, concrete input/output,
-or executed test result only when it materially strengthens the explanation.
+Ollie’s Concern is one sentence, two only when the trigger needs setup: the
+reachable trigger, the wrong behavior and who it affects. The title already
+names the failure, so do not restate it, and do not repeat the same consequence
+under a later heading.
+
+Supporting Evidence is normally 1–2 bullets, at most 3 when the causal chain
+needs them, one line each. Each bullet pairs an exact location and symbol with
+the fact it proves — links pinned to the reviewed commit where supported, or
+precise file:line references locally. Cover only the decisive steps from
+trigger to consequence, including a cross-file caller or lifecycle transition
+when that is what proves reachability. Filenames, identifiers and unsupported
+assertions are not evidence; for a claimed missing guard/reset, cite the path
+inspected and say why it allows the failure. Add a short excerpt, concrete
+input/output or executed test result only when prose cannot carry the proof.
 Never invent locations or results; distinguish code inspection, observed
-execution and proposed checks. State material assumptions and investigate
-missing causal links before publishing the claim.
+execution and proposed checks, and state material assumptions.
 
-Suggested Fix should normally be one paragraph that guides an implementing
-agent without dictating unnecessary design choices. Explain the smallest
-concrete change, where it belongs, why it addresses the cause, and any required companion edits or constraints. Preserve
-valid behavior and mention a tempting incomplete fix only when evidence shows
-why it fails. Prefer one supported approach; give alternatives only for a
-meaningful tradeoff. If a fix depends on an unresolved contract or design
-choice, state the dependency and concrete next step instead of inventing code.
-End with a single-sentence **Verify:** statement describing a targeted regression
-scenario, its expected result and relevant behavior that must remain intact.
-Use separate verification bullets only when distinct cases need explanation.
-Label proposed checks as proposed; report executed checks with their actual
-results, without implying that a test read from source was run.
+Suggested Fix is normally 1–3 sentences: the smallest concrete change, where it
+belongs, and any constraint or companion edit that is easy to miss. Prefer one
+supported approach; mention an alternative or a tempting incomplete fix only
+when evidence shows it matters. If the fix depends on an unresolved contract or
+design choice, state the dependency and next step instead of inventing code.
+Close with a one-sentence `**Verify** &middot; …` line naming the regression
+scenario, its expected result and any behavior that must stay intact. Label
+proposed checks as proposed and report executed ones with their actual results.
 
-Keep the handoff proportional to the defect: simple findings may need only
-80–120 words; a multi-step issue often fits in 170–200; complex findings can
-justify 250–300 or more. These are examples, not quotas or hard limits, and
-exclude headings, markers, footer and code. Treat 150–300 words as room when
-needed, not a target to fill. Preserve every decisive evidence bullet; trim
-repeated summaries, impact statements and fix prose first. Each sentence should
-help the reader verify the issue or implement the fix. Do not pad sections,
-compress essential context into cryptic sentences, or narrate the investigation.
+Target 60–110 words of prose per finding, excluding headings, markers, footer
+and code; a minor comment is often done in 40. Pass 150 only when a multi-step
+causal chain genuinely needs it, and do not exceed 200. Cut in this order:
+repeated impact statements, fix rationale, then non-decisive evidence. Every
+sentence must help the reader verify the issue or apply the fix — do not
+narrate the investigation, hedge, or pad a section to match the others. Be
+compact, not cryptic: keep the locations, constraints and impact that make the
+finding actionable.
 
 ### Optional patch
 

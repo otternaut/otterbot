@@ -33,15 +33,15 @@ The root includes that footer only when no inline findings accompany the review.
 Inline findings use three visible headings: **Ollie’s Concern** explains the
 trigger, incorrect behavior and impact; **Supporting Evidence** provides
 bullets linking code locations to the facts they establish; **Suggested Fix**
-gives concrete change guidance, essential constraints and a **Verify:** check.
+gives concrete change guidance, essential constraints and a **Verify** check.
 Evidence covers the decisive causal path, including relevant callers or account
 transitions, rather than listing files alone. Proposed checks are distinguished
 from code inspection and tests actually run.
-Findings scale with complexity: simple issues may need 80–120 words, multi-step
-issues often fit in 170–200, and complex issues can justify 250–300 or more.
-These are guidelines, not quotas. The concern normally takes 1–2 sentences,
-the fix one paragraph, and verification one sentence unless distinct cases
-need explanation. Decisive evidence stays; repeated summaries and fix prose go.
+Findings stay compact: most run 60–110 words of prose, and a minor comment is
+often done in 40. A multi-step causal chain can push past 150, but findings do
+not exceed 200. The concern is one or two sentences, evidence is 1–2 bullets
+(3 when the chain needs them), the fix is 1–3 sentences and verification is
+one. Decisive evidence stays; repeated impact statements and fix rationale go.
 Optional replacement code appears under **Suggested Patch**, collapsed on
 GitHub. The essential explanation stays visible, and the existing otter tagline,
 reviewed commit and developer-guide link remain in the footer.
