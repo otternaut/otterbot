@@ -3,38 +3,42 @@
 # No network, filesystem writes, code execution, or host actions.
 set -euo pipefail
 usage() {
-  cat <<'EOF'
+  cat <<'USAGE'
 Usage: decide --blockers N --minors N --coverage complete|incomplete|unknown
   --context current|stale|unknown --evidence adequate|inadequate|unknown
-  --gates pass|human-required|hold|unknown [--no-approve] [--dry-run]
-  [--ci ready|waiting|unknown] [--host ready|waiting|unknown]
+  --gates pass|human-required|hold|unknown [--minor-risk safe|uncertain]
+  [--no-approve] [--dry-run]
 
 The six review fields are required; counts are distinct outstanding verified defects.
+--minor-risk is required when --minors is nonzero: safe means every counted
+minor has a concrete, limited consequence that is safe to address after merge.
 Gates includes other code-review gates, never CI/CD or merge eligibility.
-human-required means only explicit human review/sign-off is missing.
-Legacy CI and host arguments are optional and ignored.
+human-required means only explicit human review/sign-off is missing. Combined
+with other holds it yields request-changes with a human_review_required reason.
 --no-approve suppresses approval only for an otherwise passing review.
 Outputs JSON only. This helper trusts normalized inputs; it does not verify them.
 --dry-run is identical: this command never changes state.
-EOF
+USAGE
 }
 fail() { printf 'decide: %s\n' "$1" >&2; exit 2; }
 seen=' '
 no_approve=false
+minor_risk=''
 while (($#)); do
   case "$1" in
     --help|-h) usage; exit 0 ;;
     --dry-run) shift; continue ;;
     --no-approve) no_approve=true; shift; continue ;;
-    --blockers|--minors|--coverage|--context|--evidence|--gates|--ci|--host)
+    --blockers|--minors|--coverage|--context|--evidence|--gates|--minor-risk)
       key=${1#--}
+      key=${key//-/_}
       [[ "$seen" != *" $key "* ]] || fail "duplicate field: $key"
       (($# >= 2)) || fail "missing value: $key"
       value=$2
       case "$key:$value" in
         blockers:*|minors:*)
           [[ "$value" =~ ^(0|[1-9][0-9]*)$ && ${#value} -le 6 ]] || fail "invalid count: $key" ;;
-        coverage:complete|coverage:incomplete|coverage:unknown|context:current|context:stale|context:unknown|evidence:adequate|evidence:inadequate|evidence:unknown|gates:pass|gates:human-required|gates:hold|gates:unknown|ci:ready|ci:waiting|ci:unknown|host:ready|host:waiting|host:unknown) ;;
+        coverage:complete|coverage:incomplete|coverage:unknown|context:current|context:stale|context:unknown|evidence:adequate|evidence:inadequate|evidence:unknown|gates:pass|gates:human-required|gates:hold|gates:unknown|minor_risk:safe|minor_risk:uncertain) ;;
         *) fail "invalid value: $key" ;;
       esac
       # Key is from the allowlist, value is validated; never evaluate input.
@@ -47,6 +51,7 @@ done
 for key in blockers minors coverage context evidence gates; do
   [[ "$seen" == *" $key "* ]] || fail "missing field: $key"
 done
+if ((minors > 0)) && [[ -z "$minor_risk" ]]; then fail 'missing field: minor-risk (required when minors > 0)'; fi
 reasons=()
 if ((blockers > 0)); then
   verdict=request-changes
@@ -61,8 +66,13 @@ else
   [[ "$coverage" == complete ]] || reasons+=(incomplete_coverage)
   [[ "$context" == current ]] || reasons+=(unverified_context)
   [[ "$evidence" == adequate ]] || reasons+=(insufficient_evidence)
-  [[ "$gates" == pass ]] || reasons+=(review_gates)
+  case "$gates" in
+    pass) ;;
+    human-required) reasons+=(human_review_required) ;;
+    *) reasons+=(review_gates) ;;
+  esac
   ((minors < 3)) || reasons+=(minor_threshold)
+  if ((minors > 0)) && [[ "$minor_risk" == uncertain ]]; then reasons+=(minor_risk); fi
   if ((${#reasons[@]})); then
     verdict=request-changes
     readiness=blocked

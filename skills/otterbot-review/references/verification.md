@@ -31,8 +31,9 @@ or concurrency properties merely by existing. Choose evidence proportional to
 the risk. Tests that stub out the changed boundary do not cover that boundary.
 No test is universally mandatory except the retained prior-critical test gate.
 
-Record a compact internal mapping of changed boundary to evidence and remaining
-uncertainty. Publish only the decisive evidence or exact gap, with file/test
+Keep the boundary-to-evidence mapping in the finding records' `evidence` and
+`disproof` fields (`analysis.md`) and in the coverage areas' `evidence` strings
+(`readiness.md`); there is no separate structure. Publish only the decisive evidence or exact gap, with file/test
 references. If adequate evidence is unavailable, use Request Changes for the
 specific unverified behavior; do not label absence of tests a fabricated bug.
 A demonstrated defect gets its actual severity and normal verdict precedence.
@@ -53,15 +54,24 @@ or read more equivalent tests after the decisive assertions establish the
 property. Expand only to resolve a specific remaining uncertainty. The
 prior-critical covering-test gate remains mandatory even when a code-path
 argument otherwise suffices. Reuse applicable evidence under `readiness.md`.
-Stop at the aggregate investigation deadline in `performance.md`; preserve
-unresolved properties as verification holds rather than lowering the standard.
+Stop at the step budget in `performance.md`; preserve unresolved properties as
+verification holds rather than lowering the standard.
 
 ## CI/CD exclusion
 
-Ignore workflow status, check results, logs and enforcement entirely. Do not
-retrieve them, use them as proof or gaps, or mention them in review output.
-A code-correctness verdict is identical whether workflows pass, fail, run,
-are skipped or do not exist. CI-only events do not invalidate completed review.
-Source changes to workflow/deployment definitions still receive ordinary
-behavioral review. Establish any defect independently from source or a bounded
-local reproduction and cite that evidence.
+This section is the single owner of the CI rule; other files point here
+instead of restating it.
+
+Ignore workflow status, check results, logs, enforcement and merge-protection
+rules entirely. Do not retrieve them, wait for them, use them as proof or as
+gaps, or mention them anywhere: not in the blurb, findings, reasons, markers,
+`decision_key`, resume keys or the conversation summary. A code-correctness
+verdict is identical whether workflows pass, fail, run, are skipped, are
+unavailable or do not exist. CI-only events require no review update and never
+invalidate a completed review; a legacy CI-only hold is discarded under the
+policy migration in `readiness.md` without querying checks.
+
+Source changes to workflow and deployment definitions are ordinary behavioral
+code and receive a normal review. Compile, type and behavioral defects are
+reported only when established independently from source or a bounded local
+reproduction; never read or cite CI diagnostics for them.

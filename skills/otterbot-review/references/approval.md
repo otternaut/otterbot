@@ -9,7 +9,6 @@ and reassessment sections only when applicable.
 in the marker's `gate` field.
 
 These gates govern approval, not whether to perform or publish the review.
-CI/CD state is excluded from every approval decision and output.
 
 - Every requirement source the correctness depends on, such as a linked
   ticket or spec, was accessible and read.
@@ -22,8 +21,8 @@ CI/CD state is excluded from every approval decision and output.
   Ollie read or ran, or was withdrawn.
 - The current head, target branch and base/integration context match the
   verified review state; changed context was assessed before approval.
-- The PR is not a draft. Other reviewers' review states do not affect Ollie's independent
-  approval decision.
+- The PR is not a draft. Other reviewers' review states do not affect Ollie's
+  independent approval decision.
 - Each consequential changed behavior has adequate evidence under
   `references/verification.md`; no material coverage claim rests on
   human assurance or presumed caller behavior alone.
@@ -51,20 +50,22 @@ CI/CD state is excluded from every approval decision and output.
 - The selected review scope was completed, and nothing in the verdict rests
   on an author assertion Ollie could not confirm in code.
 
-Use **🧑‍⚖️ Human Review Needed** when review coverage is complete, context is current,
-behavior has adequate evidence, no outstanding findings remain, and the only
-unmet gate is an explicitly required human review or sign-off. Name the
-behavior, who must review it, and the approval needed for the current head.
-Record a human hold, not a finding: do not assign severity, invent an inline
-defect, or add an empty Findings & Observations section. Historical resolved findings
-remain indexed. Do not invent a human-review requirement from uncertainty or
-an unrelated host reviewer quota.
+Use **🧑‍⚖️ Human Review Needed** when review coverage is complete, context is
+current, behavior has adequate evidence, no outstanding findings remain, and the
+only unmet gate is an explicitly required human review or sign-off. Name the
+behavior, who must review it, and the approval needed for the current head. It
+is delivered as a non-blocking host comment with Ollie's approval withheld,
+never as a request for changes; see `hosts.md`. Record a human hold, not a
+finding: do not assign severity, invent an inline defect, or add an empty
+Findings & Observations section. Historical resolved findings remain indexed. Do
+not invent a human-review requirement from uncertainty or an unrelated host
+reviewer quota.
 
-For example, inspected alias, region, S3 and removable-attachment constraints
-plus the Nyquist IAM contract can establish correctness, while granting a
-shared role KMS decryption still requires explicit approval covering this head
-from an authorized non-author human. With no outstanding findings or other
-gaps, that outcome is Human Review Needed.
+For example, a migration that drops a legacy column can be shown correct by
+inspecting every reader of that column and the backfill that preceded it, yet
+dropping data is irreversible and still needs explicit approval covering this
+head from an authorized non-author human. With no outstanding findings or
+other gaps, that outcome is Human Review Needed.
 
 Outstanding findings, another failed code-review gate or incomplete assessment
 yield Request Changes when approval is withheld.
@@ -74,20 +75,22 @@ do not invent a defect or severity to justify the verdict.
 
 Benign feedback accompanies Ship It when all gates pass. Never use Comment Only
 with a "Not approving because" explanation: select Human Review Needed for the
-human-only case above, otherwise Request Changes. The explicit `--no-approve` option suppresses only a passing review's
-approval action, yielding Comment Only / Review passed with a short explanation
-of the requested delivery mode. A host's inability to submit a verdict is a
-delivery limitation; retain the intended verdict in the banner.
+human-only case above, otherwise Request Changes. The explicit `--no-approve`
+option suppresses only a passing review's approval action, yielding Comment Only
+/ Review passed with a short explanation of the requested delivery mode. A
+host's inability to submit a verdict is a delivery limitation; retain the
+intended verdict in the banner.
 
 ## Minor accounting
 
 The inline posting budget is four new minors. The approval count is independent
-of that budget and includes every distinct verified outstanding minor known
-at the reviewed head from Ollie's own review, including prior rounds and
+of that budget and includes every distinct verified outstanding minor known at
+the reviewed head from Ollie's own review, including prior rounds and
 independently discovered findings not posted inline because of duplication or
-the posting cap. Do not import findings from other reviews or comments. Deduplicate by
-root cause, including between ledger entries and existing threads. Questions,
-nitpicks and unverified candidates do not count as minor defects.
+the posting cap. Do not import findings from other reviews or comments.
+Deduplicate by root cause, including between ledger entries and existing
+threads. Questions, nitpicks and unverified candidates do not count as minor
+defects.
 
 ## Decision
 
@@ -108,12 +111,12 @@ nitpicks and unverified candidates do not count as minor defects.
 Start with known prior findings and verified candidates. Verify credible minor
 candidates in risk order, up to four new inline findings within the optional
 work budget. Once three outstanding minors count, approval is withheld, but
-finish an already identified fourth candidate when useful and affordable.
-Do not search for extra minors to fill the four slots or continue optional
-investigation beyond them. Prioritize blocker work and mandatory scope until
-the aggregate investigation deadline in `performance.md`; retain unfinished work as a verification hold.
-Retain all already verified findings, including overflow. If budget expires
-with a credible concern whose impact is needed to decide approval, disclose
+finish an already identified fourth candidate when useful and affordable. Do not
+search for extra minors to fill the four slots or continue optional
+investigation beyond them. Prioritize blocker work and mandatory scope until the
+step budget in `performance.md`; retain unfinished work as a verification hold.
+Retain all already verified findings, including overflow. If budget expires with
+a credible concern whose impact is needed to decide approval, disclose
 incomplete assessment and do not approve.
 
 ## What clears a minor
@@ -133,16 +136,17 @@ is no separate deferral-count or review-round approval limit.
 
 ## Visible accounting and continuity
 
-Every finding affecting approval must have a visible trigger, consequence,
-code reference and fix. Keep up to four new minors inline; render additional verified
+Every finding affecting approval must have a visible trigger, consequence, code
+reference and fix. Keep up to four new minors inline; render additional verified
 minors as compact entries in Findings & Observations, with their stable IDs and
-status. These entries are not hidden solely in metadata and remain visible
-on subsequent rounds. Link an existing thread when available; otherwise use
-a reviewed-commit code link or plain `file:line`, never an invented thread URL.
-Existing threads covering Ollie's independently discovered duplicates are
-linked in the root's approval explanation, without reposting their findings. Explain when the approval count differs
-from Ollie's index count. Historical/overflow entries do not consume new
-inline slots; only newly introduced claims must satisfy interdiff scope.
+status. These entries are not hidden solely in metadata and remain visible on
+subsequent rounds. Link an existing thread when available; otherwise use a
+reviewed-commit code link or plain `file:line`, never an invented thread URL.
+Existing threads covering Ollie's independently discovered duplicates are linked
+in the root's approval explanation, without reposting their findings. Explain
+when the approval count differs from Ollie's index count. Historical/overflow
+entries do not consume new inline slots; only newly introduced claims must
+satisfy interdiff scope.
 
 Maintain an approval ledger in every root review, including an empty list
 when all overflow has cleared, so a later review cannot resurrect stale data:
@@ -165,8 +169,9 @@ to decide approval cannot be recovered, explain incomplete accounting and
 withhold approval. Deduplicate ledger entries against findings now in threads.
 
 Persist required sensitive-behavior sign-offs as linked evidence in the thread
-or root when used to clear that gate; they never erase findings. Commands can reference visible overflow IDs
-on the root; process those just like inline findings without inventing threads.
+or root when used to clear that gate; they never erase findings. Commands can
+reference visible overflow IDs on the root; process those just like inline
+findings without inventing threads.
 
 ## Bounded gate reassessment
 
@@ -176,14 +181,15 @@ reassess gates may change the decision without a new commit. Reuse the prior
 completed code review only when its head, target/base context and affected
 evidence remain current under `readiness.md`. Fetch the
 latest findings/statuses, ledger, behavior evidence and mutable review-gate
-metadata. Ignore CI-only changes.
+metadata.
 Reverify disputed or affected claims and evaluate every approval gate. Do not
 repeat the whole diff or investigate already settled issues merely to count
 a new review round. An incomplete prior review cannot be treated as complete.
 
-If head or base context changed, handle the reply but review the interdiff
-or affected integration context plus any prior coverage gaps before approval. Recheck head and mutable gates at delivery. If the
-head changes again, withhold approval and disclose it; do not loop.
+If head or base context changed, handle the reply but review the interdiff or
+affected integration context plus any prior coverage gaps before approval.
+Recheck head and mutable gates at delivery. If the head changes again, withhold
+approval and disclose it; do not loop.
 
 If verified evidence changes the verdict, its failed gates or the outstanding
 risk record, publish one concise updated root review with the current index
@@ -196,7 +202,8 @@ the existing review. Deduplicate repeated source comment IDs/evidence; a prior
 response does not excuse an unfinished gate update after partial delivery.
 
 Do not leave a stale Ollie Request Changes in place after its concerns are
-disproven, regardless of other reviewers' decisions. Reconcile Ollie's state while leaving
-human reviews untouched. Root updates and thread replies retain the personality
-footer. Automated sweeps need to supply changed decision evidence to trigger
-this path; it does not install a comment listener or change sweep eligibility.
+disproven, regardless of other reviewers' decisions. Reconcile Ollie's state
+while leaving human reviews untouched. Root updates and thread replies retain
+the personality footer. Automated sweeps need to supply changed decision
+evidence to trigger this path; it does not install a comment listener or change
+sweep eligibility.

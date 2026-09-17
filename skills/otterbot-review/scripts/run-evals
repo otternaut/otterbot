@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+# Validate evals/evals.json, emit shadow-run prompts, and score saved outputs.
+# Never invokes an agent or a host: it only reads the case file, fixtures and
+# output files you saved from shadow runs. Requires python3 for JSON parsing.
+set -euo pipefail
+SKILL_ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+usage() {
+  cat <<'USAGE'
+Usage: run-evals --check
+       run-evals --list [--tag TAG]
+       run-evals --prompt ID
+       run-evals --score DIR [--tag TAG]
+       run-evals --dry-run
+
+--check   validate ids, fixtures, assertion shapes and the global lists.
+--list    print id, tags and the first line of each prompt.
+--prompt  print one case's prompt with its fixture files inlined, ready to
+          paste into a fresh --shadow session.
+--score   read DIR/<id>.md (the saved shadow output per case) and report
+          pass / fail / unscored per case plus totals; exit 1 on any fail.
+Assertions: must_include are case-insensitive substrings; must_not_include
+are case-insensitive regular expressions; global lists apply to every case.
+USAGE
+}
+mode=''; arg=''; tag=''
+while (($#)); do
+  case "$1" in
+    --help|-h) usage; exit 0 ;;
+    --dry-run) printf 'Would read evals.json and fixtures only; no agent, host or write actions.\n'; exit 0 ;;
+    --check|--list) mode=${1#--}; shift ;;
+    --prompt|--score) mode=${1#--}; (($# >= 2)) || { printf 'Missing argument for %s\n' "$1" >&2; exit 2; }; arg=$2; shift 2 ;;
+    --tag) (($# >= 2)) || { printf 'Missing tag\n' >&2; exit 2; }; tag=$2; shift 2 ;;
+    *) printf 'Unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
+  esac
+done
+[[ -n "$mode" ]] || { usage >&2; exit 2; }
+command -v python3 >/dev/null || { printf 'run-evals needs python3 for JSON parsing\n' >&2; exit 2; }
+REPO_ROOT=$(cd -- "$SKILL_ROOT/../.." && pwd)
+export SKILL_ROOT REPO_ROOT MODE=$mode ARG=$arg TAG=$tag
+python3 - <<'PY'
+import json, os, re, sys, pathlib
+root = pathlib.Path(os.environ["SKILL_ROOT"]); repo = pathlib.Path(os.environ["REPO_ROOT"])
+mode, arg, tag = os.environ["MODE"], os.environ["ARG"], os.environ["TAG"]
+data = json.loads((root / "evals/evals.json").read_text())
+cases = data["evals"]
+g_inc = data.get("global_must_include", []); g_exc = data.get("global_must_not_include", [])
+def fixture_path(f):
+    p = repo / f
+    return p if p.exists() else root / f
+def selected():
+    return [c for c in cases if not tag or tag in c.get("tags", [])]
+if mode == "check":
+    errors = []
+    ids = [c["id"] for c in cases]
+    if len(ids) != len(set(ids)): errors.append("duplicate ids")
+    for c in cases:
+        for k in ("id", "prompt", "expected_output", "files"):
+            if k not in c: errors.append(f"{c.get('id')}: missing {k}")
+        for f in c.get("files", []):
+            if not fixture_path(f).exists(): errors.append(f"{c['id']}: missing fixture {f}")
+        for k in ("must_include", "must_not_include", "tags"):
+            if not isinstance(c.get(k, []), list): errors.append(f"{c['id']}: {k} must be a list")
+        for rx in c.get("must_not_include", []) + g_exc:
+            try: re.compile(rx)
+            except re.error as e: errors.append(f"{c['id']}: bad regex {rx!r}: {e}")
+    scored = sum(1 for c in cases if c.get("must_include"))
+    for e in errors: print("ERROR", e, file=sys.stderr)
+    print(f"{len(cases)} cases, {scored} with must_include assertions, {len(cases)-scored} judgment-only.")
+    sys.exit(1 if errors else 0)
+if mode == "list":
+    for c in selected():
+        print(f"{c['id']:>4}  [{', '.join(c.get('tags', []))}]  {c['prompt'].splitlines()[0][:100]}")
+    sys.exit(0)
+if mode == "prompt":
+    c = next((c for c in cases if str(c["id"]) == arg), None)
+    if not c: print(f"no case {arg}", file=sys.stderr); sys.exit(2)
+    print(c["prompt"].rstrip())
+    for f in c.get("files", []):
+        print(f"\n--- fixture: {f} ---\n" + fixture_path(f).read_text().rstrip())
+    sys.exit(0)
+if mode == "score":
+    outdir = pathlib.Path(arg)
+    if not outdir.is_dir(): print(f"not a directory: {arg}", file=sys.stderr); sys.exit(2)
+    totals = {"pass": 0, "fail": 0, "unscored": 0, "missing": 0}
+    for c in selected():
+        f = outdir / f"{c['id']}.md"
+        if not f.exists(): totals["missing"] += 1; continue
+        out = f.read_text(); low = out.lower()
+        inc = c.get("must_include", []); exc = c.get("must_not_include", [])
+        problems = [f"missing {s!r}" for s in inc + g_inc if s.lower() not in low]
+        problems += [f"forbidden {rx!r}" for rx in exc + g_exc if re.search(rx, out, re.I)]
+        if problems:
+            totals["fail"] += 1; print(f"FAIL {c['id']}: " + "; ".join(problems))
+        elif inc:
+            totals["pass"] += 1; print(f"PASS {c['id']}")
+        else:
+            totals["unscored"] += 1; print(f"UNSCORED {c['id']}: judge against expected_output")
+    print(" ".join(f"{k}={v}" for k, v in totals.items()))
+    sys.exit(1 if totals["fail"] else 0)
+PY

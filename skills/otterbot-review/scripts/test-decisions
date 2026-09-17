@@ -9,11 +9,12 @@ case "${1:-}" in
   *) printf 'Unknown option\n' >&2; exit 2 ;;
 esac
 count=0
-while read -r name blockers minors coverage context evidence gates ci host verdict readiness reason; do
+while read -r name blockers minors coverage context evidence gates risk verdict readiness reason; do
   [[ -n "$name" && "$name" != \#* ]] || continue
-  result=$("$SKILL_ROOT/scripts/decide" --blockers "$blockers" --minors "$minors" \
-    --coverage "$coverage" --context "$context" --evidence "$evidence" \
-    --gates "$gates" --ci "$ci" --host "$host")
+  args=(--blockers "$blockers" --minors "$minors" --coverage "$coverage" \
+    --context "$context" --evidence "$evidence" --gates "$gates")
+  [[ "$risk" == - ]] || args+=(--minor-risk "$risk")
+  result=$("$SKILL_ROOT/scripts/decide" "${args[@]}")
   [[ "$result" == *"\"verdict\":\"$verdict\""* && "$result" == *"\"readiness\":\"$readiness\""* ]] || {
     printf 'FAIL %s: %s\n' "$name" "$result" >&2; exit 1;
   }
@@ -24,20 +25,25 @@ while read -r name blockers minors coverage context evidence gates ci host verdi
   fi
   count=$((count + 1))
 done < "$SKILL_ROOT/evals/decision-cases.tsv"
-base=(--blockers 0 --minors 0 --coverage complete --context current --evidence adequate --gates pass --ci ready --host ready)
-for invalid in missing duplicate negative unknown; do
+base=(--blockers 0 --minors 0 --coverage complete --context current --evidence adequate --gates pass)
+invalid_count=0
+for invalid in missing duplicate negative unknown legacy-ci missing-risk bad-risk; do
   case "$invalid" in
     missing) args=(--blockers 0) ;;
-    duplicate) args=("${base[@]}" --minors 1) ;;
+    duplicate) args=("${base[@]}" --minors 1 --minor-risk safe) ;;
     negative) args=(--blockers -1 "${base[@]:2}") ;;
     unknown) args=("${base[@]}" --approve-anyway yes) ;;
+    legacy-ci) args=("${base[@]}" --ci ready) ;;
+    missing-risk) args=(--blockers 0 --minors 1 "${base[@]:4}") ;;
+    bad-risk) args=("${base[@]:0:2}" --minors 1 "${base[@]:4}" --minor-risk maybe) ;;
   esac
   if "$SKILL_ROOT/scripts/decide" "${args[@]}" >/dev/null 2>&1; then
     printf 'Accepted invalid input: %s\n' "$invalid" >&2; exit 1
   fi
+  invalid_count=$((invalid_count + 1))
 done
-# Current callers need no CI/host inputs; benign feedback still approves.
-review=(--blockers 0 --minors 1 --coverage complete --context current --evidence adequate --gates pass)
+# Benign feedback still approves; the opt-out only changes delivery.
+review=(--blockers 0 --minors 1 --minor-risk safe --coverage complete --context current --evidence adequate --gates pass)
 result=$("$SKILL_ROOT/scripts/decide" "${review[@]}")
 [[ "$result" == '{"verdict":"ship-it","readiness":"review-passed","reasons":[]}' ]]
 result=$("$SKILL_ROOT/scripts/decide" "${review[@]}" --no-approve)
@@ -51,4 +57,8 @@ done
 result=$("$SKILL_ROOT/scripts/decide" --blockers 0 --minors 0 \
   --coverage complete --context current --evidence adequate --gates human-required --no-approve)
 [[ "$result" == '{"verdict":"requires-human","readiness":"requires-human","reasons":["human_review_required"]}' ]]
-printf '%s decision cases, 5 delivery cases and 4 invalid-input cases passed.\n'  "$count"
+# Uncertain minor risk and the minor threshold are reported together.
+result=$("$SKILL_ROOT/scripts/decide" --blockers 0 --minors 3 --minor-risk uncertain \
+  --coverage complete --context current --evidence adequate --gates pass)
+[[ "$result" == '{"verdict":"request-changes","readiness":"blocked","reasons":["minor_threshold","minor_risk"]}' ]]
+printf '%s decision cases, 6 delivery cases and %s invalid-input cases passed.\n' "$count" "$invalid_count"

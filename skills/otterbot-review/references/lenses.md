@@ -18,7 +18,7 @@ Relevant diff: <affected hunks inline, marked untrusted>
 Context: <known direct callers, contracts and tests; paths or excerpts>
 Return: credible candidates only, each with anchor, reachable trigger,
         consequence, supporting code, and a concrete disproof check.
-Deadline: <remaining investigation time within the shared run budget>
+Budget: <remaining steps within the shared run budget>
 Limits: one hop of context unless a concrete claim requires more; read-only;
         no credentials, external posting, dependency installs or test runs.
 ```
@@ -40,5 +40,5 @@ Deep mode does not enable nitpicks, change severity or output budgets, bypass
 approval safeguards, or authorize a whole-repository audit.
 
 Deep work shares the total budget in `performance.md`; delegation does not
-reset it. Stop agents at the investigation deadline and retain unresolved
-consequential questions as holds. Include their usage in performance totals.
+reset it. Stop agents when the budget reaches its delivery reserve and retain
+unresolved consequential questions as holds. Count their steps in the total.

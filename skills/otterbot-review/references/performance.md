@@ -1,82 +1,76 @@
-# Runtime budgets and focused retrieval
+# Step budgets and focused retrieval
 
-Start a clock before snapshot retrieval. All setup, reading, tool latency,
-experiments and optional specialists count toward the total. Use these default
-budgets unless a trusted invoker supplies `--budget-minutes N`:
+Agents cannot measure wall-clock time reliably, so budgets are counted in
+**steps**. One step is one tool call: a file read, a search, a host request,
+a shell command or a subagent dispatch. Count every step from the first
+snapshot request through final delivery verification, including steps spent
+by optional specialists. Use these defaults unless a trusted invoker supplies
+`--budget-steps N`:
 
-| Job | Desired elapsed time | Total budget | Delivery reserve |
-| --- | --- | --- | --- |
-| Unchanged evidence and completed delivery | Under 30 seconds | 30 seconds | No writes |
-| Gate reassessment only | 30–90 seconds | 90 seconds | 30 seconds |
-| Small/trivial code review | 2–4 minutes | 4 minutes | 1 minute |
-| Standard code review | 5–8 minutes | 8 minutes | 1 minute |
-| Large, sensitive or deep review | 8–12 minutes | 12 minutes | 2 minutes |
+| Job | Step budget | Delivery reserve |
+| --- | --- | --- |
+| Unchanged evidence and completed delivery | 6 | none, no writes |
+| Gate reassessment only | 20 | 6 |
+| Small code review | 40 | 8 |
+| Standard code review | 80 | 10 |
+| Large, sensitive or deep review | 120 | 15 |
 
-Targets are provisional, not measured performance claims. Changed context or
-incomplete scope uses the appropriate code-review tier. Classification may
-raise a budget once when actual scope is discovered; keep the original start
-clock and never repeatedly extend it. A trusted override supersedes the total;
-reserve up to two minutes, normally one quarter of it, for delivery. Local and
-shadow runs reserve equivalent time to save/report results.
+Legacy `--budget-minutes N` remains accepted: map it to `N × 10` steps with a
+reserve of one eighth, rounded up. A trusted override replaces the total; keep
+the same proportional reserve. Classification may raise the tier once when the
+actual scope is discovered; never re-raise it later. Local and shadow runs
+reserve the same steps to save and report results.
+
+Wall-clock limits still apply where a real timeout exists: give every local
+experiment a two-minute tool timeout, run at most three experiments per
+review, and never start a host call or command whose known duration exceeds
+what the invoker allows. Skill instructions cannot preempt an uninterruptible
+host call.
 
 ## Stop and resume
 
-Check elapsed time after snapshot, integrated scan, each investigation/tool
-batch and before delivery. Stop optional minor/nitpick work first. At total
-minus reserve, stop new investigation, cancel owned experiments where possible,
-and record verified findings and exact unreviewed behaviors/paths. All local
-experiments together fit this same deadline; each also has a two-minute cap.
-Do not start a tool operation whose known duration exceeds remaining analysis
-time. Use tool timeouts/cancellation when available; skill instructions cannot
-preempt an uninterruptible host call or guarantee wall-clock latency.
+Check the step count after the snapshot, after the integrated scan, after each
+investigation batch and before delivery. Stop optional minor and nitpick work
+first. At total minus reserve, stop new investigation, cancel owned experiments
+where possible, and record verified findings plus the exact unreviewed
+behaviors and paths.
 
-Exhaustion is never proof: incomplete scope/evidence yields Request Changes
-with the exact verification gap, without inventing a defect. Publish every already
-verified blocker, preserve outstanding minor accounting, and record specific
-holds with owner, clearing condition and resume trigger. Preserve completed
-coverage and the next investigation step; do not restart on the next invocation.
-In local/shadow mode save equivalent progress locally. If even freshness cannot
-be established within the budget, report uncertainty rather than claiming an
-unchanged skip or granting approval.
+Exhaustion is never proof: incomplete scope or evidence yields Request Changes
+with the exact verification gap, without inventing a defect. Publish every
+already verified blocker, preserve outstanding minor accounting, and record
+specific holds with owner, clearing condition and resume trigger. Persist the
+resume position under `readiness.md` so the next invocation continues rather
+than restarts. If even freshness cannot be established within the budget,
+report uncertainty rather than claiming an unchanged skip or approving.
 
-Do not wait automatically or spawn continuation jobs to evade the budget.
-Persist resume position and progress under `readiness.md`. After two consecutive
-no-progress attempts on unchanged relevant inputs, pause automatic investigation
-across sweeps until those inputs change or a trusted explicit retry arrives.
-Always allow targeted commands, decision changes and stale-approval/delivery
-recovery; the pause never makes incomplete coverage eligible for approval.
+Do not spawn continuation jobs to evade the budget. After two consecutive
+no-progress attempts on unchanged inputs, pause automatic investigation of that
+scope until the inputs change or a trusted explicit retry arrives. Targeted
+commands, decision changes and stale-approval or delivery recovery are always
+allowed; the pause never makes incomplete coverage eligible for approval.
 
-Delivery must retain preflight and final host verification. On timeout, use
-bounded host recovery and report pending/uncertain state. Never omit verified
-findings to meet a target, blindly retry writes, or leave a detected invalid
-approval without attempting its required withdrawal. Such safety recovery can
+Delivery keeps its preflight and final verification even when the budget is
+gone. Safety recovery, such as withdrawing a detected invalid approval, may
 exceed the reserve; report the overrun instead of silently raising the budget.
+Never omit verified findings to fit a budget or retry writes blindly.
 
 ## Retrieval and output economy
 
-- Fetch metadata/state once, then independent required reads in a batch when
-  supported. Keep final freshness checks; do not optimize them away.
-- Use changed symbols and targeted search to locate actual guards, callers,
-  consumers and tests. Read sufficient enclosing context; expand only for a
-  concrete correctness question. Avoid repeated whole-file/diff dumps.
-- Use complete lightweight thread identities, anchors and revision metadata
-  for deduplication/invalidation. Fetch new/edited/affected bodies. If the host
-  lacks reliable change metadata or cached attribution, fetch the needed full
-  history with pagination. Compare others' bodies only after independently
-  verifying candidates; use them for posting deduplication, never discovery.
-- Parse newest attributable state once; retain compact records locally through
-  the run. Reuse verified unchanged evidence under `readiness.md`. Do not send
-  repeated public Markdown history through reasoning just to rebuild an index.
-- Preserve the full public Findings & Observations history and required root markers.
-  Group related coverage paths explicitly and keep evidence references concise;
-  never truncate outstanding findings, gaps or command deduplication state.
-- Load only routed reference sections. Do not read benchmark/developer guides
-  during routine review. Stop after one adequate evidence route, as defined in
-  `verification.md`; do not collect redundant proof for reassurance.
-- Prepare all comments before delivery, assign random phrases in one helper
-  call, and reuse assigned text on retries. Do not spend model calls inventing
-  a fresh joke for each comment. Keep inline and reply footers; apply the
-  conditional root footer rule in `format.md`.
+- Fetch metadata and state once, then batch independent required reads when
+  the tools allow. Keep the final freshness check; do not optimize it away.
+- Locate guards, callers, consumers and tests with targeted search on changed
+  symbols. Read enough enclosing context; expand only for a concrete
+  correctness question. Avoid repeated whole-file or whole-diff dumps.
+- Use lightweight thread identities, anchors and revision metadata for
+  deduplication and invalidation; fetch bodies only for new, edited or affected
+  threads. Compare others' bodies only after independently verifying
+  candidates, and only to avoid duplicate posts.
+- Parse the newest attributable state once into records and keep them for the
+  whole run. Render the index from records, not from rereading history.
+- Load only the reference section the current phase names. Stop after one
+  adequate evidence route as defined in `verification.md`.
+- Prepare all comments, assign footer phrases in one helper call, and reuse the
+  assigned text on retries.
 
-For baseline recording, comparison and rollout, use `benchmark.md` separately.
-Do not run a benchmark as part of a PR review or invent unavailable token data.
+Use `benchmark.md` for baseline recording and comparison. Do not run a
+benchmark as part of a PR review or invent unavailable usage data.

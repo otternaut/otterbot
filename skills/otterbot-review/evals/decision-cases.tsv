@@ -1,26 +1,23 @@
-# case blockers minors coverage context evidence gates ci host verdict readiness reason
-clean 0 0 complete current adequate pass ready ready ship-it review-passed -
-two-minors 0 2 complete current adequate pass ready ready ship-it review-passed -
-three-minors 0 3 complete current adequate pass ready ready request-changes blocked minor_threshold
-four-minors 0 4 complete current adequate pass ready ready request-changes blocked minor_threshold
-blocker-precedence 1 4 incomplete stale unknown hold waiting unknown request-changes blocked verified_blockers
-coverage-gap 0 0 incomplete current adequate pass ready ready request-changes blocked incomplete_coverage
-unknown-coverage 0 0 unknown current adequate pass ready ready request-changes blocked incomplete_coverage
-base-changed 0 0 complete stale adequate pass ready ready request-changes blocked unverified_context
-unknown-context 0 0 complete unknown adequate pass ready ready request-changes blocked unverified_context
-evidence-gap 0 0 complete current inadequate pass ready ready request-changes blocked insufficient_evidence
-unknown-evidence 0 0 complete current unknown pass ready ready request-changes blocked insufficient_evidence
-human-signoff-missing 0 0 complete current adequate human-required ready ready requires-human requires-human human_review_required
-unknown-gates 0 0 complete current adequate unknown ready ready request-changes blocked review_gates
-enforced-ci-pending 0 0 complete current adequate pass waiting ready ship-it review-passed -
-unenforced-ci-pending 0 0 complete current adequate pass waiting ready ship-it review-passed -
-host-review-waiting 0 0 complete current adequate pass ready waiting ship-it review-passed -
-host-unknown 0 0 complete current adequate pass ready unknown ship-it review-passed -
-ci-unknown 0 0 complete current adequate pass unknown ready ship-it review-passed -
-all-gaps-cleared 0 1 complete current adequate pass ready ready ship-it review-passed -
-human-plus-blocker 1 0 complete current adequate human-required ready ready request-changes blocked verified_blockers
-human-plus-minor 0 1 complete current adequate human-required ready ready request-changes blocked review_gates
-human-plus-coverage-gap 0 0 incomplete current adequate human-required ready ready request-changes blocked incomplete_coverage
-human-plus-stale-context 0 0 complete stale adequate human-required ready ready request-changes blocked unverified_context
-human-plus-evidence-gap 0 0 complete current inadequate human-required ready ready request-changes blocked insufficient_evidence
-other-gate-hold 0 0 complete current adequate hold ready ready request-changes blocked review_gates
+# case blockers minors coverage context evidence gates minor-risk verdict readiness reason
+clean 0 0 complete current adequate pass - ship-it review-passed -
+two-minors 0 2 complete current adequate pass safe ship-it review-passed -
+two-minors-uncertain 0 2 complete current adequate pass uncertain request-changes blocked minor_risk
+one-minor-uncertain 0 1 complete current adequate pass uncertain request-changes blocked minor_risk
+three-minors 0 3 complete current adequate pass safe request-changes blocked minor_threshold
+four-minors 0 4 complete current adequate pass safe request-changes blocked minor_threshold
+blocker-precedence 1 4 incomplete stale unknown hold uncertain request-changes blocked verified_blockers
+coverage-gap 0 0 incomplete current adequate pass - request-changes blocked incomplete_coverage
+unknown-coverage 0 0 unknown current adequate pass - request-changes blocked incomplete_coverage
+base-changed 0 0 complete stale adequate pass - request-changes blocked unverified_context
+unknown-context 0 0 complete unknown adequate pass - request-changes blocked unverified_context
+evidence-gap 0 0 complete current inadequate pass - request-changes blocked insufficient_evidence
+unknown-evidence 0 0 complete current unknown pass - request-changes blocked insufficient_evidence
+human-signoff-missing 0 0 complete current adequate human-required - requires-human requires-human human_review_required
+unknown-gates 0 0 complete current adequate unknown - request-changes blocked review_gates
+all-gaps-cleared 0 1 complete current adequate pass safe ship-it review-passed -
+human-plus-blocker 1 0 complete current adequate human-required - request-changes blocked verified_blockers
+human-plus-minor 0 1 complete current adequate human-required safe request-changes blocked human_review_required
+human-plus-coverage-gap 0 0 incomplete current adequate human-required - request-changes blocked incomplete_coverage
+human-plus-stale-context 0 0 complete stale adequate human-required - request-changes blocked unverified_context
+human-plus-evidence-gap 0 0 complete current inadequate human-required - request-changes blocked insufficient_evidence
+other-gate-hold 0 0 complete current adequate hold - request-changes blocked review_gates

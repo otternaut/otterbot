@@ -2,8 +2,8 @@
 
 A re-review is a conversation on the threads that already exist, not a new
 generation of comments. This file gives the classification procedure, the
-reply templates, the status markers, the reply conventions developers can use,
-and compatibility notes for threads created by v2 of this skill.
+reply templates, the status markers and the reply conventions developers can
+use. Legacy v2 markers are covered in the last section.
 
 ## Procedure
 
@@ -20,7 +20,8 @@ and compatibility notes for threads created by v2 of this skill.
    evidence, or an unanswered developer question. Resolve/reopen Ollie's
    threads as needed, without repeating unchanged still-open replies.
 4. Other reviewers' threads serve only to deduplicate independently discovered
-   findings; never import their claims or resolve, reopen, edit or duplicate them.
+   findings; never import their claims or resolve, reopen, edit or duplicate
+   them.
 
 ## Classes
 
@@ -75,13 +76,13 @@ withdrawn &middot; my mistake: <what Ollie got wrong and the code that shows it>
 
 ## Rules that decide hard cases
 
-- **Code evidence beats thread state.** Anyone with write access can resolve
-  a thread. A resolved thread whose critical or major is still present in the
-  code is classified still open: reply on that thread, reopen it where the host
-  allows, and count it in the verdict. For minors, resolution alone does not establish fixed, accepted or deferred:
-  use code and reply evidence. Keep the minor in approval accounting until
-  cleared under `approval.md`; no repetitive reply is needed. Nitpicks do not
-  count toward the minor threshold.
+- **Code evidence beats thread state.** Anyone with write access can resolve a
+  thread. A resolved thread whose critical or major is still present in the code
+  is classified still open: reply on that thread, reopen it where the host
+  allows, and count it in the verdict. For minors, resolution alone does not
+  establish fixed, accepted or deferred: use code and reply evidence. Keep the
+  minor in approval accounting until cleared under `approval.md`; no repetitive
+  reply is needed. Nitpicks do not count toward the minor threshold.
 - **Resolved threads are terminal for new comments.** Never re-raise a
   resolved finding as a new inline comment. The single exception is a critical
   that demonstrably regressed in a later commit; reply on the old thread with
@@ -94,9 +95,10 @@ withdrawn &middot; my mistake: <what Ollie got wrong and the code that shows it>
 - **Accepted minors need evidence too.** Show that the concern does not apply;
   willingness to live with it is deferral,
   not evidence that it was false. See `approval.md` for counting rules.
-- **Deferral records the reason.** Neither minors nor nitpicks require a
-  ticket. Preserve any optional link as part of the supplied explanation. A critical or major
-  is never deferred. Deferral does not remove a minor from approval accounting.
+- **Deferral records the reason.** Neither minors nor nitpicks require a ticket.
+  Preserve any optional link as part of the supplied explanation. A critical or
+  major is never deferred. Deferral does not remove a minor from approval
+  accounting.
 - **Withdrawn is a feature.** When re-analysis or the author's reply shows the
   finding was wrong, say so plainly. Precision on every PR depends on visibly
   owning mistakes, and the `withdrawn` marker is how the false-positive rate
@@ -112,9 +114,8 @@ withdrawn &middot; my mistake: <what Ollie got wrong and the code that shows it>
   Leave others' threads and review states untouched, and surface new findings.
 - **Root comment replies and mentions.** Answered where they were made, in one
   or two sentences. Never answered by posting a new root comment.
-
-- **The fix does not have to be Ollie's fix.** A change that removes the Risk
-  is fixed, whatever the Suggestion said. Insisting on a particular approach is
+- **The fix does not have to be Ollie's fix.** A change that removes the risk
+  is fixed, whatever Paws-On Fix said. Insisting on a particular approach is
   how reviews loop.
 - **Human preferences do not waive defects.** Do not relitigate a human's
   stylistic preference. If their requested pattern causes a verified major or
@@ -172,13 +173,13 @@ Examples:
 @ollie reject The tenant guard runs in requireTenant() before this handler.
 ```
 
-For bare `@ollie accept`, use an explanation already in the thread; if it does not establish
-why the finding is inapplicable, ask for the reason and leave it open. Never
-interpret acceptance as permission to waive a blocker. For bare `@ollie defer`, use thread context to assess a minor's limited risk;
-ask for a reason only if needed, never a ticket. A nitpick can be deferred on
-the author's word.
-For critical/major, explain that deferral is unavailable. For `@ollie fixed`,
-verify the current code and respond fixed or still open with evidence.
+For bare `@ollie accept`, use an explanation already in the thread; if it does
+not establish why the finding is inapplicable, ask for the reason and leave it
+open. Never interpret acceptance as permission to waive a blocker. For bare
+`@ollie defer`, use thread context to assess a minor's limited risk; ask for a
+reason only if needed, never a ticket. A nitpick can be deferred on the author's
+word. For critical/major, explain that deferral is unavailable. For `@ollie
+fixed`, verify the current code and respond fixed or still open with evidence.
 
 Every newly received command gets an answer, including one that does not
 change status. Add `<!-- ollie-response: <source-comment-id> -->` alongside the
@@ -191,22 +192,6 @@ evidence changes approval eligibility or accounting, as defined in
 Replies without a convention are read for meaning the same way. The
 conventions only remove ambiguity.
 
-## Compatibility with v2 threads
-
-Reviews and threads created by v2 of this skill remain on older PRs. Treat
-them as Ollie's own for attribution and classification, and never edit their
-bodies.
-
-- Root marker: `<!-- otterbot-review: council; head: <full-sha> -->`. Read
-  the head SHA from it for the freshness gate.
-- Finding marker: `<!-- otterbot-finding: <id> -->`. Keep the same id if the
-  finding must be referenced again.
-- Severity mapping for tallies: Critical becomes critical, High becomes major,
-  Medium becomes minor, Low and Optional become nitpick.
-- Prior v2 reviews count toward the round number.
-- A legacy PR uses the current workflow on its next effective change. Prior
-  inline threads retain their identity and receive replies only when needed. Nothing is minimized, and no v2 comment is deleted or edited.
-
 ## Measuring outcomes
 
 Every finding marker carries `level` and `category`; every reply carries an
@@ -218,7 +203,7 @@ required. Three ratios matter:
   fixed, they are probably nitpicks; if nitpicks are always fixed, some of
   them are probably minors.
 - **Withdrawn rate per level** is the precision signal. If it climbs after a
-  change to the process, verification in stage 2 is too loose.
+  change to the process, the disproof protocol in `analysis.md` is too loose.
 - **Findings per review against fix rate** is the volume signal: if the
   budget is being hit and fix rate holds, the budget is right; if fix rate
   falls as volume rises, the budget is too generous.
@@ -227,3 +212,13 @@ Procedure: list Ollie's review comments on the repository, parse the
 `ollie-finding` marker from each thread's first comment and the last
 `ollie-status` marker from its replies, and tabulate. Run it after a few
 weeks on a new version before changing thresholds again.
+
+## Legacy: v2 threads
+
+Skip this section unless a PR carries `otterbot-review: council` or
+`otterbot-finding` markers. Treat those threads as Ollie's own for attribution
+and classification, read the head SHA from the root marker, keep the same
+finding id when referencing one again, and map severities Critical→critical,
+High→major, Medium→minor, Low/Optional→nitpick. Prior v2 reviews count toward
+the round number. Never edit, delete or minimize a v2 comment; reply only when
+the current lifecycle requires it.

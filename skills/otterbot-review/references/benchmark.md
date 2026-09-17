@@ -1,8 +1,8 @@
 # Reviewer validation and staged rollout
 
-Run this separately from ordinary PR reviews. Defined scenarios are expectations,
-not evidence of model accuracy. Executing a fixture's code verifies its behavior,
-not whether a reviewing model detects the defect.
+Run this separately from ordinary PR reviews. Defined scenarios are
+expectations, not evidence of model accuracy. Executing a fixture's code
+verifies its behavior, not whether a reviewing model detects the defect.
 
 ## Three layers of validation
 
@@ -15,17 +15,21 @@ not whether a reviewing model detects the defect.
    receive only the prior delivered review/state and new raw artifacts.
 3. Trial the same host workflow on a sandbox repository or mocked host adapter,
    including pagination, partial writes, stale approvals, edited commands,
-   concurrent pushes/base advances, event redelivery and approval-removal failure.
-   No production writes for validation. Shadow itself must issue zero writes.
+   concurrent pushes/base advances, event redelivery and approval-removal
+   failure. No production writes for validation. Shadow itself must issue zero
+   writes.
 
-The existing fixture-backed cases in `evals/evals.json` are a starting point,
-not a representative release benchmark. Extend with anonymized realistic PRs
-covering permission boundaries, migrations, concurrency, API compatibility,
-dependency changes and ordinary safe refactors. Include cases where behavior
-is safe because a real caller guard exists and cases where the guard is bypassed.
-Include incomplete first reviews followed by small fixes, and clean PR heads
-that become incompatible with a changed base. Use the same raw snapshots when
-comparing skill/model versions. Repeat runs to expose nondeterminism.
+The fixture-backed cases in `evals/evals.json` are a starting point, not a
+representative release benchmark. `scripts/run-evals --check` validates the case
+file, `--prompt <id>` emits one case with its fixture inlined for a shadow run,
+and `--score <dir>` scores saved outputs against each case's assertions. Extend
+with anonymized realistic PRs covering permission boundaries, migrations,
+concurrency, API compatibility, dependency changes and ordinary safe refactors.
+Include cases where behavior is safe because a real caller guard exists and
+cases where the guard is bypassed. Include incomplete first reviews followed by
+small fixes, and clean PR heads that become incompatible with a changed base.
+Use the same raw snapshots when comparing skill/model versions. Repeat runs to
+expose nondeterminism.
 
 ## Record outcomes, not wording
 
@@ -38,7 +42,7 @@ Report counts and denominators by risk class:
 
 - Serious defects detected and missed; unsafe code approvals.
 - Incorrect findings and unjustified holds on clean controls.
-- Correct fixes that reach readiness without unrelated new demands.
+- Correct fixes that reach Review passed without unrelated new demands.
 - Correct rejection/deferral commands and persistent unresolved risks.
 - State-transition and event-recovery failures; duplicate comments/approvals.
 - Median/tail elapsed time and usage, including failure and recovery runs.
@@ -62,13 +66,14 @@ The skill does not provision automation, change branch protection, or merge PRs.
 
 Before asserting a speedup, collect at least 12 representative snapshot cases:
 four initial reviews (small, standard, sensitive, large), four changed-code
-re-reviews (including a fixed blocker and a changed dependency), two comment/source-evidence
-reassessments, one unchanged skip and one incomplete-review recovery. Include
-buggy, clean and corrected controls. Capture the same raw source, paginated
-host facts and initial review state for both skill versions; isolate their
-sessions and caches so neither sees the other's findings. Alternate version
-order and repeat each case at least twice. Record missing host capabilities;
-a simulated adapter measures that adapter, not production host latency.
+re-reviews (including a fixed blocker and a changed dependency), two
+comment/source-evidence reassessments, one unchanged skip and one
+incomplete-review recovery. Include buggy, clean and corrected controls. Capture
+the same raw source, paginated host facts and initial review state for both
+skill versions; isolate their sessions and caches so neither sees the other's
+findings. Alternate version order and repeat each case at least twice. Record
+missing host capabilities; a simulated adapter measures that adapter, not
+production host latency.
 
 Save one local record per run using `evals/performance-record.json` as a field
 template. Set unavailable counters to null, never zero. Collect available

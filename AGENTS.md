@@ -86,7 +86,9 @@ Conventions:
 - **`evals/evals.json`** — example prompts and expected outputs used to
   regression-test the skill. Follow the shape in
   `skills/otterbot-review/evals/evals.json`: a top-level `skill_name` plus an
-  `evals` array of `{ id, prompt, expected_output, files }`.
+  `evals` array of `{ id, prompt, expected_output, files }`, optionally with
+  `must_include` / `must_not_include` string arrays and `tags` so a runner can
+  score outputs (see `skills/otterbot-review/scripts/run-evals`).
 
 ## Installation model
 

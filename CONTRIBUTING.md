@@ -71,8 +71,9 @@ the tool to reload skills.
 5. **Add evals (recommended).** Create `evals/evals.json` following the shape in
    [`skills/otterbot-review/evals/evals.json`](skills/otterbot-review/evals/evals.json):
    a top-level `skill_name` and an `evals` array of
-   `{ id, prompt, expected_output, files }`. Cover the main path and the tricky
-   edge cases.
+   `{ id, prompt, expected_output, files }`, optionally with `must_include`,
+   `must_not_include` and `tags` so a scorer can check outputs mechanically.
+   Cover the main path and the tricky edge cases.
 
 6. **Publish it.** Run `./scripts/install` and confirm the new skill is picked
    up. This symlinks it for Claude Code, copies it for Codex and the Cursor app,
