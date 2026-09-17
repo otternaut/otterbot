@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "review this PR: https://github.com/acme/widgets/pull/42",
-      "expected_output": "One integrated review, evidenced inline findings and matching host verdict. Root normally at most 60 words; most inline findings use 3–8 prose sentences with a soft 200-word ceiling, excluding marker, headings, footer and code, and no minimum. Use 1–2 sentences for problem, trigger and cause with evidence, 1–3 each for the concrete consequence and fix, including useful rationale and a regression check. Each section contributes new information; prefer one verified fix and one consequence. Do not pad, overload sentences, repeat calculations or paraphrase suggested code. Exceed the guidance when essential evidence or a non-obvious fix requires it. Include an applyable suggestion for a verified self-contained replacement when the host and anchor support it; otherwise provide a code or diff example when a safe fix is known. Inline findings preserve the category/severity header and sub footer, place the problem and trigger directly below the header without a Problem heading or bullets, and separate the consequence and fix under matching bold summary titles Why It Matters and How To Fix It in separate details open sections on GitHub (level-four headings for renderers without disclosure support). Every comment has Ollie personality subtext and reviewed head. Collapsible Advisory Findings indexes current and prior Ollie findings with original thread links and prior statuses. Back-fill new links once after verification; preserve root footer. Submit against reviewed head and verify marker, state, count and URLs. Conversation gives link, verdict, counts and material limits.",
+      "expected_output": "One integrated review, evidenced inline findings and matching host verdict. Root normally at most 60 words; most inline findings use 3–8 prose sentences with a soft 200-word ceiling, excluding marker, headings, footer and code, and no minimum. Use 1–2 sentences for problem, trigger and cause with evidence, 1–3 each for the concrete consequence and fix, including useful rationale and a regression check. Each section contributes new information; prefer one verified fix and one consequence. Do not pad, overload sentences, repeat calculations or paraphrase suggested code. Exceed the guidance when essential evidence or a non-obvious fix requires it. Include an applyable suggestion for a verified self-contained replacement when the host and anchor support it; otherwise provide a code or diff example when a safe fix is known. Inline findings preserve the category/severity header and sub footer, place the problem and trigger directly below the header without a Problem heading or bullets, and separate the consequence and fix under matching bold summary titles Why This Matters and Recommended Approach in separate details without open sections on GitHub (level-four headings for renderers without disclosure support). Inline comments and replies have Ollie personality subtext and reviewed head; roots have a footer only when no inline findings accompany that review. Visible Findings & Observations indexes current and prior Ollie findings with original thread links and prior statuses. Back-fill new links once after verification; apply the conditional root footer rule. Submit against reviewed head and verify marker, state, count and URLs. Conversation gives link, verdict, counts and material limits. Root uses #### 🦦 The Raft Report · <result emoji> <result> and #### Findings & Observations. Keep a brief assessment of the decision and scope; add material review limits or required steps beyond fixes only when applicable. Do not duplicate inline causes, impacts or fixes, or repeat counts unless needed to explain an approval threshold. Keep the existing category/severity, status dots, file references and original links in one visible two-line bullet list with active findings first and resolved findings in the same list. No heading tally or separate resolved section. Omit the root footer when inline findings accompany the review; retain reviewed-head/state markers. Clean or root-only reviews retain the footer and omit the findings section only when there are no findings.",
       "files": []
     },
     {
@@ -16,7 +16,7 @@
     {
       "id": 3,
       "prompt": "re-review https://github.com/acme/widgets/pull/42 after the author pushed fixes and replied on two threads",
-      "expected_output": "Review interdiff and validate prior blocker evidence applicability and recheck changed/uncertain blockers plus affected threads/new replies. Resolve verified fixes and answer pending questions with status marker and personality footer. Do not repeat unchanged still-open status. Summarize changed counts and retain a collapsible linked index of current and historical Ollie findings with statuses, including resolved ones.",
+      "expected_output": "Review interdiff and validate prior blocker evidence applicability and recheck changed/uncertain blockers plus affected threads/new replies. Resolve verified fixes and answer pending questions with status marker and personality footer. Do not repeat unchanged still-open status. Summarize changed counts and retain a visible linked index of current and historical Ollie findings with statuses, including resolved ones.",
       "files": []
     },
     {
@@ -124,7 +124,7 @@
     {
       "id": 21,
       "prompt": "review https://github.com/acme/widgets/pull/72, which yields five inline findings",
-      "expected_output": "Five findings may all post when budget allows, e.g. three verified blockers and two minors. Root blurb stays concise with a collapsible Advisory Findings index linking all five threads. Every inline has personality subtext. One batch submission and verification, then one edit back-fills all new thread links.",
+      "expected_output": "Five findings may all post when budget allows, e.g. three verified blockers and two minors. Root blurb stays concise with a visible Findings & Observations index linking all five threads. Every inline has personality subtext. One batch submission and verification, then one edit back-fills all new thread links.",
       "files": []
     },
     {
@@ -232,7 +232,7 @@
     {
       "id": 39,
       "prompt": "review this PR --maintainability; initial review has no human approval and no critical",
-      "expected_output": "Allow up to two useful evidenced nitpicks in addition to up to four minors and verified blockers. Do not invent issues to fill slots. Keep footer on each comment and do not let nitpicks affect verdict.",
+      "expected_output": "Allow up to two useful evidenced nitpicks in addition to up to four minors and verified blockers. Do not invent issues to fill slots. Keep inline footers and omit the root footer when inline findings accompany the review and do not let nitpicks affect verdict.",
       "files": []
     },
     {
@@ -262,7 +262,7 @@
     {
       "id": 44,
       "prompt": "post review; submission times out after the host may have accepted it",
-      "expected_output": "Check matching reviewed-head marker before recovery, no blind duplicate submission. At most one recovery attempt; disclose unresolved delivery limitation. Keep personality footer in any delivered comment.",
+      "expected_output": "Check matching reviewed-head marker before recovery, no blind duplicate submission. At most one recovery attempt; disclose unresolved delivery limitation. Keep inline/reply footers and a root footer only when no inline findings accompany that review.",
       "files": []
     },
     {
@@ -304,31 +304,31 @@
     {
       "id": 51,
       "prompt": "Re-review a clean PR with two fixed and one withdrawn prior Ollie findings; no new findings",
-      "expected_output": "Render Advisory Findings with all three original thread links and accurate fixed/withdrawn statuses and tally. Do not omit the section because nothing is open. No new inline findings or redundant thread replies. Preserve footer; no link edit if prior URLs are known. Use separate 🟢 fixed and ⚪ withdrawn bullets with matching colored summary counts in a <summary> that starts Advisory Findings &nbsp;; never claim all findings fixed when one is withdrawn.",
+      "expected_output": "Render Findings & Observations with all three original thread links and accurate fixed/withdrawn statuses. Do not omit the section because nothing is open. No new inline findings or redundant thread replies. Preserve footer; no link edit if prior URLs are known. Use separate 🟢 fixed and ⚪ withdrawn bullets under #### Findings & Observations without heading tallies or a separate resolved section; never claim all findings fixed when one is withdrawn.",
       "files": []
     },
     {
       "id": 52,
       "prompt": "Review a PR with one prior human finding, three prior Ollie findings and two new Ollie minors",
-      "expected_output": "Index the five distinct Ollie findings only, linking original threads and marking prior statuses. Historical findings do not consume the four-new-minor budget. Fill new links from delivery result in one edit; human thread remains excluded. Group by current status with active groups first and both new minors labeled 🔵 new; use colored nonzero summary counts, separated with &nbsp; after the Advisory Findings label, and textual severity on entries.",
+      "expected_output": "Index the five distinct Ollie findings only, linking original threads and marking prior statuses. Historical findings do not consume the four-new-minor budget. Fill new links from delivery result in one edit; human thread remains excluded. Sort one visible list by current status with active findings first and both new minors labeled 🔵 new; use #### Findings & Observations with no heading tallies or status group sections, and textual severity on entries.",
       "files": []
     },
     {
       "id": 53,
       "prompt": "Post a clean initial review with no current or prior findings",
-      "expected_output": "Omit Advisory Findings entirely, retain concise verdict and personality footer. No zero-count section or link update.",
+      "expected_output": "Omit Findings & Observations entirely, retain concise verdict and personality footer. No zero-count section or link update.",
       "files": []
     },
     {
       "id": 54,
       "prompt": "Submit review with new finding; root link update fails twice",
-      "expected_output": "Keep posted review and plain file:line fallback for new finding, preserve known prior links, visible overflow, ledger and footer, report partial linking failure. No further retry or duplicate review submission.",
+      "expected_output": "Keep posted review and plain file:line fallback for new finding, preserve known prior links, visible overflow, ledger and the conditional footer rule, report partial linking failure. No further retry or duplicate review submission.",
       "files": []
     },
     {
       "id": 55,
       "prompt": "Review a clean PR with no minors and all approval gates satisfied",
-      "expected_output": "Ship It / Review passed with approval; no CI or merge-readiness claims, quota search or empty Advisory Findings. Persist complete coverage, context and explicit empty ledger.",
+      "expected_output": "Ship It / Review passed with approval; no CI or merge-readiness claims, quota search or empty Findings & Observations. Persist complete coverage, context and explicit empty ledger.",
       "files": []
     },
     {
@@ -340,7 +340,7 @@
     {
       "id": 57,
       "prompt": "Review a PR with three credible minor candidates, no prior findings, no blockers",
-      "expected_output": "Three verified minors give Request Changes explaining the threshold and fixes without raising their severities. All three may post inline with Advisory Findings links and footers. Do not seek a fourth to fill slots.",
+      "expected_output": "Three verified minors give Request Changes explaining the threshold without repeating inline fixes or raising their severities. All three may post inline with Findings & Observations links and footers. Do not seek a fourth to fill slots.",
       "files": []
     },
     {
@@ -352,7 +352,7 @@
     {
       "id": 59,
       "prompt": "Re-review a PR with one open minor and two resolved deferred minors linked to tickets, no human risk decisions",
-      "expected_output": "Count three. Tickets and resolution do not remove deferred risks. Request Changes naming threshold, preserve deferred statuses and Advisory Findings links.",
+      "expected_output": "Count three. Tickets and resolution do not remove deferred risks. Request Changes naming threshold, preserve deferred statuses and Findings & Observations links.",
       "files": []
     },
     {
@@ -496,7 +496,7 @@
     {
       "id": 83,
       "prompt": "Render a review with five verified new minors and no blockers",
-      "expected_output": "Request Changes because at least three minors count. Four inline; fifth visibly in Advisory Findings with stable ID, code reference, consequence, fix and status, plus ledger record. Index has five distinct findings. No fabricated thread link or hidden-only approval reason.",
+      "expected_output": "Request Changes because at least three minors count. Four inline; fifth visibly in Findings & Observations with stable ID, code reference, consequence, fix and status, plus ledger record. Index has five distinct findings. No fabricated thread link or hidden-only approval reason.",
       "files": []
     },
     {
@@ -672,7 +672,7 @@
     {
       "id": 111,
       "prompt": "Review four verified new minors with no blockers",
-      "expected_output": "Post four inline with personality footers and Advisory Findings links. Request Changes at three-minor threshold; never approve because posting cap increased. No overflow ledger entries for these four.",
+      "expected_output": "Post four inline with personality footers and Findings & Observations links. Request Changes at three-minor threshold; never approve because posting cap increased. No overflow ledger entries for these four.",
       "files": []
     },
     {
@@ -906,13 +906,13 @@
     {
       "id": 150,
       "prompt": "Re-review a PR whose only two Ollie findings are now verified fixed in commits a1b2c3d and e4f5a6b. Both original thread URLs are known.",
-      "expected_output": "Keep the collapsible Advisory Findings section with summary <summary>Advisory Findings &nbsp; 🟢 All 2 findings fixed</summary> and two separate 🟢 fixed bullets. Leave one blank line after the summary before the first finding, without an HTML break or spacer. Preserve each original thread link and verified fix SHA. For every finding, use two normal-sized lines per bullet with no <sub> wrappers: an entirely bold category/severity and status line, such as 🟡 correctness(minor) · 🟢 fixed, then a code-formatted file:line reference followed by a middot ( · ) and the linked title on the same line. The first dot is severity and the second is status. End the first line with two trailing spaces for a Markdown hard line break and indent the second line by two spaces, without a blank line between them. Append fixed in and the verified fix SHA inside the bold status line. Separate findings with a single blank line and no horizontal rules; omit tables, status group headings and absent details, and retain the root footer. No redundant replies or invented URLs.",
+      "expected_output": "Keep one visible #### Findings & Observations section with two separate 🟢 fixed bullets, no heading tally and no separate resolved section. Leave one blank line after the heading before the first finding, without an HTML break or spacer. Preserve each original thread link and verified fix SHA. For every finding, use two normal-sized lines per bullet with no <sub> wrappers: an entirely bold category/severity and status line, such as 🟡 correctness(minor) · 🟢 fixed, then a code-formatted file:line reference followed by a middot ( · ) and the linked title on the same line. The first dot is severity and the second is status. End the first line with two trailing spaces for a Markdown hard line break and indent the second line by two spaces, without a blank line between them. Append fixed in and the verified fix SHA inside the bold status line. Separate findings with a single blank line and no horizontal rules; omit tables, status group headings and absent details, and retain the root footer. No redundant replies or invented URLs.",
       "files": []
     },
     {
       "id": 151,
       "prompt": "Render a re-review index with one still-open regressed critical, one new minor, one deferred minor, one fixed minor, one accepted finding, one superseded finding and one withdrawn finding. The deferred minor is visible overflow without a thread; all other original URLs are known.",
-      "expected_output": "Render seven findings formatted as bullets separated by a single blank line and no horizontal rules, sorted 🟠 open, 🔵 new, 🟡 deferred, 🟢 fixed, 🟣 accepted, ⚪ superseded and ⚪ withdrawn in that order, with matching nonzero colored summary counts in a <summary> that starts Advisory Findings &nbsp;. Preserve original links including the regressed critical, fix SHA when known (appended as fixed in on the bold status line, omitted when unknown) and visible overflow ID, code evidence, consequence and fix without inventing a thread URL. For every entry, use two normal-sized lines per bullet with no <sub> wrappers: an entirely bold category/severity and status line, such as 🔴 correctness(critical) · 🟠 open, then the code-formatted file:line reference followed by a middot ( · ) and a linked description with any necessary notes on the same line (retain the reference after link back-fill; disclose unavailable historical locations rather than inventing them). The first dot is severity and the second is status. End the first line with two trailing spaces for a Markdown hard line break and indent the second line by two spaces, without a blank line between them. Leave one blank line between the summary and first finding, without an HTML break or spacer. Use normal spaces, omit tables, HTML line breaks within entries, repeated status group headings and absent details, and preserve ledger and approval counting rules.",
+      "expected_output": "Render seven findings formatted as bullets separated by a single blank line and no horizontal rules, sorted 🟠 open, 🔵 new, 🟡 deferred, 🟢 fixed, 🟣 accepted, ⚪ superseded and ⚪ withdrawn in that order, under #### Findings & Observations, with no heading tally, disclosure wrapper or separate resolved section. Preserve original links including the regressed critical, fix SHA when known (appended as fixed in on the bold status line, omitted when unknown) and visible overflow ID, code evidence, consequence and fix without inventing a thread URL. For every entry, use two normal-sized lines per bullet with no <sub> wrappers: an entirely bold category/severity and status line, such as 🔴 correctness(critical) · 🟠 open, then the code-formatted file:line reference followed by a middot ( · ) and a linked description with any necessary notes on the same line (retain the reference after link back-fill; disclose unavailable historical locations rather than inventing them). The first dot is severity and the second is status. End the first line with two trailing spaces for a Markdown hard line break and indent the second line by two spaces, without a blank line between them. Leave one blank line between the heading and first finding, without an HTML break or spacer. Use normal spaces, omit tables, HTML line breaks within entries, repeated status group headings and absent details, and preserve ledger and approval counting rules.",
       "files": []
     },
     {
@@ -954,7 +954,7 @@
     {
       "id": 158,
       "prompt": "Prepare a hosted review with two independently verified safe minors, no existing matching threads, complete coverage and passing gates. The prior root used ✅ Ollie's Verdict · Ship It.",
-      "expected_output": "Use 🚢 Ollie's Verdict · Ship It and approve. Publish both minors as inline findings with evidence and fixes, index them in Advisory Findings and verify their returned comments. Do not preserve the old success icon or omit findings because the verdict passes.",
+      "expected_output": "Use #### 🦦 The Raft Report · 🚢 Ship It and approve. Publish both minors as inline findings with evidence and fixes, index them in Findings & Observations and verify their returned comments. Do not preserve the old success icon or legacy title, or omit findings because the verdict passes.",
       "files": []
     },
     {
@@ -972,7 +972,7 @@
     {
       "id": 161,
       "prompt": "Review a shared-role KMS decrypt change. Alias, region, S3 constraints and removable attachment are proven by inspection and the Nyquist IAM contract. Review is complete with no findings; no authorized non-author human approval covers this head.",
-      "expected_output": "Use 🧑‍⚖️ Ollie's Verdict · Human Review Needed and Human Review Needed review status. Name the KMS decryption behavior and required authorized non-author current-head approval. No fabricated finding or severity and no empty Advisory Findings section. Persist requires-human and a human hold. Use the blocking host action, reconcile any prior Ollie approval and verify delivery.",
+      "expected_output": "Use #### 🦦 The Raft Report · 🧑‍⚖️ Human Review Needed and Human Review Needed review status. Name the KMS decryption behavior and required authorized non-author current-head approval. No fabricated finding or severity and no empty Findings & Observations section. Persist requires-human and a human hold. Use the blocking host action, reconcile any prior Ollie approval and verify delivery.",
       "files": []
     },
     {
@@ -1008,7 +1008,7 @@
     {
       "id": 167,
       "prompt": "Review a GitHub diff where an off-by-one loop reads items[items.length]. The verified fix replaces <= with < on one commentable line, requires no companion changes, and preserves the caller contract.",
-      "expected_output": "Include a native suggestion under How To Fix It containing the complete corrected source line, anchored to that exact line with matching indentation. Explain the effect and a useful boundary regression case; prose-only advice is insufficient.",
+      "expected_output": "Include a native suggestion under Recommended Approach containing the complete corrected source line, anchored to that exact line with matching indentation. Explain the effect and a useful boundary regression case; prose-only advice is insufficient.",
       "files": []
     },
     {
@@ -1026,19 +1026,19 @@
     {
       "id": 170,
       "prompt": "Review a local diff with a verified one-line null guard fix. There is no host-native apply-suggestion capability.",
-      "expected_output": "Provide a fenced code or diff example under How To Fix It with the target file and sufficient source context to apply the verified replacement. Do not claim it has a host apply button or omit code just because native suggestions are unavailable.",
+      "expected_output": "Provide a fenced code or diff example under Recommended Approach with the target file and sufficient source context to apply the verified replacement. Do not claim it has a host apply button or omit code just because native suggestions are unavailable.",
       "files": []
     },
     {
       "id": 171,
       "prompt": "Review a PR with three independent, straightforward defects, each with a verified local replacement. Explain each clearly without making the set of findings cumbersome to read.",
-      "expected_output": "Keep each finding concise, normally 3–8 prose sentences with a soft 200-word ceiling and no minimum. Use 1–2 sentences for the problem and cause, 1–3 each for the impact and fix, including useful rationale and a regression check. Preserve the category/severity header, default-open Why It Matters and How To Fix It disclosures with matching bold summary titles on GitHub, and footer. Each section adds new information; prefer one concrete consequence and one verified fix with an applicable suggestion block. Do not pad, overload sentences, repeat identifiers or calculations, narrate test procedures, or paraphrase the patch. Preserve necessary evidence and complete replacement code, exceeding the guidance when essential explanation requires it.",
+      "expected_output": "Keep each finding concise, normally 3–8 prose sentences with a soft 200-word ceiling and no minimum. Use 1–2 sentences for the problem and cause, 1–3 each for the impact and fix, including useful rationale and a regression check. Preserve the category/severity header, default-collapsed Why This Matters and Recommended Approach disclosures with matching bold summary titles on GitHub, and footer. Each section adds new information; prefer one concrete consequence and one verified fix with an applicable suggestion block. Do not pad, overload sentences, repeat identifiers or calculations, narrate test procedures, or paraphrase the patch. Preserve necessary evidence and complete replacement code, exceeding the guidance when essential explanation requires it.",
       "files": []
     },
     {
       "id": 172,
       "prompt": "Review a GitHub PR with a verified, self-contained 30-line replacement. Keep the suggested change collapsed so the inline finding does not take up a huge amount of space.",
-      "expected_output": "Keep the finding explanation, Why It Matters, How To Fix It prose and footer visible. Put the complete native suggestion fence inside a closed details block with bold summary Suggested Change, no open attribute, and blank lines around the fence. Preserve the exact anchor, indentation and all replacement lines. Use a matching bold Example Fix summary for a fallback code or diff example. Do not wrap the whole finding or claim to control the host source excerpt above the comment. Why It Matters and How To Fix It each use a separate details open block; Suggested Change is a sibling details block without open. All three summary titles use strong tags for consistent styling. Collapsing How To Fix It must not hide the Suggested Change toggle.",
+      "expected_output": "Keep the finding explanation and footer visible; collapse Why This Matters and Recommended Approach by default. Put the complete native suggestion fence inside a closed details block with bold summary Suggested Patch, no open attribute, and blank lines around the fence. Preserve the exact anchor, indentation and all replacement lines. Use a matching bold Suggested Patch summary for a fallback code or diff example. Do not wrap the whole finding or claim to control the host source excerpt above the comment. Why This Matters and Recommended Approach each use a separate details without open block; Suggested Patch is a sibling details block without open. All three summary titles use strong tags for consistent styling, with a <br> on the line immediately below each summary inside its disclosure. Collapsing Recommended Approach must not hide the Suggested Patch toggle.",
       "files": []
     }
   ]

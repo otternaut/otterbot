@@ -56,7 +56,7 @@ behavior has adequate evidence, no outstanding findings remain, and the only
 unmet gate is an explicitly required human review or sign-off. Name the
 behavior, who must review it, and the approval needed for the current head.
 Record a human hold, not a finding: do not assign severity, invent an inline
-defect, or add an empty Advisory Findings section. Historical resolved findings
+defect, or add an empty Findings & Observations section. Historical resolved findings
 remain indexed. Do not invent a human-review requirement from uncertainty or
 an unrelated host reviewer quota.
 
@@ -135,7 +135,7 @@ is no separate deferral-count or review-round approval limit.
 
 Every finding affecting approval must have a visible trigger, consequence,
 code reference and fix. Keep up to four new minors inline; render additional verified
-minors as compact entries in Advisory Findings, with their stable IDs and
+minors as compact entries in Findings & Observations, with their stable IDs and
 status. These entries are not hidden solely in metadata and remain visible
 on subsequent rounds. Link an existing thread when available; otherwise use
 a reviewed-commit code link or plain `file:line`, never an invented thread URL.

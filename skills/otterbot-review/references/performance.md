@@ -67,7 +67,7 @@ exceed the reserve; report the overrun instead of silently raising the budget.
 - Parse newest attributable state once; retain compact records locally through
   the run. Reuse verified unchanged evidence under `readiness.md`. Do not send
   repeated public Markdown history through reasoning just to rebuild an index.
-- Preserve the full public Advisory Findings history and required root markers.
+- Preserve the full public Findings & Observations history and required root markers.
   Group related coverage paths explicitly and keep evidence references concise;
   never truncate outstanding findings, gaps or command deduplication state.
 - Load only routed reference sections. Do not read benchmark/developer guides
@@ -75,7 +75,8 @@ exceed the reserve; report the overrun instead of silently raising the budget.
   `verification.md`; do not collect redundant proof for reassurance.
 - Prepare all comments before delivery, assign random phrases in one helper
   call, and reuse assigned text on retries. Do not spend model calls inventing
-  a fresh joke for each comment. Keep Ollie's playful footer on every comment.
+  a fresh joke for each comment. Keep inline and reply footers; apply the
+  conditional root footer rule in `format.md`.
 
 For baseline recording, comparison and rollout, use `benchmark.md` separately.
 Do not run a benchmark as part of a PR review or invent unavailable token data.

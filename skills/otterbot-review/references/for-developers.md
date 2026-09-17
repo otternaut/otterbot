@@ -1,8 +1,11 @@
 # How Ollie reviews your pull request
 
 Ollie 🦦 leaves a concise first-pass review with evidenced bugs and concrete
-fixes. Findings are inline or visibly summarized under Advisory Findings; the root explains the verdict in about two
-sentences. A collapsible **Advisory Findings** section links to each current
+fixes. The root uses **🦦 The Raft Report · <result emoji> <result>** as a
+level-four heading, followed by a short assessment of the decision and scope.
+It adds only material review limits and required next steps beyond fixes when
+applicable; technical causes, consequences and fixes stay in the inline findings.
+A visible level-four **Findings & Observations** heading links to each current
 and prior Ollie finding in separate bullets. Each finding uses two
 lines of normal-sized text: a bold category/severity and status line (for
 example `🟠 contracts(major) · 🔵 new`), then an indented `file:line` reference
@@ -13,21 +16,23 @@ A small gap separates
 the section title from the first finding. Relevant notes stay in
 the description. Entries are sorted by status with active items first:
 🟠 open, 🔵 new, 🟡 deferred, 🟢 fixed, 🟣 accepted, ⚪ superseded and
-⚪ withdrawn. The collapsed summary shows counts for each nonzero status;
-when all findings are verified fixed, it says **🟢 All N findings fixed**.
+⚪ withdrawn. All findings stay in one list, including resolved findings;
+there are no separate status sections or heading tallies.
 Fixed entries append “fixed in” and the verified fix commit to the bold status
 line when known, and retain their original links.
 The entire status line is bold. Entry status labels are lowercase, with plain
 emoji dots.
-The summary uses status dots only. It is omitted only when there are no
-findings.
+Omit the findings section only when there are no findings.
 On GitHub, the verdict and new inline findings belong to one submitted review;
 the verdict is its review body, including later link updates. Hosts without
 review grouping use a disclosed root-first fallback.
-Every comment keeps Ollie's otter footer and reviewed commit.
+Inline findings and replies keep Ollie's otter footer and reviewed commit.
+The root includes that footer only when no inline findings accompany the review.
 Inline findings put the problem description directly below the category/severity
-header, followed by collapsible sections **Why It Matters** for the consequence
-and **How To Fix It** for the suggested change, both open by default on GitHub.
+header, followed by collapsible sections **Why This Matters** for the consequence
+and **Recommended Approach** for the suggested change, both collapsed by default on GitHub. **Suggested Patch** holds any code
+suggestion or example in a separate collapsed section. Each inline section has
+a `<br>` immediately below its summary, inside the disclosure.
 Most findings use 3–8 prose sentences: 1–2 for the problem and cause, and 1–3
 each for the impact and fix, including useful rationale or a regression check.
 A soft 200-word ceiling allows context without imposing a minimum; simple
@@ -101,9 +106,8 @@ when the host and review anchor support it. Otherwise, known safe fixes include
 a code or diff example with file paths and any companion edits so an agent can
 apply them. When a fix depends on an unresolved contract or design choice, Ollie
 explains what must be resolved before proposing replacement code. On GitHub,
-replacement code starts collapsed under **Suggested Change** (or **Example
-Fix** for code examples); expand it to inspect the patch. The fix explanation
-stays visible.
+replacement code starts collapsed under **Suggested Patch**; expand it to
+inspect the patch. The fix explanation has its own collapsed section.
 
 - **Ship It:** no open verified blockers, at most two counted minors that are
   demonstrably safe to address after merge, and every approval rule passed.
@@ -118,9 +122,9 @@ stays visible.
 Three or more distinct verified outstanding minors yield Request Changes,
 based on Ollie's own review. The count includes prior rounds, independently
 discovered duplicates and verified overflow beyond the four inline comments. Ollie records
-overflow minors visibly under Advisory Findings, with code evidence and a
+overflow minors visibly under Findings & Observations, with code evidence and a
 fix, and preserves their IDs in metadata for subsequent reviews.
-The root explains when this count differs from the linked Advisory Findings
+The root explains when this count differs from the linked Findings & Observations
 list. Three outstanding minors still withhold approval; a fourth identified
 minor may be verified for useful feedback within the time budget. Ollie never
 searches for issues just to fill the four slots.

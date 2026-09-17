@@ -9,37 +9,53 @@ On hosts with grouped reviews, this entire root is the body of the review that
 owns the new inline findings. Submit them together and back-fill links by
 editing that same body, never by posting a separate conversation comment.
 
-Use the exact verdict banner mapping: **🚢 Ollie's Verdict &middot; Ship It**,
-**💬 Ollie's Verdict &middot; Comment Only**,
-**🧑‍⚖️ Ollie's Verdict &middot; Human Review Needed**, or
-**⚠️ Ollie's Verdict &middot; Request Changes**. Ship It always uses 🚢;
-do not substitute ✅ or another success icon, including on edits and retries.
+Use a level-four heading for the banner, with 🦦 branding before the title and
+an outcome-specific emoji after the separator. Use these exact mappings:
+
+- `#### 🦦 The Raft Report · 🚢 Ship It`
+- `#### 🦦 The Raft Report · 💬 Comment Only`
+- `#### 🦦 The Raft Report · 🧑‍⚖️ Human Review Needed`
+- `#### 🦦 The Raft Report · ⚠️ Request Changes`
+
+Ship It always uses 🚢; do not substitute ✅ or another success icon,
+including on edits and retries.
 
 ```markdown
 <!-- ollie-review: head: <full-sha>; base: <full-sha>; verdict: <ship-it|comment-only|requires-human|request-changes>; gate: <pass|failed rules|->; round: <n> -->
 
-**<🚢|💬|🧑‍⚖️|⚠️> Ollie's Verdict &middot; <Ship It|Comment Only|Human Review Needed|Request Changes>**
+#### 🦦 The Raft Report · <🚢|💬|🧑‍⚖️|⚠️> <Ship It|Comment Only|Human Review Needed|Request Changes>
 
-<Two sentences explaining the verdict, evidence, and actionable holds.>
+<Brief assessment explaining the decision and affected scope.>
+<Material review limits or required steps beyond fixes, only when applicable.>
 
-<details>
-<summary>Advisory Findings &nbsp; <colored status tally></summary>
+#### Findings & Observations
 
 - **<severity dot> <category>(<level>) · <status dot> <lowercase status label>**  
   `<file>:<line>` · [<short summary>](<original-thread-url>)
 
-</details>
-
 <!-- ollie-approval: {"head":"<full-sha>","unposted_minors":[]} -->
 <!-- ollie-state: <JSON record from readiness.md> -->
 
-<sub>🦦 Ollie reviewed `<short-sha>` &middot; <phrase></sub>
+<Optional root footer; include only when this review has no inline findings.>
 ```
 
 Replace the empty ledger with current outstanding overflow records from
 `approval.md` when applicable; retain an explicit empty list when none remain.
 
-Normally keep the body within 60 words, excluding marker, banner, findings index and footer.
+Normally keep the assessment to one sentence, within 60 words total for root
+prose excluding markers, headings, findings and any footer. Explain the overall
+decision and affected scope without repeating a linked finding's cause, impact
+or proposed fix. Add material review limits only when they affect confidence,
+and required next steps beyond fixes only when applicable, such as a specific
+human review. Do not invent limitations or add routine coverage checklists.
+Keep categories, severities and statuses in the bullets; do not repeat counts
+above them unless a count is necessary to explain an approval threshold.
+
+Omit the root personality footer when the review includes inline findings.
+Keep it when no inline findings accompany the review, including clean reviews,
+root-only re-reviews and threadless findings, using
+``<sub>🦦 Ollie reviewed `<short-sha>` &middot; <phrase></sub>``.
+Always preserve the reviewed-head and state markers, with or without a footer.
 Benign comments normally accompany Ship It and an approval. If approval is
 withheld solely for required human review with no outstanding findings and
 otherwise passing gates, use 🧑‍⚖️ Human Review Needed and name the exact approval
@@ -51,10 +67,10 @@ Never emit a Comment Only "Not approving because" summary. Omit CI/CD status,
 check names/results/enforcement, waiting-on-workflow text and merge readiness
 from all output, including hidden markers and the conversation summary.
 Use extra words only when essential. For Request Changes, `gate: -` means
-blockers decided the verdict before approval was considered. The collapsible `Advisory Findings` section is required whenever Ollie has
+blockers decided the verdict before approval was considered. The visible `Findings & Observations` section is required whenever Ollie has
 current or prior findings on the PR, including a clean re-review with only
 resolved findings. Omit it when there are none; never render a zero-findings
-section. Leave one blank line between `</summary>` and the first bullet;
+section. Leave one blank line between the heading and the first bullet;
 do not add an HTML break or spacer below the title.
 
 Include each distinct Ollie finding once, linking to its original thread
@@ -93,9 +109,7 @@ a middot (` · `). The first line is
 `- **<severity dot> <category>(<level>) · <status dot> <lowercase status label>**`
 (for example `- **🟠 contracts(major) · 🔵 new**`). The first dot denotes
 severity: 🔴 critical, 🟠 major, 🟡 minor or 🔵 nitpick; the second denotes
-status. Lowercase all entry status labels and use plain emoji dots. The
-collapsed summary uses status dots only. Always pair a status dot with its
-label. End the first line with two trailing spaces for a Markdown hard line
+status. Lowercase all entry status labels and use plain emoji dots. Always pair a status dot with its label. End the first line with two trailing spaces for a Markdown hard line
 break and indent the second line by two spaces, without a blank line between
 them. Use normal-sized text, without `<sub>` wrappers. Use normal spaces so
 content can wrap naturally; no non-breaking spaces, HTML line breaks within
@@ -115,18 +129,15 @@ include the stable ID, trigger/consequence and fix in the description, with the
 supporting code reference first on the second line. Use the same two-line
 bullet format.
 
-The collapsed summary starts with `Advisory Findings &nbsp;` and shows nonzero
-status counts in entry order, separated with `&nbsp;` (for example
-`<summary>Advisory Findings &nbsp; 🔵 1 new</summary>`). Counts must match the entries.
-When every finding is verified fixed, use `🟢 All <count> findings fixed`
-(singular `finding` for one); retain the Fixed entries and original links inside.
-For mixed statuses, use the tally even if no findings remain open.
+Use `#### Findings & Observations`, matching the banner's heading level.
+Keep every finding visible in one list; do not wrap it in a disclosure or add
+separate resolved sections, status group headings or heading tallies. Retain
+resolved entries with their statuses and original links in the same list.
 
 Example with known thread links (the URLs below are placeholders):
 
 ```markdown
-<details>
-<summary>Advisory Findings &nbsp; 🟠 1 open &nbsp; 🟡 1 deferred &nbsp; 🟢 2 fixed</summary>
+#### Findings & Observations
 
 - **🟠 correctness(major) · 🟠 open**  
   `src/jobs/worker.ts:84` · [Missing retry limit](<original-thread-url>)
@@ -140,14 +151,13 @@ Example with known thread links (the URLs below are placeholders):
 - **🟠 reliability(major) · 🟢 fixed · fixed in `e4f5a6b`**  
   `src/events/consumer.ts:96` · [Duplicate event delivery](<original-thread-url>)
 
-</details>
 ```
 
 Use known prior thread URLs immediately;
 new findings temporarily use plain `file:line` text until delivery returns
 URLs. Never invent a link. Back-fill all new links in one root edit as described
 in `hosts.md`; if unsupported or unsuccessful retain locations and disclose
-the limitation. The root footer remains after the collapsible section.
+the limitation. Preserve the conditional root footer rule during link back-fill.
 
 ## Inline finding
 
@@ -157,22 +167,25 @@ the limitation. The root footer remains after the collapsible section.
 
 <Problem and reachable trigger, citing supporting file:line evidence.>
 
-<details open>
-<summary><strong>Why It Matters</strong></summary>
+<details>
+<summary><strong>Why This Matters</strong></summary>
+<br>
 
 <Concrete consequence for the affected caller or user.>
 
 </details>
 
-<details open>
-<summary><strong>How To Fix It</strong></summary>
+<details>
+<summary><strong>Recommended Approach</strong></summary>
+<br>
 
 <Smallest concrete change; targeted regression check when useful.>
 
 </details>
 
 <details>
-<summary><strong>Suggested Change</strong></summary>
+<summary><strong>Suggested Patch</strong></summary>
+<br>
 
 <Applyable suggestion or concrete code example when applicable; see below.>
 
@@ -183,17 +196,18 @@ the limitation. The root footer remains after the collapsible section.
 
 Place the problem description directly below the finding header, without a
 Problem heading or bullets. On GitHub, use sibling disclosure sections with
-matching bold summary titles: `Why It Matters`, `How To Fix It`, and
-`Suggested Change`. The first two use `<details open>` so their prose starts
-visible; the code section uses `<details>` so it starts collapsed. Keep each
-section independently collapsible, with blank lines around its Markdown body.
+matching bold summary titles: `Why This Matters`, `Recommended Approach`, and
+`Suggested Patch`. All sections use `<details>` without `open` so they start
+collapsed. Put `<br>` on the line immediately below each `</summary>`, inside
+the disclosure. Keep each section independently collapsible, with blank lines
+around its Markdown body.
 Keep the impact distinct from the problem description rather than repeating
 it. Preserve the existing category/severity header and `<sub>` footer outside
 the disclosures. If the renderer does not support disclosures, use level-four
 headings with the same titles and visible content instead.
 
 Keep the problem, trigger and cause to 1–2 prose sentences. Allow 1–3
-sentences each under Why It Matters and How To Fix It: enough to explain the
+sentences each under Why This Matters and Recommended Approach: enough to explain the
 consequence and affected scenario, then the concrete fix, its rationale and a
 useful regression check. Most findings fit in 3–8 prose sentences with a soft
 200-word ceiling, excluding marker, titles, footer and code. These are limits
@@ -209,7 +223,7 @@ Include applicable replacement code separately as described below, without
 restating it in prose. Brevity must not remove evidence or code needed to
 understand and apply the fix.
 
-After How To Fix It, include a host-native suggestion block whenever the fix
+After Recommended Approach, include a host-native suggestion block whenever the fix
 is a verified, self-contained replacement of a contiguous range and the host
 supports applying it at the review anchor. Use the host's suggestion syntax
 from `hosts.md`. Check the replacement against the reviewed source, match the
@@ -219,11 +233,12 @@ suggestion attached to the finding's current anchor. Choose a supported anchor
 that fits both the finding and the replacement when possible.
 
 On GitHub, wrap the suggestion fence in a closed `<details>` block with
-`<summary><strong>Suggested Change</strong></summary>`, as in the template. Omit the `open`
-attribute and leave blank lines around the fenced block so Markdown renders.
-Keep the fix explanation in its own open disclosure and the footer outside
+`<summary><strong>Suggested Patch</strong></summary>`, as in the template. Omit the `open`
+attribute, put `<br>` directly below the summary, and leave blank lines around
+the fenced block so Markdown renders.
+Keep the fix explanation in its own collapsed disclosure and the footer outside
 all disclosures. Put fallback code or diff examples in the code disclosure,
-using the same bold summary styling with the title `Example Fix`. Omit
+using the same bold summary styling with the title `Suggested Patch`. Omit
 the disclosure when there is no code. On other hosts or local output, use this
 wrapper only if the renderer supports it and preserves native suggestions;
 otherwise keep the code visible. Preserve the complete replacement and native
@@ -266,8 +281,9 @@ or `uncommitted repository` when no commit exists, in the personality footer.
 
 ## Tagline pool
 
-Every posted root, inline comment and thread reply retains the `<sub>` footer,
-reviewed SHA, and a randomly selected playful phrase. Shuffle this pool per
+Every inline comment and thread reply retains the `<sub>` footer, reviewed
+SHA, and a randomly selected playful phrase. Root comments use a footer only
+when no inline findings accompany that review. Shuffle this pool per
 review and draw without replacement for each new comment; reshuffle after
 exhausting it. Use available runtime randomness, not severity, filename, SHA
 or a fixed first entry. A retry or edit of an existing comment preserves its
@@ -282,7 +298,8 @@ incident. Phrases must not assert coverage or readiness the review did not
 establish. Use these playful lines or equally brief original variations:
 
 The canonical pool is `../assets/phrases.txt` with 48 phrases. Prepare the
-comments, then call `scripts/phrase --count N` once for the N new comments.
+comments, then call `scripts/phrase --count N` once for the N new comments requiring footers.
+Skip phrase selection when none require one.
 Assign the returned lines in comment order; the helper samples without
 replacement and resets the pool only after exhaustion. For an additional
 batch in the same review, pass phrases already used in the current cycle as

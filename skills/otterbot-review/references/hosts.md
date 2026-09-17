@@ -100,7 +100,7 @@ Replace placeholders; never pass a filename as the body.
    `pull_request_review_id` must equal that ID; a pending review or a comment
    attached to another review is incomplete delivery.
    Match returned comments to findings by marker or anchor, then update the root
-   once by editing that same review body to back-fill all new Advisory Findings
+   once by editing that same review body to back-fill all new Findings & Observations
    links (never create an issue comment), preserving the approval
    ledger and ollie-state markers. Prior links come from the
    snapshot. If there are no missing links, no edit is needed. Retry a failed
@@ -203,5 +203,6 @@ with `sc worktree review-add ... --provider otterbot-review`, then each inline
 finding on its changed range. On a re-review, update only affected Ollie comments
 using the same lifecycle rules as host threads: resolve verified fixes, answer
 new questions, and leave unchanged still-open comments without another reply.
-Keep the personality footer on each newly posted comment or reply. Do not
+Keep the personality footer on each new inline comment or reply; include it
+on the root only when no inline findings accompany the review. Do not
 archive unresolved findings merely to replace the review generation.
