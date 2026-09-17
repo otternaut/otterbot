@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Ollie the otter reviews PRs and local diffs for evidenced bugs, posts concise inline findings with a verdict, and handles incremental re-reviews. Use for "review this PR", "review my diff", "re-review", a pull-request URL, or a code-review verdict request. Supports GitHub, GitLab, Bitbucket, and similar hosts.
-version: 6.1.23
+version: 7.0.3
 ---
 
 # Otterbot Review &middot; Ollie
@@ -143,10 +143,11 @@ not a finding. See `performance.md` for stop and resume rules.
 - 🟡 minor: actionable edge case with limited impact.
 - 🔵 nitpick: maintainability with no runtime impact; opt-in only.
 
-Every finding needs trigger, consequence, evidence and concrete fix. Include
-an applyable suggestion for a verified, self-contained replacement when the
-host and review anchor support it; otherwise include a concrete code example
-when a safe fix is known. Follow `references/format.md` for applicability.
+Every finding needs a behavioral summary, reachable trigger, consequence,
+linked causal evidence and concrete fix guidance with a targeted verification
+check. Use the visible Ollie’s Concern, Supporting Evidence and Suggested Fix
+sections in `references/format.md`; preserve Ollie's otter tagline. Replacement
+code is optional when it materially helps apply a verified fix.
 Choose lower severity when impact falls between levels; unresolved potentially
 serious impact still prevents approval. Respect human style/design preferences,
 but report verified behavioral blockers even if humans requested the pattern.
@@ -212,12 +213,13 @@ is needed. Installing this skill creates no background listener.
 
 ## Delivery
 
-Root blurb normally at most 60 words; inline prose 100, excluding markers,
-code, advisory index and footer. Replies are one or two sentences plus footer.
+Root blurb normally at most 60 words, excluding markers, code, advisory index
+and footer. Inline length scales with complexity per `format.md`. Replies are
+one or two sentences plus footer.
 Use `format.md` templates. Retain the visible **Findings & Observations** index
 of all current and historical Ollie findings, original links and current
-statuses in one list of two-line bullets per `format.md`; overflow
-includes evidence and fix. Generate it from retained
+statuses in one sequence of unbulleted two-line `<sub>` entries per
+`format.md`; overflow includes evidence and fix. Generate it from retained
 records, not repeated rereading of history. Omit only when there are no findings.
 Batch random phrase selection for prepared new comments; preserve phrases on
 edits/retries and the guide links on inline comments/replies.

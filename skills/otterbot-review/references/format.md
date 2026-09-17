@@ -48,7 +48,7 @@ decision and affected scope without repeating a linked finding's cause, impact
 or proposed fix. Add material review limits only when they affect confidence,
 and required next steps beyond fixes only when applicable, such as a specific
 human review. Do not invent limitations or add routine coverage checklists.
-Keep categories, severities and statuses in the bullets; do not repeat counts
+Keep categories, severities and statuses in the entries; do not repeat counts
 above them unless a count is necessary to explain an approval threshold.
 
 Omit the root personality footer when the review includes inline findings.
@@ -70,7 +70,7 @@ Use extra words only when essential. For Request Changes, `gate: -` means
 blockers decided the verdict before approval was considered. The visible `Findings & Observations` section is required whenever Ollie has
 current or prior findings on the PR, including a clean re-review with only
 resolved findings. Omit it when there are none; never render a zero-findings
-section. Leave one blank line between the heading and the first bullet;
+section. Leave one blank line between the heading and the first entry;
 do not add an HTML break or spacer below the title.
 
 Include each distinct Ollie finding once, linking to its original thread
@@ -90,7 +90,7 @@ limit. Prior findings and verified overflow can also affect the approval count.
 Keep overflow evidence and fixes visible; preserve the supplementary ledger from `approval.md` in the root,
 including during link back-fill; do not invent thread links for its entries.
 
-Use one bullet per finding, separated by a single blank line.
+Use one unbulleted entry per finding, separated by a single blank line.
 Do not use horizontal rules or a table.
 Sort entries by current status, with active findings first, in this order:
 🟠 **open**, 🔵 **new**, 🟡 **deferred**, 🟢 **fixed**, 🟣 **accepted**,
@@ -98,36 +98,37 @@ Sort entries by current status, with active findings first, in this order:
 Open displays the existing `still open` status; New is for findings first
 raised this round.
 These are display labels, not changes to stored statuses or approval rules.
-Keep each finding in exactly one bullet; a regressed finding returns to
+Keep each finding in exactly one entry; a regressed finding returns to
 Open. Fixed entries retain their verified fix SHA when known. Accepted,
 superseded and withdrawn findings retain their own status and must not be
 labeled fixed.
 
-Use two lines per bullet: a bold category/severity and status line, then an
-indented code-formatted file reference and linked short summary, separated by
-a middot (` · `). The first line is
-`- **<severity dot> <category>(<level>) · <status dot> <lowercase status label>**`
-(for example `- **🟠 contracts(major) · 🔵 new**`). The first dot denotes
-severity: 🔴 critical, 🟠 major, 🟡 minor or 🔵 nitpick; the second denotes
-status. Lowercase all entry status labels and use plain emoji dots. Always pair a status dot with its label. End the first line with two trailing spaces for a Markdown hard line
-break and indent the second line by two spaces, without a blank line between
-them. Use normal-sized text, without `<sub>` wrappers. Use normal spaces so
-content can wrap naturally; no non-breaking spaces, HTML line breaks within
-entries or custom CSS.
+Use two small-text lines per entry, each enclosed in its own `<sub>` wrapper:
+a bold category/severity and status line, then a short summary linking directly
+to the original finding thread. Do not add list markers or indentation, and
+do not repeat source paths for linked findings. The first line is
+`<sub>**<severity dot> <category>(<level>) · <status dot> <lowercase status label>**</sub>`.
+The first dot denotes severity: 🔴 critical, 🟠 major, 🟡 minor or 🔵 nitpick;
+the second denotes status. Lowercase all entry status labels and always pair
+a status dot with its label. End the first line with two trailing spaces for
+a Markdown hard line break, without a blank line between the two lines.
+Keep Markdown links and bold formatting inside the inline `<sub>` wrappers.
+Use normal spaces so content wraps naturally; no non-breaking spaces, HTML
+line breaks within entries or custom CSS. On renderers without inline HTML
+support, retain the unbulleted two-line format without the wrappers.
 
 For fixed entries with a verified fix SHA, append `` · fixed in `<sha>` `` to
 the first line, inside its bold formatting, as shown below. Omit this suffix
 when the fix SHA is unknown; do not repeat it below the title.
 
-Every entry follows this order: bold category/severity and status line, then
-file reference · linked description. Include any necessary status note in the
-description. Retain
-this reference after thread links are back-filled. For historical findings,
-reuse the original location; if unavailable, say “File reference unavailable”
-rather than invent one. For threadless overflow, use a plain summary and
-include the stable ID, trigger/consequence and fix in the description, with the
-supporting code reference first on the second line. Use the same two-line
-bullet format.
+For linked findings, the second line contains only the linked description and
+any necessary status note. Source locations and evidence belong in the detailed
+finding, including for historical entries. Add a short filename only when it
+is needed to distinguish otherwise similar descriptions; do not repeat full
+paths or add “File reference unavailable” placeholders to linked entries.
+For threadless overflow, use a plain summary and include the stable ID,
+trigger/consequence and fix in the description, with the supporting code
+reference first on the second line. Use the same unbulleted, small-text two-line format.
 
 Use `#### Findings & Observations`, matching the banner's heading level.
 Keep every finding visible in one list; do not wrap it in a disclosure or add
@@ -139,23 +140,24 @@ Example with known thread links (the URLs below are placeholders):
 ```markdown
 #### Findings & Observations
 
-- **🟠 correctness(major) · 🟠 open**  
-  `src/jobs/worker.ts:84` · [Missing retry limit](<original-thread-url>)
+<sub>**🟠 correctness(major) · 🟠 open**</sub>  
+<sub>[Missing retry limit](<original-thread-url>)</sub>
 
-- **🟡 observability(minor) · 🟡 deferred**  
-  `src/network/client.ts:112` · [Missing timeout logging](<original-thread-url>) — awaiting logging follow-up.
+<sub>**🟡 observability(minor) · 🟡 deferred**</sub>  
+<sub>[Missing timeout logging](<original-thread-url>) — awaiting logging follow-up.</sub>
 
-- **🟡 correctness(minor) · 🟢 fixed · fixed in `a1b2c3d`**  
-  `src/users/profile.ts:37` · [Missing null guard](<original-thread-url>)
+<sub>**🟡 correctness(minor) · 🟢 fixed · fixed in `a1b2c3d`**</sub>  
+<sub>[Missing null guard](<original-thread-url>)</sub>
 
-- **🟠 reliability(major) · 🟢 fixed · fixed in `e4f5a6b`**  
-  `src/events/consumer.ts:96` · [Duplicate event delivery](<original-thread-url>)
+<sub>**🟠 reliability(major) · 🟢 fixed · fixed in `e4f5a6b`**</sub>  
+<sub>[Duplicate event delivery](<original-thread-url>)</sub>
 
 ```
 
 Use known prior thread URLs immediately;
 new findings temporarily use plain `file:line` text until delivery returns
-URLs. Never invent a link. Back-fill all new links in one root edit as described
+URLs. Replace the temporary location with the linked summary once the thread
+URL is known. Never invent a link. Back-fill all new links in one root edit as described
 in `hosts.md`; if unsupported or unsuccessful retain locations and disclose
 the limitation. Preserve the conditional root footer rule during link back-fill.
 
@@ -163,96 +165,105 @@ the limitation. Preserve the conditional root footer rule during link back-fill.
 
 ```markdown
 <!-- ollie-finding: <root-cause-slug>; level: <level>; category: <category>; head: <full-sha> -->
-<dot> **<category>(<level>)** &middot; <short summary>
+<dot> **<category>(<level>)** &middot; <short behavioral summary>
 
-<Problem and reachable trigger, citing supporting file:line evidence.>
+### Ollie’s Concern
 
-<details>
-<summary><strong>Why This Matters</strong></summary>
-<br>
+<Reachable trigger, incorrect behavior and concrete user/caller impact.>
 
-<Concrete consequence for the affected caller or user.>
+### Supporting Evidence
 
-</details>
+- <Linked file:line and symbol> — <observed fact and what it proves.>
+- <Additional decisive location when needed> — <next causal step.>
 
-<details>
-<summary><strong>Recommended Approach</strong></summary>
-<br>
+### Suggested Fix
 
-<Smallest concrete change; targeted regression check when useful.>
+<Concrete change, affected components and essential implementation constraints.>
 
-</details>
-
-<details>
-<summary><strong>Suggested Patch</strong></summary>
-<br>
-
-<Applyable suggestion or concrete code example when applicable; see below.>
-
-</details>
+**Verify:** <Failure scenario that must stop and valid behavior to preserve.>
 
 <sub>🦦 Ollie reviewed `<short-sha>` &middot; <phrase> &middot; [how Ollie reviews](<developer-guide-url>)</sub>
 ```
 
-Place the problem description directly below the finding header, without a
-Problem heading or bullets. On GitHub, use sibling disclosure sections with
-matching bold summary titles: `Why This Matters`, `Recommended Approach`, and
-`Suggested Patch`. All sections use `<details>` without `open` so they start
-collapsed. Put `<br>` on the line immediately below each `</summary>`, inside
-the disclosure. Keep each section independently collapsible, with blank lines
-around its Markdown body.
-Keep the impact distinct from the problem description rather than repeating
-it. Preserve the existing category/severity header and `<sub>` footer outside
-the disclosures. If the renderer does not support disclosures, use level-four
-headings with the same titles and visible content instead.
+Keep all three headings and their contents visible, without heading emojis or
+mandatory disclosures. Preserve the category/severity header, finding marker,
+reviewed commit and existing otter tagline/footer. The title summarizes the
+behavioral failure; Ollie’s Concern gives enough context to understand it
+without opening every evidence link. Explain the trigger, actual versus
+expected behavior and concrete impact in a short paragraph, normally 1–2
+sentences. Do not repeat the same consequence in each section.
 
-Keep the problem, trigger and cause to 1–2 prose sentences. Allow 1–3
-sentences each under Why This Matters and Recommended Approach: enough to explain the
-consequence and affected scenario, then the concrete fix, its rationale and a
-useful regression check. Most findings fit in 3–8 prose sentences with a soft
-200-word ceiling, excluding marker, titles, footer and code. These are limits
-for guidance, not targets or minimums; keep simple findings shorter. Do not
-cram details into overloaded sentences. Exceed the guidance when essential
-evidence or a non-obvious fix requires it.
+Supporting Evidence normally uses 1–3 bullets, with more when the causal chain
+requires them. Each bullet pairs an exact source location and relevant symbol
+with the fact it establishes. Use links pinned to the reviewed commit where
+supported, or precise file:line references locally. Cover the decisive path
+from trigger through faulty behavior to consequence, including cross-file
+callers or lifecycle transitions when they are necessary to prove reachability.
+A list of filenames, identifiers or unsupported assertions is not evidence.
+For a claimed missing guard/reset, cite the relevant inspected path and explain
+why it allows the failure. Include a short code excerpt, concrete input/output,
+or executed test result only when it materially strengthens the explanation.
+Never invent locations or results; distinguish code inspection, observed
+execution and proposed checks. State material assumptions and investigate
+missing causal links before publishing the claim.
 
-Each section must contribute new information. Prefer one verified fix and one
-concrete consequence; include alternatives only for a meaningful tradeoff.
-Cite only the source locations needed to establish the cause. Avoid repeating
-identifiers, calculations or consequences, and do not narrate test procedures.
-Include applicable replacement code separately as described below, without
-restating it in prose. Brevity must not remove evidence or code needed to
-understand and apply the fix.
+Suggested Fix should normally be one paragraph that guides an implementing
+agent without dictating unnecessary design choices. Explain the smallest
+concrete change, where it belongs, why it addresses the cause, and any required companion edits or constraints. Preserve
+valid behavior and mention a tempting incomplete fix only when evidence shows
+why it fails. Prefer one supported approach; give alternatives only for a
+meaningful tradeoff. If a fix depends on an unresolved contract or design
+choice, state the dependency and concrete next step instead of inventing code.
+End with a single-sentence **Verify:** statement describing a targeted regression
+scenario, its expected result and relevant behavior that must remain intact.
+Use separate verification bullets only when distinct cases need explanation.
+Label proposed checks as proposed; report executed checks with their actual
+results, without implying that a test read from source was run.
 
-After Recommended Approach, include a host-native suggestion block whenever the fix
-is a verified, self-contained replacement of a contiguous range and the host
-supports applying it at the review anchor. Use the host's suggestion syntax
-from `hosts.md`. Check the replacement against the reviewed source, match the
-exact target range and indentation, and include all replacement lines without
-ellipses or placeholders. Do not put a replacement for another location in a
-suggestion attached to the finding's current anchor. Choose a supported anchor
-that fits both the finding and the replacement when possible.
+Keep the handoff proportional to the defect: simple findings may need only
+80–120 words; a multi-step issue often fits in 170–200; complex findings can
+justify 250–300 or more. These are examples, not quotas or hard limits, and
+exclude headings, markers, footer and code. Treat 150–300 words as room when
+needed, not a target to fill. Preserve every decisive evidence bullet; trim
+repeated summaries, impact statements and fix prose first. Each sentence should
+help the reader verify the issue or implement the fix. Do not pad sections,
+compress essential context into cryptic sentences, or narrate the investigation.
 
-On GitHub, wrap the suggestion fence in a closed `<details>` block with
-`<summary><strong>Suggested Patch</strong></summary>`, as in the template. Omit the `open`
-attribute, put `<br>` directly below the summary, and leave blank lines around
-the fenced block so Markdown renders.
-Keep the fix explanation in its own collapsed disclosure and the footer outside
-all disclosures. Put fallback code or diff examples in the code disclosure,
-using the same bold summary styling with the title `Suggested Patch`. Omit
-the disclosure when there is no code. On other hosts or local output, use this
-wrapper only if the renderer supports it and preserves native suggestions;
-otherwise keep the code visible. Preserve the complete replacement and native
-suggestion syntax inside the wrapper.
+### Optional patch
 
-If a safe concrete fix is known but cannot be offered as an applyable suggestion
-(for example, it spans multiple files or the target is outside the commentable
-diff), include a fenced code or diff example with explicit file paths and enough
-context for an agent to apply it. Label it as an example rather than a one-click
-replacement, and identify any required companion edits. If a safe replacement
-depends on an unresolved contract or design choice, explain that dependency
-and the concrete next step instead of inventing a patch. Verify proposed values
-and behavior against affected callers; do not turn a rough estimate into an
-applyable fix.
+Replacement code is optional. Include it when a small verified patch materially
+helps apply the fix, or when explicitly requested. Do not generate speculative
+or extensive multi-file examples merely to fill a section. Concrete prose
+with locations, constraints and acceptance criteria is a complete fix handoff.
+
+For a verified, self-contained replacement of a contiguous range, use a native
+suggestion if the host supports it at the review anchor; see `hosts.md`. Check
+the replacement against the reviewed source, exact range and indentation.
+Include all replacement lines without ellipses or placeholders. Never attach
+a replacement for a different location to the finding's current anchor.
+
+If code is useful but cannot be applied as a native suggestion, label it as an
+example and include explicit file paths, enough context and required companion
+edits. Verify proposed values and behavior against affected callers.
+
+On GitHub, place optional code after Suggested Fix and before the footer in a
+closed disclosure:
+
+```markdown
+<details>
+<summary><strong>Suggested Patch</strong></summary>
+<br>
+
+<Complete native suggestion or clearly labeled code/diff example.>
+
+</details>
+```
+
+Keep blank lines around fenced code. Omit the disclosure entirely when there
+is no code; never put repeated fix prose under Suggested Patch. On other hosts
+or locally, use the wrapper only if supported without breaking suggestions;
+otherwise show the code beneath a Suggested Patch heading. Essential evidence,
+fix guidance and verification remain visible outside the disclosure.
 
 A slug names the root cause, not its location. Category is one lowercase word such as
 correctness, contracts, security, data, reliability, regression, tests,

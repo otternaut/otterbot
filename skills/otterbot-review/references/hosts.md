@@ -57,7 +57,7 @@ root comment only when the host lacks review grouping.
 | --- | --- | --- | --- |
 | Single-call review with inline comments | yes: create a review with a `comments` array and an `event` | draft notes, then publish all at once | no: post comments individually |
 | File-level comment | yes: comment with `subject_type: file` | yes: file position type | yes: inline comment with a path and no line |
-| Suggestion block | ```` ```suggestion ```` | ```` ```suggestion:-0+0 ```` | not supported; use a code or diff example when a safe fix is known |
+| Suggestion block | ```` ```suggestion ```` | ```` ```suggestion:-0+0 ```` | not supported; optional verified code or diff example |
 | Edit review body after submit | yes | yes, edit the note | yes, edit the comment |
 | Resolve or unresolve a thread | GraphQL `resolveReviewThread` / `unresolveReviewThread` | resolve or unresolve the discussion | resolve or reopen the comment |
 | Dismiss own prior review | yes, with a message | unapprove | unapprove |

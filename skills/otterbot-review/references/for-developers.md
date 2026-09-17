@@ -6,10 +6,12 @@ level-four heading, followed by a short assessment of the decision and scope.
 It adds only material review limits and required next steps beyond fixes when
 applicable; technical causes, consequences and fixes stay in the inline findings.
 A visible level-four **Findings & Observations** heading links to each current
-and prior Ollie finding in separate bullets. Each finding uses two
-lines of normal-sized text: a bold category/severity and status line (for
-example `🟠 contracts(major) · 🔵 new`), then an indented `file:line` reference
-and linked description, separated by a middot (` · `). A Markdown hard line
+and prior Ollie finding in separate unbulleted entries. Each finding uses two
+small-text lines, each wrapped in `<sub>`: a bold category/severity and status line (for
+example `🟠 contracts(major) · 🔵 new`), then a description linking directly to the detailed finding thread.
+Linked entries omit source paths; those belong in the detailed finding.
+Threadless findings retain source references, evidence and fix guidance. A short
+filename may distinguish otherwise similar entries. A Markdown hard line
 break keeps both lines together. The first dot is criticality; the second is
 status.
 A small gap separates
@@ -28,17 +30,21 @@ the verdict is its review body, including later link updates. Hosts without
 review grouping use a disclosed root-first fallback.
 Inline findings and replies keep Ollie's otter footer and reviewed commit.
 The root includes that footer only when no inline findings accompany the review.
-Inline findings put the problem description directly below the category/severity
-header, followed by collapsible sections **Why This Matters** for the consequence
-and **Recommended Approach** for the suggested change, both collapsed by default on GitHub. **Suggested Patch** holds any code
-suggestion or example in a separate collapsed section. Each inline section has
-a `<br>` immediately below its summary, inside the disclosure.
-Most findings use 3–8 prose sentences: 1–2 for the problem and cause, and 1–3
-each for the impact and fix, including useful rationale or a regression check.
-A soft 200-word ceiling allows context without imposing a minimum; simple
-findings stay shorter and suggested code is separate. Each section adds new
-information, usually with one concrete consequence and one verified fix.
-Longer explanations are reserved for essential evidence or non-obvious fixes.
+Inline findings use three visible headings: **Ollie’s Concern** explains the
+trigger, incorrect behavior and impact; **Supporting Evidence** provides
+bullets linking code locations to the facts they establish; **Suggested Fix**
+gives concrete change guidance, essential constraints and a **Verify:** check.
+Evidence covers the decisive causal path, including relevant callers or account
+transitions, rather than listing files alone. Proposed checks are distinguished
+from code inspection and tests actually run.
+Findings scale with complexity: simple issues may need 80–120 words, multi-step
+issues often fit in 170–200, and complex issues can justify 250–300 or more.
+These are guidelines, not quotas. The concern normally takes 1–2 sentences,
+the fix one paragraph, and verification one sentence unless distinct cases
+need explanation. Decisive evidence stays; repeated summaries and fix prose go.
+Optional replacement code appears under **Suggested Patch**, collapsed on
+GitHub. The essential explanation stays visible, and the existing otter tagline,
+reviewed commit and developer-guide link remain in the footer.
 
 ## What review status means
 
@@ -100,14 +106,13 @@ assigned in batches without repeats until the pool is exhausted.
 Every verified blocker is posted, plus at most four new inline minors. Nitpicks appear
 only with `--maintainability`, at most two on an initial review without
 a critical. Three outstanding minors require Request Changes without inflating severity.
-Comments explain the trigger, consequence, code evidence and smallest fix;
-Verified, self-contained replacements include an applyable suggestion block
-when the host and review anchor support it. Otherwise, known safe fixes include
-a code or diff example with file paths and any companion edits so an agent can
-apply them. When a fix depends on an unresolved contract or design choice, Ollie
-explains what must be resolved before proposing replacement code. On GitHub,
-replacement code starts collapsed under **Suggested Patch**; expand it to
-inspect the patch. The fix explanation has its own collapsed section.
+Comments explain the trigger, consequence, code evidence and concrete fix.
+Patches are optional when verified code materially helps apply the change.
+Native suggestions must match the exact review anchor; fallback examples name
+the affected files and required companion edits. An unresolved contract or
+design choice is explained rather than filled in with speculative code.
+On GitHub, optional code starts collapsed under **Suggested Patch**; the fix
+guidance and verification check remain visible.
 
 - **Ship It:** no open verified blockers, at most two counted minors that are
   demonstrably safe to address after merge, and every approval rule passed.
