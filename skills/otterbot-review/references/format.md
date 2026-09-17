@@ -181,7 +181,7 @@ and `How to Fix It` on their own lines, with a blank line before and after
 each. Keep the impact distinct from the problem description rather than
 repeating it. Preserve the existing category/severity header and `<sub>` footer.
 
-Aim for 80–120 words of prose per finding, excluding marker, headings, footer
+Aim for 100–140 words of prose per finding, excluding marker, headings, footer
 and code; keep straightforward findings shorter. This is a target, not a
 minimum. Use 1–2 sentences for the problem and trigger, one for the concrete
 impact under Why It Matters, and 1–2 for the fix under How to Fix It. Cite only

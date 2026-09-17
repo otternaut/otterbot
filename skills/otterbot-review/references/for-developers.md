@@ -28,7 +28,7 @@ Every comment keeps Ollie's otter footer and reviewed commit.
 Inline findings put the problem description directly below the category/severity
 header, followed by level-four headings **Why It Matters** for the consequence
 and **How to Fix It** for the suggested change. Findings typically aim for
-80–120 words of prose, with simpler findings kept shorter and suggested code
+100–140 words of prose, with simpler findings kept shorter and suggested code
 excluded from that target. Each gives a brief problem and trigger, concrete
 impact, and one verified fix, adding a short regression check when useful.
 Longer explanations are reserved for essential evidence or non-obvious fixes.
