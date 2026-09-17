@@ -181,17 +181,21 @@ and `How to Fix It` on their own lines, with a blank line before and after
 each. Keep the impact distinct from the problem description rather than
 repeating it. Preserve the existing category/severity header and `<sub>` footer.
 
-Aim for 100–140 words of prose per finding, excluding marker, headings, footer
-and code; keep straightforward findings shorter. This is a target, not a
-minimum. Use 1–2 sentences for the problem and trigger, one for the concrete
-impact under Why It Matters, and 1–2 for the fix under How to Fix It. Cite only
-the source locations needed to establish the cause. Prefer one verified fix;
-include alternatives only when a meaningful tradeoff requires them. Add a
-brief regression check when useful, without narrating the test procedure.
-Do not repeat identifiers, timeout arithmetic, consequences or the suggested
-code in prose. Exceed the target only when essential evidence or a non-obvious
-fix needs it. Include the applicable suggested change as described below;
-brevity must not remove the code needed to apply the fix.
+Most findings should use 3–5 prose sentences: 1–2 for the problem, trigger and
+cause with evidence; one for the concrete consequence under Why It Matters;
+and 1–2 for the fix and, when useful, a brief regression check under How to Fix
+It. Treat 140 words as a soft ceiling, not a target or minimum, excluding
+marker, headings, footer and code. Keep simple findings shorter. Sentence
+counts are guidance; do not cram details into long, overloaded sentences.
+Exceed the guidance when essential evidence or a non-obvious fix requires it.
+
+Each section must contribute new information. Prefer one verified fix and one
+concrete consequence; include alternatives only for a meaningful tradeoff.
+Cite only the source locations needed to establish the cause. Avoid repeating
+identifiers, calculations or consequences, and do not narrate test procedures.
+Include applicable replacement code separately as described below, without
+restating it in prose. Brevity must not remove evidence or code needed to
+understand and apply the fix.
 
 Under How to Fix It, include a host-native suggestion block whenever the fix
 is a verified, self-contained replacement of a contiguous range and the host
