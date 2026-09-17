@@ -181,15 +181,17 @@ and `How to Fix It` on their own lines, with a blank line before and after
 each. Keep the impact distinct from the problem description rather than
 repeating it. Preserve the existing category/severity header and `<sub>` footer.
 
-Prefer 120–180 words when the finding needs explanation, excluding marker,
-header, footer and code. Keep straightforward findings shorter. Explain the
-trigger, cause, concrete impact and fix without repeating information across
-sections. Add detail only when it helps the developer understand or verify the
-issue. In the opening, explain why the current code allows the problem and
-cite the relevant function or code location. Under Why It Matters, describe
-what the affected caller or user experiences and when. Under How to Fix It,
-explain why the proposed change addresses the cause and identify a useful
-regression case. Include the applicable suggested change as described below.
+Aim for 80–120 words of prose per finding, excluding marker, headings, footer
+and code; keep straightforward findings shorter. This is a target, not a
+minimum. Use 1–2 sentences for the problem and trigger, one for the concrete
+impact under Why It Matters, and 1–2 for the fix under How to Fix It. Cite only
+the source locations needed to establish the cause. Prefer one verified fix;
+include alternatives only when a meaningful tradeoff requires them. Add a
+brief regression check when useful, without narrating the test procedure.
+Do not repeat identifiers, timeout arithmetic, consequences or the suggested
+code in prose. Exceed the target only when essential evidence or a non-obvious
+fix needs it. Include the applicable suggested change as described below;
+brevity must not remove the code needed to apply the fix.
 
 Under How to Fix It, include a host-native suggestion block whenever the fix
 is a verified, self-contained replacement of a contiguous range and the host

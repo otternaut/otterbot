@@ -27,10 +27,11 @@ review grouping use a disclosed root-first fallback.
 Every comment keeps Ollie's otter footer and reviewed commit.
 Inline findings put the problem description directly below the category/severity
 header, followed by level-four headings **Why It Matters** for the consequence
-and **How to Fix It** for the suggested change. Findings that need explanation
-typically use 120–180 words, with simpler findings kept shorter. The explanation
-connects the trigger and cause to the practical impact, fix and regression case
-without repeating information across sections.
+and **How to Fix It** for the suggested change. Findings typically aim for
+80–120 words of prose, with simpler findings kept shorter and suggested code
+excluded from that target. Each gives a brief problem and trigger, concrete
+impact, and one verified fix, adding a short regression check when useful.
+Longer explanations are reserved for essential evidence or non-obvious fixes.
 
 ## What review status means
 

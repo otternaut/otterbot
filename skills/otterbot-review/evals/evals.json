@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "review this PR: https://github.com/acme/widgets/pull/42",
-      "expected_output": "One integrated review, evidenced inline findings and matching host verdict. Root normally at most 60 words; inline prose preferably 120–180 words when explanation is needed, excluding marker, header, footer and code, with straightforward findings kept shorter. Explain trigger, cause, concrete impact and why the fix works without repetition; include a useful regression case and an applyable suggestion for a verified self-contained replacement when the host and anchor support it; otherwise provide a code or diff example when a safe fix is known. Inline findings preserve the category/severity header and sub footer, place the problem and trigger directly below the header without a Problem heading or bullets, and separate the consequence and fix under the exact level-four headings #### Why It Matters and #### How to Fix It, each on its own line with surrounding blank lines. Every comment has Ollie personality subtext and reviewed head. Collapsible Advisory Findings indexes current and prior Ollie findings with original thread links and prior statuses. Back-fill new links once after verification; preserve root footer. Submit against reviewed head and verify marker, state, count and URLs. Conversation gives link, verdict, counts and material limits.",
+      "expected_output": "One integrated review, evidenced inline findings and matching host verdict. Root normally at most 60 words; inline prose targets 80–120 words, excluding marker, headings, footer and code, with straightforward findings kept shorter. Use 1–2 sentences for problem and trigger, one for impact and 1–2 for the fix; prefer one verified fix and a brief regression check when useful. Avoid repeating identifiers, calculations or suggested code; exceed the target only for essential evidence or a non-obvious fix. Explain trigger, cause, concrete impact and why the fix works without repetition; include a useful regression case and an applyable suggestion for a verified self-contained replacement when the host and anchor support it; otherwise provide a code or diff example when a safe fix is known. Inline findings preserve the category/severity header and sub footer, place the problem and trigger directly below the header without a Problem heading or bullets, and separate the consequence and fix under the exact level-four headings #### Why It Matters and #### How to Fix It, each on its own line with surrounding blank lines. Every comment has Ollie personality subtext and reviewed head. Collapsible Advisory Findings indexes current and prior Ollie findings with original thread links and prior statuses. Back-fill new links once after verification; preserve root footer. Submit against reviewed head and verify marker, state, count and URLs. Conversation gives link, verdict, counts and material limits.",
       "files": []
     },
     {
@@ -1027,6 +1027,12 @@
       "id": 170,
       "prompt": "Review a local diff with a verified one-line null guard fix. There is no host-native apply-suggestion capability.",
       "expected_output": "Provide a fenced code or diff example under How to Fix It with the target file and sufficient source context to apply the verified replacement. Do not claim it has a host apply button or omit code just because native suggestions are unavailable.",
+      "files": []
+    },
+    {
+      "id": 171,
+      "prompt": "Review a PR with three independent, straightforward defects, each with a verified local replacement. Explain each clearly without making the set of findings cumbersome to read.",
+      "expected_output": "Keep each finding concise, targeting 80–120 prose words or fewer when sufficient. Preserve the category/severity header, level-four Why It Matters and How to Fix It headings, and footer. State the trigger and cause briefly, give one concrete impact, and recommend one verified fix with an applicable suggestion block. Do not pad to the target, repeat source identifiers or calculations, narrate regression procedures, or paraphrase the patch. Preserve necessary evidence and complete replacement code.",
       "files": []
     }
   ]
