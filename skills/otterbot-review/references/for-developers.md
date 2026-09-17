@@ -93,7 +93,11 @@ Every verified blocker is posted, plus at most four new inline minors. Nitpicks 
 only with `--maintainability`, at most two on an initial review without
 a critical. Three outstanding minors require Request Changes without inflating severity.
 Comments explain the trigger, consequence, code evidence and smallest fix;
-exact mechanical edits may include an applyable suggestion block.
+Verified, self-contained replacements include an applyable suggestion block
+when the host and review anchor support it. Otherwise, known safe fixes include
+a code or diff example with file paths and any companion edits so an agent can
+apply them. When a fix depends on an unresolved contract or design choice, Ollie
+explains what must be resolved before proposing replacement code.
 
 - **Ship It:** no open verified blockers, at most two counted minors that are
   demonstrably safe to address after merge, and every approval rule passed.

@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Ollie the otter reviews PRs and local diffs for evidenced bugs, posts concise inline findings with a verdict, and handles incremental re-reviews. Use for "review this PR", "review my diff", "re-review", a pull-request URL, or a code-review verdict request. Supports GitHub, GitLab, Bitbucket, and similar hosts.
-version: 6.1.10
+version: 6.1.11
 ---
 
 # Otterbot Review &middot; Ollie
@@ -142,8 +142,11 @@ not a finding. See `performance.md` for stop and resume rules.
 - 🟡 minor: actionable edge case with limited impact.
 - 🔵 nitpick: maintainability with no runtime impact; opt-in only.
 
-Every finding needs trigger, consequence, evidence and concrete fix. Choose
-lower severity when impact falls between levels; unresolved potentially
+Every finding needs trigger, consequence, evidence and concrete fix. Include
+an applyable suggestion for a verified, self-contained replacement when the
+host and review anchor support it; otherwise include a concrete code example
+when a safe fix is known. Follow `references/format.md` for applicability.
+Choose lower severity when impact falls between levels; unresolved potentially
 serious impact still prevents approval. Respect human style/design preferences,
 but report verified behavioral blockers even if humans requested the pattern.
 Report independently established compile/type and behavioral defects with

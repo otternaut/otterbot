@@ -170,6 +170,8 @@ the limitation. The root footer remains after the collapsible section.
 
 <Smallest concrete change; targeted regression check when useful.>
 
+<Applyable suggestion or concrete code example when applicable; see below.>
+
 <sub>🦦 Ollie reviewed `<short-sha>` &middot; <phrase> &middot; [how Ollie reviews](<developer-guide-url>)</sub>
 ```
 
@@ -187,7 +189,26 @@ issue. In the opening, explain why the current code allows the problem and
 cite the relevant function or code location. Under Why It Matters, describe
 what the affected caller or user experiences and when. Under How to Fix It,
 explain why the proposed change addresses the cause and identify a useful
-regression case. Include code when it makes the fix clearer.
+regression case. Include the applicable suggested change as described below.
+
+Under How to Fix It, include a host-native suggestion block whenever the fix
+is a verified, self-contained replacement of a contiguous range and the host
+supports applying it at the review anchor. Use the host's suggestion syntax
+from `hosts.md`. Check the replacement against the reviewed source, match the
+exact target range and indentation, and include all replacement lines without
+ellipses or placeholders. Do not put a replacement for another location in a
+suggestion attached to the finding's current anchor. Choose a supported anchor
+that fits both the finding and the replacement when possible.
+
+If a safe concrete fix is known but cannot be offered as an applyable suggestion
+(for example, it spans multiple files or the target is outside the commentable
+diff), include a fenced code or diff example with explicit file paths and enough
+context for an agent to apply it. Label it as an example rather than a one-click
+replacement, and identify any required companion edits. If a safe replacement
+depends on an unresolved contract or design choice, explain that dependency
+and the concrete next step instead of inventing a patch. Verify proposed values
+and behavior against affected callers; do not turn a rough estimate into an
+applyable fix.
 
 A slug names the root cause, not its location. Category is one lowercase word such as
 correctness, contracts, security, data, reliability, regression, tests,
@@ -196,9 +217,8 @@ Dots are 🔴 critical, 🟠 major, 🟡 minor and 🔵 nitpick.
 
 Evidence must establish the claim at the reviewed head. An introducing SHA is
 optional unless provenance is needed to establish scope. State any material
-assumption; unsupported speculation does not become a finding. Suggestion
-blocks are optional for exact contiguous fixes requiring no design decision;
-match the anchor and indentation. Never quote secrets.
+assumption; unsupported speculation does not become a finding. Never quote
+secrets, including in suggested changes.
 
 ## Replies and local output
 

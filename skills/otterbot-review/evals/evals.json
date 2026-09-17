@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "review this PR: https://github.com/acme/widgets/pull/42",
-      "expected_output": "One integrated review, evidenced inline findings and matching host verdict. Root normally at most 60 words; inline prose preferably 120–180 words when explanation is needed, excluding marker, header, footer and code, with straightforward findings kept shorter. Explain trigger, cause, concrete impact and why the fix works without repetition; include a useful regression case and code when it clarifies the fix. Inline findings preserve the category/severity header and sub footer, place the problem and trigger directly below the header without a Problem heading or bullets, and separate the consequence and fix under the exact level-four headings #### Why It Matters and #### How to Fix It, each on its own line with surrounding blank lines. Every comment has Ollie personality subtext and reviewed head. Collapsible Advisory Findings indexes current and prior Ollie findings with original thread links and prior statuses. Back-fill new links once after verification; preserve root footer. Submit against reviewed head and verify marker, state, count and URLs. Conversation gives link, verdict, counts and material limits.",
+      "expected_output": "One integrated review, evidenced inline findings and matching host verdict. Root normally at most 60 words; inline prose preferably 120–180 words when explanation is needed, excluding marker, header, footer and code, with straightforward findings kept shorter. Explain trigger, cause, concrete impact and why the fix works without repetition; include a useful regression case and an applyable suggestion for a verified self-contained replacement when the host and anchor support it; otherwise provide a code or diff example when a safe fix is known. Inline findings preserve the category/severity header and sub footer, place the problem and trigger directly below the header without a Problem heading or bullets, and separate the consequence and fix under the exact level-four headings #### Why It Matters and #### How to Fix It, each on its own line with surrounding blank lines. Every comment has Ollie personality subtext and reviewed head. Collapsible Advisory Findings indexes current and prior Ollie findings with original thread links and prior statuses. Back-fill new links once after verification; preserve root footer. Submit against reviewed head and verify marker, state, count and URLs. Conversation gives link, verdict, counts and material limits.",
       "files": []
     },
     {
@@ -1003,6 +1003,30 @@
       "id": 166,
       "prompt": "A GitHub submission timed out. Read-back finds the submitted verdict review and one matching finding, but another intended finding remains in a different pending review.",
       "expected_output": "Do not duplicate the submitted review or submit the other pending review separately. Verify review IDs and treat the unattached finding as incomplete delivery. Recover only if the same-review relationship can be preserved; otherwise show its full evidence and fix in the existing verdict body, report the limitation and retain unfinished delivery. Do not claim both findings were delivered inline.",
+      "files": []
+    },
+    {
+      "id": 167,
+      "prompt": "Review a GitHub diff where an off-by-one loop reads items[items.length]. The verified fix replaces <= with < on one commentable line, requires no companion changes, and preserves the caller contract.",
+      "expected_output": "Include a native suggestion under How to Fix It containing the complete corrected source line, anchored to that exact line with matching indentation. Explain the effect and a useful boundary regression case; prose-only advice is insufficient.",
+      "files": []
+    },
+    {
+      "id": 168,
+      "prompt": "Review a defect with a verified fix that changes two files; one target is outside the commentable diff. The finding is anchored at the caller.",
+      "expected_output": "Include a concrete fenced code or diff example with explicit paths, enough context to apply it, and all required companion edits. Label it as an example. Do not put a different file or range replacement in a native suggestion at the caller anchor.",
+      "files": []
+    },
+    {
+      "id": 169,
+      "prompt": "Review a retry timeout defect. The finding suggests reducing a timeout to roughly 100 seconds, but the total number of subprocess waits and the caller deadline contract have not been verified.",
+      "expected_output": "Do not emit a speculative applyable timeout replacement. Check the complete retry and wait budget against affected callers before proposing a value. If the safe fix still depends on an unresolved contract or design choice, explain that dependency and the concrete next step without inventing code.",
+      "files": []
+    },
+    {
+      "id": 170,
+      "prompt": "Review a local diff with a verified one-line null guard fix. There is no host-native apply-suggestion capability.",
+      "expected_output": "Provide a fenced code or diff example under How to Fix It with the target file and sufficient source context to apply the verified replacement. Do not claim it has a host apply button or omit code just because native suggestions are unavailable.",
       "files": []
     }
   ]
