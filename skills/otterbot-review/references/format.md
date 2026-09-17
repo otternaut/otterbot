@@ -27,8 +27,8 @@ do not substitute ✅ or another success icon, including on edits and retries.
 
 <br>
 
-> <sub>**<status dot> <lowercase status label> · <severity dot> <category>(<level>)**</sub>
-> <sub>`<file>:<line>` · [<short summary>](<original-thread-url>)</sub>
+- **<severity dot> <category>(<level>) · <status dot> <lowercase status label>**  
+  `<file>:<line>` · [<short summary>](<original-thread-url>)
 
 </details>
 
@@ -57,7 +57,7 @@ blockers decided the verdict before approval was considered. The collapsible `Ad
 current or prior findings on the PR, including a clean re-review with only
 resolved findings. Omit it when there are none; never render a zero-findings
 section. Add one standalone `<br>` between `</summary>` and the first
-blockquote, with a blank line on each side, for a small gap below the title.
+bullet, with a blank line on each side, for a small gap below the title.
 
 Include each distinct Ollie finding once, linking to its original thread
 when one exists. Overflow findings without threads are visible entries with
@@ -76,7 +76,7 @@ limit. Prior findings and verified overflow can also affect the approval count.
 Keep overflow evidence and fixes visible; preserve the supplementary ledger from `approval.md` in the root,
 including during link back-fill; do not invent thread links for its entries.
 
-Use one full-width blockquote per finding, separated by a single blank line.
+Use one bullet per finding, separated by a single blank line.
 Do not use horizontal rules or a table.
 Sort entries by current status, with active findings first, in this order:
 🟠 **open**, 🔵 **new**, 🟡 **deferred**, 🟢 **fixed**, 🟣 **accepted**,
@@ -84,37 +84,39 @@ Sort entries by current status, with active findings first, in this order:
 Open displays the existing `still open` status; New is for findings first
 raised this round.
 These are display labels, not changes to stored statuses or approval rules.
-Keep each finding in exactly one blockquote; a regressed finding returns to
+Keep each finding in exactly one bullet; a regressed finding returns to
 Open. Fixed entries retain their verified fix SHA when known. Accepted,
 superseded and withdrawn findings retain their own status and must not be
 labeled fixed.
 
-Use two consecutive blockquoted `<sub>` lines per finding: a bold status line,
-then a code-formatted file reference and linked short summary on the same line,
-separated by a middot (` · `). The status line is
-`**<status dot> <lowercase status label> · <severity dot> <category>(<level>)**`
-(for example `**🔵 new · 🟠 correctness(major)**`). The first dot denotes
-status; the second denotes severity: 🔴 critical, 🟠 major, 🟡 minor or 🔵
-nitpick. Lowercase all entry status labels and use plain emoji dots without
-subscript formatting. Keep summary dots as shown below. The collapsed summary
-uses status dots only. Always pair an entry's status dot with its label. Use
-normal spaces and Markdown paragraphs so content can wrap
-naturally; no non-breaking spaces, HTML line breaks within entries or custom
-CSS. The single `<br>` below the section title is only a spacer.
+Use two lines per bullet: a bold category/severity and status line, then an
+indented code-formatted file reference and linked short summary, separated by
+a middot (` · `). The first line is
+`- **<severity dot> <category>(<level>) · <status dot> <lowercase status label>**`
+(for example `- **🟠 contracts(major) · 🔵 new**`). The first dot denotes
+severity: 🔴 critical, 🟠 major, 🟡 minor or 🔵 nitpick; the second denotes
+status. Lowercase all entry status labels and use plain emoji dots. The
+collapsed summary uses status dots only. Always pair a status dot with its
+label. End the first line with two trailing spaces for a Markdown hard line
+break and indent the second line by two spaces, without a blank line between
+them. Use normal-sized text, without `<sub>` wrappers. Use normal spaces so
+content can wrap naturally; no non-breaking spaces, HTML line breaks within
+entries or custom CSS. The single `<br>` below the section title is only a
+spacer.
 
 For fixed entries with a verified fix SHA, append `` · fixed in `<sha>` `` to
 the first line, inside its bold formatting, as shown below. Omit this suffix
 when the fix SHA is unknown; do not repeat it below the title.
 
-Every entry follows this order: bold status line, then file reference · linked
-description. Include any necessary status note in the description. Retain
+Every entry follows this order: bold category/severity and status line, then
+file reference · linked description. Include any necessary status note in the
+description. Retain
 this reference after thread links are back-filled. For historical findings,
 reuse the original location; if unavailable, say “File reference unavailable”
 rather than invent one. For threadless overflow, use a plain summary and
 include the stable ID, trigger/consequence and fix in the description, with the
-supporting code reference first on the second line. Prefix both lines with `> `
-and wrap each
-line in `<sub>`.
+supporting code reference first on the second line. Use the same two-line
+bullet format.
 
 The collapsed summary starts with `Advisory Findings &nbsp;` and shows nonzero
 status counts in entry order, separated with `&nbsp;` (for example
@@ -131,17 +133,17 @@ Example with known thread links (the URLs below are placeholders):
 
 <br>
 
-> <sub>**🟠 open · 🟠 correctness(major)**</sub>
-> <sub>`src/jobs/worker.ts:84` · [Missing retry limit](<original-thread-url>)</sub>
+- **🟠 correctness(major) · 🟠 open**  
+  `src/jobs/worker.ts:84` · [Missing retry limit](<original-thread-url>)
 
-> <sub>**🟡 deferred · 🟡 observability(minor)**</sub>
-> <sub>`src/network/client.ts:112` · [Missing timeout logging](<original-thread-url>) — awaiting logging follow-up.</sub>
+- **🟡 observability(minor) · 🟡 deferred**  
+  `src/network/client.ts:112` · [Missing timeout logging](<original-thread-url>) — awaiting logging follow-up.
 
-> <sub>**🟢 fixed · 🟡 correctness(minor) · fixed in `a1b2c3d`**</sub>
-> <sub>`src/users/profile.ts:37` · [Missing null guard](<original-thread-url>)</sub>
+- **🟡 correctness(minor) · 🟢 fixed · fixed in `a1b2c3d`**  
+  `src/users/profile.ts:37` · [Missing null guard](<original-thread-url>)
 
-> <sub>**🟢 fixed · 🟠 reliability(major) · fixed in `e4f5a6b`**</sub>
-> <sub>`src/events/consumer.ts:96` · [Duplicate event delivery](<original-thread-url>)</sub>
+- **🟠 reliability(major) · 🟢 fixed · fixed in `e4f5a6b`**  
+  `src/events/consumer.ts:96` · [Duplicate event delivery](<original-thread-url>)
 
 </details>
 ```

@@ -3,10 +3,12 @@
 Ollie 🦦 leaves a concise first-pass review with evidenced bugs and concrete
 fixes. Findings are inline or visibly summarized under Advisory Findings; the root explains the verdict in about two
 sentences. A collapsible **Advisory Findings** section links to each current
-and prior Ollie finding in separate blockquotes. Each finding uses two
-`<sub>` lines: a bold status and severity line (for example
-`🔵 new · 🟠 correctness(major)`), then a `file:line` reference and the linked
-description on the same line, separated by a middot (` · `). The first dot is status; the second is criticality.
+and prior Ollie finding in separate bullets. Each finding uses two
+lines of normal-sized text: a bold category/severity and status line (for
+example `🟠 contracts(major) · 🔵 new`), then an indented `file:line` reference
+and linked description, separated by a middot (` · `). A Markdown hard line
+break keeps both lines together. The first dot is criticality; the second is
+status.
 A small gap separates
 the section title from the first finding. Relevant notes stay in
 the description. Entries are sorted by status with active items first:
