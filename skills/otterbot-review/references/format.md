@@ -162,11 +162,11 @@ the limitation. The root footer remains after the collapsible section.
 
 <Problem and reachable trigger, citing supporting file:line evidence.>
 
-##### Why It Matters
+#### Why It Matters
 
 <Concrete consequence for the affected caller or user.>
 
-##### How to Fix It
+#### How to Fix It
 
 <Smallest concrete change; targeted regression check when useful.>
 
@@ -174,7 +174,7 @@ the limitation. The root footer remains after the collapsible section.
 ```
 
 Place the problem description directly below the finding header, without a
-Problem heading or bullets. Use the exact level-five headings `Why It Matters`
+Problem heading or bullets. Use the exact level-four headings `Why It Matters`
 and `How to Fix It` on their own lines, with a blank line before and after
 each. Keep the impact distinct from the problem description rather than
 repeating it. Preserve the existing category/severity header and `<sub>` footer.
