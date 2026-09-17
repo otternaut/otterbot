@@ -86,11 +86,12 @@ intended verdict in the banner.
 The inline posting budget is four new minors. The approval count is independent
 of that budget and includes every distinct verified outstanding minor known at
 the reviewed head from Ollie's own review, including prior rounds and
-independently discovered findings not posted inline because of duplication or
-the posting cap. Do not import findings from other reviews or comments.
-Deduplicate by root cause, including between ledger entries and existing
-threads. Questions, nitpicks and unverified candidates do not count as minor
-defects.
+independently discovered findings not posted inline because they are already
+covered externally or exceed the posting cap. Do not import findings from
+other reviews or comments. Deduplicate Ollie's records by root cause, including
+against its ledger and prior threads. External root-cause matching changes only
+publication and never supplies evidence. Questions, nitpicks and unverified
+candidates do not count as minor defects.
 
 ## Decision
 
@@ -138,15 +139,15 @@ is no separate deferral-count or review-round approval limit.
 
 Every finding affecting approval must have a visible trigger, consequence, code
 reference and fix. Keep up to four new minors inline; render additional verified
-minors as compact entries in Findings & Observations, with their stable IDs and
-status. These entries are not hidden solely in metadata and remain visible on
-subsequent rounds. Link an existing thread when available; otherwise use a
-reviewed-commit code link or plain `file:line`, never an invented thread URL.
-Existing threads covering Ollie's independently discovered duplicates are linked
-in the root's approval explanation, without reposting their findings. Explain
-when the approval count differs from Ollie's index count. Historical/overflow
-entries do not consume new inline slots; only newly introduced claims must
-satisfy interdiff scope.
+minors and independently verified findings covered by another reviewer as
+compact threadless entries in Findings & Observations, with their stable IDs and
+status. These entries are rendered only from Ollie's frozen record and remain
+visible on subsequent rounds. Link only Ollie's own existing thread; otherwise
+use a reviewed-commit code link or plain `file:line`, never another reviewer's
+URL or an invented thread URL. Do not mention the matching reviewer or reproduce
+their wording. Explain when the approval count differs from Ollie's index count.
+Historical/overflow entries do not consume new inline slots; only newly
+introduced claims must satisfy interdiff scope.
 
 Maintain an approval ledger in every root review, including an empty list
 when all overflow has cleared, so a later review cannot resurrect stale data:

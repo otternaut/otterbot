@@ -63,8 +63,9 @@ on edits and retries.
   Only "Not approving because" summary.
 - Omit merge readiness everywhere. The CI/CD exclusion in `verification.md`
   applies to every visible line, marker and conversation summary.
-- Link existing threads that cover independently discovered duplicates here;
-  never import other reviewers' findings.
+- Do not link, quote, summarize or identify another reviewer's thread. An
+  independently verified Ollie finding already covered externally remains
+  Ollie's own threadless entry, rendered only from its frozen record.
 
 ### Findings & Observations index
 
@@ -76,11 +77,14 @@ rules, tables, disclosures, status group headings, tallies or separate
 resolved sections.
 
 Each distinct Ollie finding appears exactly once, in one unbulleted two-line
-entry, entries separated by a single blank line. Human findings are never
-listed. Historical entries do not consume this round's inline slots. The index
-counts distinct Ollie findings including visible overflow, which may differ
-from the approval count; explain the difference in the assessment when it
-matters.
+entry, entries separated by a single blank line. Findings from other reviewers
+are never listed or linked. An independently frozen Ollie finding whose inline
+publication was suppressed by an external root-cause match uses the threadless
+overflow form and Ollie's own evidence; the matching external URL and wording
+must not appear anywhere in the report. Historical entries do not consume this
+round's inline slots. The index counts distinct Ollie findings including
+visible overflow, which may differ from the approval count; explain the
+difference in the assessment when it matters.
 
 Entry format, each line in its own `<sub>` wrapper with two trailing spaces on
 the first line for a hard break and no blank line between them:
@@ -135,9 +139,10 @@ unbulleted two-line shape without the wrappers.
 <sub>`src/export.ts:88` · export-null-currency · Rows with a null currency are written as "undefined"; default to the account currency before formatting.</sub>
 ```
 
-Links: use known prior thread URLs immediately. New findings temporarily use
-plain `file:line` text until delivery returns URLs, then back-fill every new
-link in one root edit per `hosts.md`. If back-fill is unsupported or fails,
+Links: use only known prior Ollie thread URLs immediately. New Ollie findings
+temporarily use plain `file:line` text until delivery returns Ollie's own URLs,
+then back-fill every new link in one root edit per `hosts.md`. A URL owned by
+another reviewer is never a fallback. If back-fill is unsupported or fails,
 keep the locations and disclose it. Never invent a link.
 
 ### Markers, ledger and size

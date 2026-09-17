@@ -66,7 +66,7 @@ Each root review includes an attributable `ollie-state` JSON marker alongside
 existing finding and approval markers. Schema version 1 fields:
 
 ```json
-{"schema":1,"policy_revision":"5","resume":{"input_key":"<relevant-input-digest>","position":"<remaining-scope-id>","no_progress_attempts":0,"last_attempt_id":"<unique-attempt-id-or-null>"},"head":"<sha>","target":"<branch>","base":"<sha>","integration":"<sha-or-null>","coverage":{"complete":false,"areas":[{"path":"<path>","paths":["<optional list for a grouped area>"],"status":"reviewed|excluded|incomplete","reason":"<scope or justified exclusion>","evidence":["<test/code reference>"]}]},"decision_key":"<stable digest of relevant gate inputs>","events":["<processed event id>"],"readiness":"blocked","holds":[{"kind":"defect|verification|human|context|delivery","reason":"<specific gap>","clears_when":"<observable acceptance condition>","owner":"author|ollie|authorized-reviewer","trigger":"<event causing reassessment>"}]}
+{"schema":1,"policy_revision":"6","resume":{"input_key":"<relevant-input-digest>","position":"<remaining-scope-id>","no_progress_attempts":0,"last_attempt_id":"<unique-attempt-id-or-null>"},"head":"<sha>","target":"<branch>","base":"<sha>","integration":"<sha-or-null>","coverage":{"complete":false,"areas":[{"path":"<path>","paths":["<optional list for a grouped area>"],"status":"reviewed|excluded|incomplete","reason":"<scope or justified exclusion>","evidence":["<test/code reference>"]}]},"decision_key":"<stable digest of relevant gate inputs>","events":["<processed event id>"],"readiness":"blocked","holds":[{"kind":"defect|verification|human|context|delivery","reason":"<specific gap>","clears_when":"<observable acceptance condition>","owner":"author|ollie|authorized-reviewer","trigger":"<event causing reassessment>"}]}
 ```
 
 Coverage areas may group tightly related files with an explicit path list.
@@ -93,13 +93,21 @@ older nonempty state. Retain visible history in Findings & Observations.
 
 ## Policy identity
 
-The current review policy revision is **5**. This is the authoritative value;
+The current review policy revision is **6**. This is the authoritative value;
 record it as `policy_revision` in every new root state. It is independent of the
 skill release version. Increment it when approval criteria, required
 verification, scope, evidence reuse or recovery semantics change. Phrase,
 formatting and wording-only changes do not increment it. A policy change must
 identify affected requirements here so existing evidence can be reassessed.
-Revision 5 delivers Human Review Needed as a non-blocking host comment with
+Revision 6 requires a clean information boundary between independent candidate
+verification and external-review deduplication. On reassessment, reuse prior
+Ollie evidence only when its provenance is independent of external comments.
+Otherwise reverify affected scope without external-review content before
+counting or publishing the claim. External thread URLs previously adopted into
+Ollie's index are removed; a reverified matching finding is retained as a
+threadless Ollie record built from Ollie's evidence, while an unverified
+imported claim is excluded. Revision 5 delivers Human Review Needed as a
+non-blocking host comment with
 approval withheld instead of a blocking request for changes, and replaces minute
 budgets with step budgets. On the next reassessment of a legacy human-only
 Request Changes, dismiss Ollie's own request and repost the banner as a comment

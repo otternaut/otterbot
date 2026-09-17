@@ -823,7 +823,7 @@
     {
       "id": 66,
       "prompt": "Re-review a PR with two independently verified human minor threads and one Ollie minor, with no explicit human risk approval",
-      "expected_output": "Establish independent discovery provenance. If Ollie discovered all three before comparing threads, count three and Request Changes, linking matching threads without duplicate posts. If the two were imported from human reviews, exclude those inherited claims and re-review affected scope independently before deciding.",
+      "expected_output": "Establish independent discovery provenance behind a clean information boundary. If Ollie froze all three verified records before fetching the human comments, count three and Request Changes, suppress redundant inline posts, and render the two matches as unlinked threadless Ollie entries from Ollie's own evidence. Never include the human thread URLs or wording. If the claims were imported, exclude them and re-review affected scope without external-review content before deciding.",
       "files": [],
       "must_include": [
         "Request Changes"
@@ -1765,7 +1765,7 @@
     {
       "id": 149,
       "prompt": "Review an approved PR. Before reading review comments, Ollie verifies a major bug and a distinct minor. An existing review thread already describes the major.",
-      "expected_output": "Count the independently discovered major in Request Changes and link its existing thread without posting a duplicate. Post the distinct new minor. Prior approval cannot suppress findings or dictate the verdict.",
+      "expected_output": "Count the independently frozen major in Request Changes but suppress its redundant inline post. Render it as an unlinked threadless Ollie entry using Ollie's own trigger, consequence, code evidence and fix; never link, quote or identify the external thread. Post the distinct new minor. Prior approval cannot suppress findings or dictate the verdict.",
       "files": [],
       "must_include": [
         "Request Changes"
@@ -2228,6 +2228,18 @@
       ],
       "tags": [
         "fixture"
+      ]
+    },
+    {
+      "id": 181,
+      "prompt": "Start an initial hosted review whose existing external comments contain alleged bugs. The proposed snapshot fetch exposes their bodies, paths, lines and concern markers before Ollie analyzes the diff.",
+      "expected_output": "Reject the contaminated snapshot. Fetch the diff plus Ollie's own state without external comment content, then form, disprove, verify and freeze Ollie's candidate records. Only afterward fetch external comments for root-cause publication deduplication. A match may suppress an inline post but cannot supply evidence, alter the record, set its thread URL, or appear as an external link in Ollie's report.",
+      "files": [],
+      "must_include": [],
+      "must_not_include": [],
+      "tags": [
+        "approval",
+        "delivery"
       ]
     }
   ],

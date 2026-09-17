@@ -57,11 +57,14 @@ footer is personality, not evidence.
 - **💬 Comment Only**: the review passed but the operator asked Ollie not to
   approve. Feedback is still posted.
 
-Ollie decides from its own evidence. Other reviewers' approvals or rejections
-never change what it reports, and it ignores CI status entirely: pending or
-failing checks neither block nor trigger a review, and workflow files are
-reviewed as ordinary code. It never claims a PR is ready to merge; that is
-your call and your branch rules.
+Ollie decides from its own evidence. It forms and verifies candidates before
+reading other reviewers' comments. If another thread already covers the same
+root cause, Ollie suppresses a redundant inline comment but keeps its own
+evidence as an unlinked entry; it never adopts or links the other reviewer's
+finding. Other reviewers' approvals or rejections never change what it reports,
+and it ignores CI status entirely: pending or failing checks neither block nor
+trigger a review, and workflow files are reviewed as ordinary code. It never
+claims a PR is ready to merge; that is your call and your branch rules.
 
 Things that never move a verdict: deferring a minor, resolving a thread,
 saying "this is fine", the number of review rounds, or Ollie running out of

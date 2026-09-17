@@ -81,14 +81,18 @@ The sequence for a GitHub PR, using the GitHub CLI's API access.
 Replace placeholders; never pass a filename as the body.
 
 1. Fetch the reviewing identity and a lightweight PR snapshot for early exits:
-   author, head/base SHAs, target/integration context, draft/conflict state,
-   latest reviewer states and the newest attributable Ollie marker. Then fetch
-   changed files, lightweight thread identities/anchors/revisions and the newest
-   attributable root review and ledger when review continues. Retrieve detailed
-   bodies for new/edited/affected threads or missing records; when reliable
-   metadata is unavailable, reconcile the full needed history. Fully paginate
-   all needed connections, including nested comments; a single query is not a
-   guarantee of completeness. Reuse results throughout the review.
+   author, head/base SHAs, target/integration context, draft/conflict state and
+   the newest attributable Ollie marker. Then fetch changed files and Ollie's
+   own root, ledger and thread history when review continues. Keep every other
+   reviewer's comment body, title, anchor, path, line and concern marker out of
+   the code-review context until `analysis.md` freezes Ollie's verified
+   candidate records. After that boundary, retrieve and fully paginate the
+   external threads needed only for root-cause publication deduplication.
+   Targeted command/reply jobs may retrieve the triggering comment early but
+   cannot derive review candidates from it. When reliable metadata is
+   unavailable, reconcile needed Ollie history without exposing unrelated
+   external content before the boundary. A single query is not a guarantee of
+   completeness. Reuse results throughout the review.
 2. Read the diff at the snapshot head. Investigate introducing commits only
    when provenance is necessary to establish a finding's scope.
 3. Refresh head/base context and mutable gates once, then submit one review with

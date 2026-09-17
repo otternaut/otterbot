@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Ollie the otter reviews PRs and local diffs for evidenced bugs, posts concise inline findings with a verdict, and handles incremental re-reviews. Use for "review this PR", "review my diff", "re-review", a pull-request URL, or a code-review verdict request. Supports GitHub, GitLab, Bitbucket, and similar hosts.
-version: 8.0.0
+version: 9.0.0
 ---
 
 # Otterbot Review &middot; Ollie
@@ -46,9 +46,13 @@ Owner: `references/readiness.md` (state, policy identity, progress control).
    gates do not apply. Ask only when the target is ambiguous.
 2. Start the step counter and pick the budget tier from `performance.md`.
 3. For hosted reviews, fetch once: identity, author, head/base SHAs, target and
-   integration revision, draft/conflict state, reviewer states, changed-file
-   metadata, thread identities and the newest attributable Ollie root state
-   (including legacy markers). Paginate every connection you rely on.
+   integration revision, draft/conflict state, changed-file metadata and the
+   newest attributable Ollie root state and threads (including legacy markers).
+   Before Phase 3 freezes Ollie's verified candidate records, do not fetch or
+   expose another reviewer's comment body, title, anchor, path, line or concern
+   marker. Defer all external-review content until the deduplication step.
+   A targeted command/reply job may read its triggering comment, but that text
+   cannot seed code-review candidates. Paginate every connection you rely on.
 4. Classify the job from normalized evidence, not timestamps:
    - Unchanged policy, context, coverage, decision evidence and completed
      delivery, and no new commands: return the existing review in one line.
@@ -63,10 +67,11 @@ Owner: `references/readiness.md` (state, policy identity, progress control).
      change was reviewed.
 
 Merge conflicts prevent approval but not replies or stale-state cleanup.
-Other reviewers' states and comments never limit scope, suppress findings or
-decide Ollie's verdict. CI/CD is excluded from every input and output; the
-single owner of that rule is the **CI/CD exclusion** section of
-`references/verification.md`.
+Other reviewers' states and comments never limit scope or decide Ollie's
+verdict. Their comments suppress only redundant publication after Ollie has
+independently frozen the matching finding. CI/CD is excluded from every input
+and output; the single owner of that rule is the **CI/CD exclusion** section
+of `references/verification.md`.
 
 ## Phase 2 · Scope
 
@@ -99,9 +104,12 @@ positives).
    Trace farther only to establish a consequential boundary. Do not run
    additional whole-diff checklist passes or audit neighboring refactors.
 2. Open a finding record for every candidate with a reachable trigger, code
-   evidence and a concrete consequence. Form candidates from the code before
-   reading other reviewers' comments; use their threads afterwards only to
-   avoid posting a duplicate root cause.
+   evidence and a concrete consequence. Form, disprove and freeze Ollie's
+   verified candidate records from code and requirements before retrieving
+   external-review content. Then fetch other reviewers' comments and compare
+   root causes only to avoid redundant inline publication. A match must not
+   replace Ollie's record, supply evidence, set its thread URL or appear as an
+   external link in Ollie's report.
 3. Run the disproof protocol on blockers first, then credible minors in risk
    order. Only `verified` records are posted or counted. A material unresolved
    path with potentially serious impact becomes a specific verification hold,
@@ -130,8 +138,9 @@ verified behavioral blockers even when a human requested the pattern.
 Owner: `references/approval.md` (gates, minor accounting, gate reassessment).
 
 1. Count outstanding minors: prior rounds, deferred, independently discovered
-   duplicates and verified overflow all count. Three mean Request Changes; one
-   or two approve only when demonstrably safe to address after merge.
+   externally covered findings and verified overflow all count. Three mean
+   Request Changes; one or two approve only when demonstrably safe to address
+   after merge. External coverage never substitutes for Ollie's own evidence.
 2. Evaluate every approval gate. Then run `scripts/decide` with the seven
    normalized inputs: blockers, minors, minor-risk (required when minors are
    nonzero), coverage, context, evidence and gates; it calculates policy, not

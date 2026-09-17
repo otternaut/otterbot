@@ -11,13 +11,35 @@ comments, the Findings & Observations index and the approval ledger from these
 records, never from memory of the diff. Fields:
 
 ```json
-{"id":"<root-cause-slug>","anchor":"<file:line at head>","category":"<one word>","level":"critical|major|minor|nitpick|question","trigger":"<concrete input, caller or sequence that reaches the code>","consequence":"<what breaks, for whom>","evidence":["<file:line symbol — fact it proves>"],"disproof":[{"check":"<guard, caller, test or contract inspected>","result":"holds|refuted|unknown"}],"status":"candidate|verified|refuted|unresolved|duplicate","fix":"<smallest concrete change>","verify":"<regression scenario and expected result>","dup_of":"<existing thread URL or null>","thread_url":"<set from the host response after delivery, else null>"}
+{"id":"<root-cause-slug>","anchor":"<file:line at head>","category":"<one word>","level":"critical|major|minor|nitpick|question","trigger":"<concrete input, caller or sequence that reaches the code>","consequence":"<what breaks, for whom>","evidence":["<file:line symbol — fact it proves>"],"disproof":[{"check":"<guard, caller, test or contract inspected>","result":"holds|refuted|unknown"}],"status":"candidate|verified|refuted|unresolved","fix":"<smallest concrete change>","verify":"<regression scenario and expected result>","publication":"inline|overflow|externally-covered","thread_url":"<Ollie's own published thread URL or null>"}
 ```
 
 Only `verified` records may be posted or counted. `refuted` records are
 dropped silently. `unresolved` records with potentially serious impact become
-a specific verification hold, not a finding. `duplicate` records link the
-existing thread in the root and still count on Ollie's own evidence.
+a specific verification hold, not a finding. `externally-covered` is a
+publication disposition on a verified Ollie record, not a source or status:
+it suppresses a redundant inline comment but keeps Ollie's independently
+established finding and count. Render it as threadless overflow from Ollie's
+record. Never copy or persist the external URL, wording, evidence or fix.
+
+## Independent-candidate boundary
+
+For an initial or changed-code review, complete candidate formation, the
+disproof protocol and verification without external-review content in context.
+Freeze the verified records before fetching another reviewer's comment bodies,
+titles, anchors, paths, lines or concern markers. The frozen record includes
+its stable ID, trigger, consequence, evidence, disproof result, severity, fix
+and verification scenario. Do not add a candidate after the external fetch
+unless new code or requirement evidence—not the comment—independently exposes
+it; defer that code investigation to a clean-context review when provenance
+cannot be established.
+
+After the freeze, compare external comments by root cause only. A match may set
+`publication` to `externally-covered`; it must not alter the record, set
+`thread_url`, appear in Findings & Observations as a linked finding, or be
+labelled as a finding sourced from that reviewer. Non-matches do not expand
+scope. Targeted replies and commands may be read earlier for their lifecycle
+job, but their claims cannot seed candidates in a simultaneous code review.
 
 ## Disproof protocol
 
