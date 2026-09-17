@@ -25,6 +25,12 @@ On GitHub, the verdict and new inline findings belong to one submitted review;
 the verdict is its review body, including later link updates. Hosts without
 review grouping use a disclosed root-first fallback.
 Every comment keeps Ollie's otter footer and reviewed commit.
+Inline findings put the problem description directly below the category/severity
+header, followed by level-five headings **Why It Matters** for the consequence
+and **How to Fix It** for the suggested change. Findings that need explanation
+typically use 120–180 words, with simpler findings kept shorter. The explanation
+connects the trigger and cause to the practical impact, fix and regression case
+without repeating information across sections.
 
 ## What review status means
 

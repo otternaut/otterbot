@@ -160,16 +160,36 @@ the limitation. The root footer remains after the collapsible section.
 <!-- ollie-finding: <root-cause-slug>; level: <level>; category: <category>; head: <full-sha> -->
 <dot> **<category>(<level>)** &middot; <short summary>
 
-<Reachable trigger and consequence, citing supporting file:line evidence.>
+<Problem and reachable trigger, citing supporting file:line evidence.>
 
-**Fix:** <Smallest concrete change; targeted regression check when useful.>
+##### Why It Matters
+
+<Concrete consequence for the affected caller or user.>
+
+##### How to Fix It
+
+<Smallest concrete change; targeted regression check when useful.>
 
 <sub>🦦 Ollie reviewed `<short-sha>` &middot; <phrase> &middot; [how Ollie reviews](<developer-guide-url>)</sub>
 ```
 
-Normally keep prose within 100 words, excluding marker, footer and code. Use
-extra space only for evidence necessary to establish a serious claim. A slug
-names the root cause, not its location. Category is one lowercase word such as
+Place the problem description directly below the finding header, without a
+Problem heading or bullets. Use the exact level-five headings `Why It Matters`
+and `How to Fix It` on their own lines, with a blank line before and after
+each. Keep the impact distinct from the problem description rather than
+repeating it. Preserve the existing category/severity header and `<sub>` footer.
+
+Prefer 120–180 words when the finding needs explanation, excluding marker,
+header, footer and code. Keep straightforward findings shorter. Explain the
+trigger, cause, concrete impact and fix without repeating information across
+sections. Add detail only when it helps the developer understand or verify the
+issue. In the opening, explain why the current code allows the problem and
+cite the relevant function or code location. Under Why It Matters, describe
+what the affected caller or user experiences and when. Under How to Fix It,
+explain why the proposed change addresses the cause and identify a useful
+regression case. Include code when it makes the fix clearer.
+
+A slug names the root cause, not its location. Category is one lowercase word such as
 correctness, contracts, security, data, reliability, regression, tests,
 performance, accessibility, observability, maintainability or question.
 Dots are 🔴 critical, 🟠 major, 🟡 minor and 🔵 nitpick.
