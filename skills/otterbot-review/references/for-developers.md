@@ -26,11 +26,12 @@ the verdict is its review body, including later link updates. Hosts without
 review grouping use a disclosed root-first fallback.
 Every comment keeps Ollie's otter footer and reviewed commit.
 Inline findings put the problem description directly below the category/severity
-header, followed by level-four headings **Why It Matters** for the consequence
-and **How to Fix It** for the suggested change. Most findings use 3–5 prose
-sentences: 1–2 for the problem and cause, one for the impact, and 1–2 for the
-fix and any useful regression check. A soft 140-word ceiling keeps them concise
-without imposing a minimum; suggested code is separate. Each section adds new
+header, followed by collapsible sections **Why It Matters** for the consequence
+and **How To Fix It** for the suggested change, both open by default on GitHub.
+Most findings use 3–8 prose sentences: 1–2 for the problem and cause, and 1–3
+each for the impact and fix, including useful rationale or a regression check.
+A soft 200-word ceiling allows context without imposing a minimum; simple
+findings stay shorter and suggested code is separate. Each section adds new
 information, usually with one concrete consequence and one verified fix.
 Longer explanations are reserved for essential evidence or non-obvious fixes.
 
@@ -99,7 +100,10 @@ Verified, self-contained replacements include an applyable suggestion block
 when the host and review anchor support it. Otherwise, known safe fixes include
 a code or diff example with file paths and any companion edits so an agent can
 apply them. When a fix depends on an unresolved contract or design choice, Ollie
-explains what must be resolved before proposing replacement code.
+explains what must be resolved before proposing replacement code. On GitHub,
+replacement code starts collapsed under **Suggested Change** (or **Example
+Fix** for code examples); expand it to inspect the patch. The fix explanation
+stays visible.
 
 - **Ship It:** no open verified blockers, at most two counted minors that are
   demonstrably safe to address after merge, and every approval rule passed.

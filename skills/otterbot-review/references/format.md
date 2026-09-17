@@ -25,8 +25,6 @@ do not substitute ✅ or another success icon, including on edits and retries.
 <details>
 <summary>Advisory Findings &nbsp; <colored status tally></summary>
 
-<br>
-
 - **<severity dot> <category>(<level>) · <status dot> <lowercase status label>**  
   `<file>:<line>` · [<short summary>](<original-thread-url>)
 
@@ -56,8 +54,8 @@ Use extra words only when essential. For Request Changes, `gate: -` means
 blockers decided the verdict before approval was considered. The collapsible `Advisory Findings` section is required whenever Ollie has
 current or prior findings on the PR, including a clean re-review with only
 resolved findings. Omit it when there are none; never render a zero-findings
-section. Add one standalone `<br>` between `</summary>` and the first
-bullet, with a blank line on each side, for a small gap below the title.
+section. Leave one blank line between `</summary>` and the first bullet;
+do not add an HTML break or spacer below the title.
 
 Include each distinct Ollie finding once, linking to its original thread
 when one exists. Overflow findings without threads are visible entries with
@@ -101,8 +99,7 @@ label. End the first line with two trailing spaces for a Markdown hard line
 break and indent the second line by two spaces, without a blank line between
 them. Use normal-sized text, without `<sub>` wrappers. Use normal spaces so
 content can wrap naturally; no non-breaking spaces, HTML line breaks within
-entries or custom CSS. The single `<br>` below the section title is only a
-spacer.
+entries or custom CSS.
 
 For fixed entries with a verified fix SHA, append `` · fixed in `<sha>` `` to
 the first line, inside its bold formatting, as shown below. Omit this suffix
@@ -130,8 +127,6 @@ Example with known thread links (the URLs below are placeholders):
 ```markdown
 <details>
 <summary>Advisory Findings &nbsp; 🟠 1 open &nbsp; 🟡 1 deferred &nbsp; 🟢 2 fixed</summary>
-
-<br>
 
 - **🟠 correctness(major) · 🟠 open**  
   `src/jobs/worker.ts:84` · [Missing retry limit](<original-thread-url>)
@@ -162,32 +157,49 @@ the limitation. The root footer remains after the collapsible section.
 
 <Problem and reachable trigger, citing supporting file:line evidence.>
 
-#### Why It Matters
+<details open>
+<summary><strong>Why It Matters</strong></summary>
 
 <Concrete consequence for the affected caller or user.>
 
-#### How to Fix It
+</details>
+
+<details open>
+<summary><strong>How To Fix It</strong></summary>
 
 <Smallest concrete change; targeted regression check when useful.>
 
+</details>
+
+<details>
+<summary><strong>Suggested Change</strong></summary>
+
 <Applyable suggestion or concrete code example when applicable; see below.>
+
+</details>
 
 <sub>🦦 Ollie reviewed `<short-sha>` &middot; <phrase> &middot; [how Ollie reviews](<developer-guide-url>)</sub>
 ```
 
 Place the problem description directly below the finding header, without a
-Problem heading or bullets. Use the exact level-four headings `Why It Matters`
-and `How to Fix It` on their own lines, with a blank line before and after
-each. Keep the impact distinct from the problem description rather than
-repeating it. Preserve the existing category/severity header and `<sub>` footer.
+Problem heading or bullets. On GitHub, use sibling disclosure sections with
+matching bold summary titles: `Why It Matters`, `How To Fix It`, and
+`Suggested Change`. The first two use `<details open>` so their prose starts
+visible; the code section uses `<details>` so it starts collapsed. Keep each
+section independently collapsible, with blank lines around its Markdown body.
+Keep the impact distinct from the problem description rather than repeating
+it. Preserve the existing category/severity header and `<sub>` footer outside
+the disclosures. If the renderer does not support disclosures, use level-four
+headings with the same titles and visible content instead.
 
-Most findings should use 3–5 prose sentences: 1–2 for the problem, trigger and
-cause with evidence; one for the concrete consequence under Why It Matters;
-and 1–2 for the fix and, when useful, a brief regression check under How to Fix
-It. Treat 140 words as a soft ceiling, not a target or minimum, excluding
-marker, headings, footer and code. Keep simple findings shorter. Sentence
-counts are guidance; do not cram details into long, overloaded sentences.
-Exceed the guidance when essential evidence or a non-obvious fix requires it.
+Keep the problem, trigger and cause to 1–2 prose sentences. Allow 1–3
+sentences each under Why It Matters and How To Fix It: enough to explain the
+consequence and affected scenario, then the concrete fix, its rationale and a
+useful regression check. Most findings fit in 3–8 prose sentences with a soft
+200-word ceiling, excluding marker, titles, footer and code. These are limits
+for guidance, not targets or minimums; keep simple findings shorter. Do not
+cram details into overloaded sentences. Exceed the guidance when essential
+evidence or a non-obvious fix requires it.
 
 Each section must contribute new information. Prefer one verified fix and one
 concrete consequence; include alternatives only for a meaningful tradeoff.
@@ -197,7 +209,7 @@ Include applicable replacement code separately as described below, without
 restating it in prose. Brevity must not remove evidence or code needed to
 understand and apply the fix.
 
-Under How to Fix It, include a host-native suggestion block whenever the fix
+After How To Fix It, include a host-native suggestion block whenever the fix
 is a verified, self-contained replacement of a contiguous range and the host
 supports applying it at the review anchor. Use the host's suggestion syntax
 from `hosts.md`. Check the replacement against the reviewed source, match the
@@ -205,6 +217,17 @@ exact target range and indentation, and include all replacement lines without
 ellipses or placeholders. Do not put a replacement for another location in a
 suggestion attached to the finding's current anchor. Choose a supported anchor
 that fits both the finding and the replacement when possible.
+
+On GitHub, wrap the suggestion fence in a closed `<details>` block with
+`<summary><strong>Suggested Change</strong></summary>`, as in the template. Omit the `open`
+attribute and leave blank lines around the fenced block so Markdown renders.
+Keep the fix explanation in its own open disclosure and the footer outside
+all disclosures. Put fallback code or diff examples in the code disclosure,
+using the same bold summary styling with the title `Example Fix`. Omit
+the disclosure when there is no code. On other hosts or local output, use this
+wrapper only if the renderer supports it and preserves native suggestions;
+otherwise keep the code visible. Preserve the complete replacement and native
+suggestion syntax inside the wrapper.
 
 If a safe concrete fix is known but cannot be offered as an applyable suggestion
 (for example, it spans multiple files or the target is outside the commentable
