@@ -906,13 +906,13 @@
     {
       "id": 150,
       "prompt": "Re-review a PR whose only two Ollie findings are now verified fixed in commits a1b2c3d and e4f5a6b. Both original thread URLs are known.",
-      "expected_output": "Keep the collapsible Advisory Findings section with summary <summary>Advisory Findings &nbsp; 🟢 All 2 findings fixed</summary> and two separate 🟢 fixed blockquotes. Add one standalone <br> after the summary with blank lines on both sides before the first finding. Preserve each original thread link and verified fix SHA. For every finding, use three consecutive blockquoted <sub> lines: an entirely bold status and severity line, such as 🟢 fixed · 🟡 correctness(minor), a linked title, then a code-formatted file:line reference. The first dot is status and the second is severity. Append fixed in and the verified fix SHA inside the bold status line. Separate findings with a single blank line and no horizontal rules; omit tables, status group headings and absent details, and retain the root footer. No redundant replies or invented URLs.",
+      "expected_output": "Keep the collapsible Advisory Findings section with summary <summary>Advisory Findings &nbsp; 🟢 All 2 findings fixed</summary> and two separate 🟢 fixed blockquotes. Add one standalone <br> after the summary with blank lines on both sides before the first finding. Preserve each original thread link and verified fix SHA. For every finding, use two consecutive blockquoted <sub> lines: an entirely bold status and severity line, such as 🟢 fixed · 🟡 correctness(minor), then a code-formatted file:line reference followed by a middot ( · ) and the linked title on the same line. The first dot is status and the second is severity. Append fixed in and the verified fix SHA inside the bold status line. Separate findings with a single blank line and no horizontal rules; omit tables, status group headings and absent details, and retain the root footer. No redundant replies or invented URLs.",
       "files": []
     },
     {
       "id": 151,
       "prompt": "Render a re-review index with one still-open regressed critical, one new minor, one deferred minor, one fixed minor, one accepted finding, one superseded finding and one withdrawn finding. The deferred minor is visible overflow without a thread; all other original URLs are known.",
-      "expected_output": "Render seven findings formatted as blockquotes separated by a single blank line and no horizontal rules, sorted 🟠 open, 🔵 new, 🟡 deferred, 🟢 fixed, 🟣 accepted, ⚪ superseded and ⚪ withdrawn in that order, with matching nonzero colored summary counts in a <summary> that starts Advisory Findings &nbsp;. Preserve original links including the regressed critical, fix SHA when known (appended as fixed in on the bold status line, omitted when unknown) and visible overflow ID, code evidence, consequence and fix without inventing a thread URL. For every entry, use three consecutive blockquoted <sub> lines: an entirely bold status and severity line, such as 🟠 open · 🔴 correctness(critical), a linked description with any necessary notes, then the code-formatted file:line reference (retain it after link back-fill; disclose unavailable historical locations rather than inventing them). The first dot is status and the second is severity. Use one standalone <br> with surrounding blank lines between the summary and first finding. Use normal spaces, omit tables, HTML line breaks within entries, repeated status group headings and absent details, and preserve ledger and approval counting rules.",
+      "expected_output": "Render seven findings formatted as blockquotes separated by a single blank line and no horizontal rules, sorted 🟠 open, 🔵 new, 🟡 deferred, 🟢 fixed, 🟣 accepted, ⚪ superseded and ⚪ withdrawn in that order, with matching nonzero colored summary counts in a <summary> that starts Advisory Findings &nbsp;. Preserve original links including the regressed critical, fix SHA when known (appended as fixed in on the bold status line, omitted when unknown) and visible overflow ID, code evidence, consequence and fix without inventing a thread URL. For every entry, use two consecutive blockquoted <sub> lines: an entirely bold status and severity line, such as 🟠 open · 🔴 correctness(critical), then the code-formatted file:line reference followed by a middot ( · ) and a linked description with any necessary notes on the same line (retain the reference after link back-fill; disclose unavailable historical locations rather than inventing them). The first dot is status and the second is severity. Use one standalone <br> with surrounding blank lines between the summary and first finding. Use normal spaces, omit tables, HTML line breaks within entries, repeated status group headings and absent details, and preserve ledger and approval counting rules.",
       "files": []
     },
     {
@@ -985,6 +985,24 @@
       "id": 163,
       "prompt": "Review a KMS change missing human approval with no proven findings, but its caller contract remains unverified.",
       "expected_output": "Request Changes / Blocked for the specific verification gap and missing sign-off. Human Review Needed cannot hide incomplete evidence; do not invent a bug.",
+      "files": []
+    },
+    {
+      "id": 164,
+      "prompt": "Submit a GitHub Request Changes review with two new findings. A proposed plan submits the inline comments in a review with no body, then posts the verdict and index as a PR issue comment.",
+      "expected_output": "Reject the split plan. Submit one review with the reviewed commit, verdict event, complete root body and both inline comments, or stage and submit one pending review. Verify both pull_request_review_id values equal the submitted verdict review ID. Back-fill links by editing that review body; no separate issue comment.",
+      "files": []
+    },
+    {
+      "id": 165,
+      "prompt": "The GitHub connector can create individual comments but has no batch review tool. Another available API route supports pending reviews. Deliver one safe minor with Ship It.",
+      "expected_output": "Use the available grouped review route, staging the finding on one pending review and submitting it with the complete Ship It body and APPROVE event. Missing connector convenience is not a host limitation. Verify parent review ID; never publish the finding standalone.",
+      "files": []
+    },
+    {
+      "id": 166,
+      "prompt": "A GitHub submission timed out. Read-back finds the submitted verdict review and one matching finding, but another intended finding remains in a different pending review.",
+      "expected_output": "Do not duplicate the submitted review or submit the other pending review separately. Verify review IDs and treat the unattached finding as incomplete delivery. Recover only if the same-review relationship can be preserved; otherwise show its full evidence and fix in the existing verdict body, report the limitation and retain unfinished delivery. Do not claim both findings were delivered inline.",
       "files": []
     }
   ]

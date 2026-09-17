@@ -5,6 +5,10 @@ root explains the verdict, indexes history and shows any overflow findings.
 
 ## Root review
 
+On hosts with grouped reviews, this entire root is the body of the review that
+owns the new inline findings. Submit them together and back-fill links by
+editing that same body, never by posting a separate conversation comment.
+
 Use the exact verdict banner mapping: **🚢 Ollie's Verdict &middot; Ship It**,
 **💬 Ollie's Verdict &middot; Comment Only**,
 **🧑‍⚖️ Ollie's Verdict &middot; Human Review Needed**, or
@@ -24,8 +28,7 @@ do not substitute ✅ or another success icon, including on edits and retries.
 <br>
 
 > <sub>**<status dot> <lowercase status label> · <severity dot> <category>(<level>)**</sub>
-> <sub>[<short summary>](<original-thread-url>)</sub>
-> <sub>`<file>:<line>`</sub>
+> <sub>`<file>:<line>` · [<short summary>](<original-thread-url>)</sub>
 
 </details>
 
@@ -86,8 +89,9 @@ Open. Fixed entries retain their verified fix SHA when known. Accepted,
 superseded and withdrawn findings retain their own status and must not be
 labeled fixed.
 
-Use three consecutive blockquoted `<sub>` lines per finding: a bold status line,
-a linked short summary, then a code-formatted file reference. The status line is
+Use two consecutive blockquoted `<sub>` lines per finding: a bold status line,
+then a code-formatted file reference and linked short summary on the same line,
+separated by a middot (` · `). The status line is
 `**<status dot> <lowercase status label> · <severity dot> <category>(<level>)**`
 (for example `**🔵 new · 🟠 correctness(major)**`). The first dot denotes
 status; the second denotes severity: 🔴 critical, 🟠 major, 🟡 minor or 🔵
@@ -102,13 +106,14 @@ For fixed entries with a verified fix SHA, append `` · fixed in `<sha>` `` to
 the first line, inside its bold formatting, as shown below. Omit this suffix
 when the fix SHA is unknown; do not repeat it below the title.
 
-Every entry follows this order: bold status line, linked description, file
-reference. Include any necessary status note in the linked description. Retain
+Every entry follows this order: bold status line, then file reference · linked
+description. Include any necessary status note in the description. Retain
 this reference after thread links are back-filled. For historical findings,
 reuse the original location; if unavailable, say “File reference unavailable”
 rather than invent one. For threadless overflow, use a plain summary and
 include the stable ID, trigger/consequence and fix in the description, with the
-supporting code reference last. Prefix all three lines with `> ` and wrap each
+supporting code reference first on the second line. Prefix both lines with `> `
+and wrap each
 line in `<sub>`.
 
 The collapsed summary starts with `Advisory Findings &nbsp;` and shows nonzero
@@ -127,20 +132,16 @@ Example with known thread links (the URLs below are placeholders):
 <br>
 
 > <sub>**🟠 open · 🟠 correctness(major)**</sub>
-> <sub>[Missing retry limit](<original-thread-url>)</sub>
-> <sub>`src/jobs/worker.ts:84`</sub>
+> <sub>`src/jobs/worker.ts:84` · [Missing retry limit](<original-thread-url>)</sub>
 
 > <sub>**🟡 deferred · 🟡 observability(minor)**</sub>
-> <sub>[Missing timeout logging](<original-thread-url>) — awaiting logging follow-up.</sub>
-> <sub>`src/network/client.ts:112`</sub>
+> <sub>`src/network/client.ts:112` · [Missing timeout logging](<original-thread-url>) — awaiting logging follow-up.</sub>
 
 > <sub>**🟢 fixed · 🟡 correctness(minor) · fixed in `a1b2c3d`**</sub>
-> <sub>[Missing null guard](<original-thread-url>)</sub>
-> <sub>`src/users/profile.ts:37`</sub>
+> <sub>`src/users/profile.ts:37` · [Missing null guard](<original-thread-url>)</sub>
 
 > <sub>**🟢 fixed · 🟠 reliability(major) · fixed in `e4f5a6b`**</sub>
-> <sub>[Duplicate event delivery](<original-thread-url>)</sub>
-> <sub>`src/events/consumer.ts:96`</sub>
+> <sub>`src/events/consumer.ts:96` · [Duplicate event delivery](<original-thread-url>)</sub>
 
 </details>
 ```

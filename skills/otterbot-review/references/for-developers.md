@@ -3,10 +3,10 @@
 Ollie 🦦 leaves a concise first-pass review with evidenced bugs and concrete
 fixes. Findings are inline or visibly summarized under Advisory Findings; the root explains the verdict in about two
 sentences. A collapsible **Advisory Findings** section links to each current
-and prior Ollie finding in separate blockquotes. Each finding uses three
+and prior Ollie finding in separate blockquotes. Each finding uses two
 `<sub>` lines: a bold status and severity line (for example
-`🔵 new · 🟠 correctness(major)`), the linked description, then a `file:line`
-reference. The first dot is status; the second is criticality.
+`🔵 new · 🟠 correctness(major)`), then a `file:line` reference and the linked
+description on the same line, separated by a middot (` · `). The first dot is status; the second is criticality.
 A small gap separates
 the section title from the first finding. Relevant notes stay in
 the description. Entries are sorted by status with active items first:
@@ -19,6 +19,9 @@ The entire status line is bold. Entry status labels are lowercase, with plain
 emoji dots.
 The summary uses status dots only. It is omitted only when there are no
 findings.
+On GitHub, the verdict and new inline findings belong to one submitted review;
+the verdict is its review body, including later link updates. Hosts without
+review grouping use a disclosed root-first fallback.
 Every comment keeps Ollie's otter footer and reviewed commit.
 
 ## What review status means

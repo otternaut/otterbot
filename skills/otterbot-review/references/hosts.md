@@ -17,11 +17,18 @@ plain comment carrying the intended verdict; never mislabel it Comment Only.
 Ignore all CI/CD metadata during retrieval, submission and final verification.
 
 Prepare the root and eligible inline findings together, regardless of verdict.
+Where the host supports review grouping, the verdict body and every new inline
+finding must belong to the same submitted review. The root is that review's
+body, never a separate PR conversation comment. A link between separate posts
+or matching timestamps does not establish attachment. Existing-thread replies
+and historical findings retain their original threads.
 During final verification, match every intended new inline finding to a
-published comment by marker or anchor; a successful root review or approval
+published comment by marker or anchor and verify its parent review identity; a successful root review or approval
 alone does not establish finding delivery. Pending draft comments are not
 published findings. Recover only missing comments within the recovery limit,
-preserving deduplication. If inline publication remains unavailable, include
+preserving deduplication and the same-review requirement. If the host cannot
+attach a missing finding to the submitted review, do not publish it standalone
+or create a second review merely to carry it. If inline publication remains unavailable, include
 each missing finding's trigger, consequence, evidence and fix visibly in the
 root index, or in conversation if host writes fail. Report the delivery
 limitation and retain unfinished delivery for recovery; never silently drop
@@ -40,8 +47,9 @@ as Request Changes throughout this file; preserve `requires-human` in Ollie
 markers and reports. When the required current-head sign-off arrives, reassess
 all gates and clear/supersede Ollie's prior request before reporting approval.
 
-Where a host cannot express a state, post the root comment as a plain comment
-and state the limitation; the verdict banner already carries the verdict.
+Where a host cannot express a state, retain the intended verdict banner in
+the grouped review body where supported and state the limitation. Use a plain
+root comment only when the host lacks review grouping.
 
 ## Capability map
 
@@ -57,7 +65,17 @@ and state the limitation; the verdict banner already carries the verdict.
 
 ## GitHub
 
-The recommended sequence for a GitHub PR, using the GitHub CLI's API access.
+The required grouping uses GitHub's
+[review API](https://docs.github.com/en/rest/pulls/reviews): one review owns the
+verdict body and new inline comments. Use any available tool that preserves
+this relationship; a tool lacking batch submission is not a host limitation.
+Either create a review with its body, event and comments together, or stage all
+comments on one pending review and submit that review with the verdict body.
+Never submit an empty-body review with findings and post the verdict afterward
+as an issue comment. Never publish new findings through standalone comment
+operations before or after a separate verdict review.
+
+The sequence for a GitHub PR, using the GitHub CLI's API access.
 Replace placeholders; never pass a filename as the body.
 
 1. Fetch the reviewing identity and a lightweight PR snapshot for early exits:
@@ -77,9 +95,13 @@ Replace placeholders; never pass a filename as the body.
    prevents approval until assessed; never relabel findings as reviewing the newer head.
 4. After the state transitions below, verify marker, effective review state,
    head/base context, review status, coverage state and mutable review gates, comment
-   count and URLs together.
+   count and URLs together. Record the submitted review ID and verify its body
+   contains the verdict banner, index and markers. Every new inline comment's
+   `pull_request_review_id` must equal that ID; a pending review or a comment
+   attached to another review is incomplete delivery.
    Match returned comments to findings by marker or anchor, then update the root
-   once to back-fill all new Advisory Findings links, preserving the approval
+   once by editing that same review body to back-fill all new Advisory Findings
+   links (never create an issue comment), preserving the approval
    ledger and ollie-state markers. Prior links come from the
    snapshot. If there are no missing links, no edit is needed. Retry a failed
    update at most once, then retain plain file:line entries and report the
@@ -154,13 +176,18 @@ a review. Allow at most one recovery attempt for a failed operation, then
 report the limitation. Pagination is required retrieval, not a retry loop.
 
 
-- No single-call submission: post the root comment first, then each inline
-  comment, then set the state. Say so.
+- No single-call submission: use one pending review and submit it with the
+  verdict body after staging its findings. If the host itself has no review
+  grouping, use its host-specific root-first sequence and disclose that
+  attachment is unavailable. If tools cannot access a host's supported review
+  grouping, report the limitation and keep findings visible in the verdict
+  body; do not fall back to detached inline comments.
 - No body editing: retain known prior links and plain `file:line` for new
   findings; report that new links could not be back-filled.
 - No file-level comments: attach to the nearest changed line in the file.
-- Cannot attach a verdict: post the root comment as a plain comment with the
-  verdict banner intact and state why.
+- Cannot express a verdict state: retain the verdict banner in the grouped
+  review body when supported (for example, GitHub self-review uses `COMMENT`).
+  Only hosts without review grouping use a plain root comment; state why.
 - Cannot post at all: state the failure, show the report in conversation, and
   offer to review a pasted diff. Never present the review as delivered.
 
