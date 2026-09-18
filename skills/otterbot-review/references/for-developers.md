@@ -10,14 +10,15 @@ back.
 
 The root comment is **🦦 The Raft Report**, followed by a verdict and a 1–3
 sentence explanation of the decision and affected behavior. When action is
-required, **Required Next Steps** lists **Verify**, **Fix** and **Human review**
-actions as applicable. The findings index has no section title or counts and
-lists every finding Ollie has ever raised on the PR, current and resolved, each linking to
-its thread when one exists. Entries use two lines, both in `<sub>`: bold
-severity/category and regular-weight status on the first, then a short linked
-title in regular weight on the second. One blank line separates entries. Empty action and finding
-sections are omitted. The first symbol on the metadata line is severity and
-the second is status:
+required, **🎣 Tackle These Next** lists **Verify**, **Fix** and **Human review**
+actions as applicable. The findings index sits under **🐟 Fishy Findings** — what Ollie surfaced with —
+with no counts, and lists every finding Ollie has ever raised on the PR,
+current and resolved, each linking to its thread when one exists. Each finding
+is a bullet with two lines: bold severity/category and regular-weight status
+on the first, then a short linked title on the second. Both lines use full
+body size, with the title indented to align with the metadata above it.
+Empty action and finding sections are omitted. The first symbol on
+the metadata line is severity and the second is status:
 
 | Severity | | Status | |
 | --- | --- | --- | --- |

@@ -18,17 +18,18 @@ editing that same body, never by posting a separate conversation comment.
 
 <Summary: 1–3 sentences explaining the verdict and affected behavior.>
 
-#### Required Next Steps
+#### 🎣 Tackle These Next
 
 - **Verify** · <Evidence needed to settle an unresolved concern.>
 - **Fix** · <Concrete repair needed; refer to the finding below.>
 - **Human review** · <Required reviewer, behavior and current-commit approval.>
 
-<sub>**<severity dot> <category>(<level>)** · <status glyph> <lowercase status label></sub><br>
-<sub>[<short summary>](<original-thread-url>)</sub>
+#### 🐟 Fishy Findings
 
-<sub>**<severity dot> <category>(<level>)** · <status glyph> <lowercase status label></sub><br>
-<sub>`<file>:<line>` · <stable ID> · <trigger/consequence and fix, for threadless overflow only></sub>
+- **<severity dot> <category>(<level>)** · <status glyph> <lowercase status label><br>
+  [<short summary>](<original-thread-url>)
+- **<severity dot> <category>(<level>)** · <status glyph> <lowercase status label><br>
+  `<file>:<line>` · <stable ID> · <trigger/consequence and fix, for threadless overflow only>
 
 <!-- ollie-approval: {"head":"<full-sha>","unposted_minors":[]} -->
 <!-- ollie-state: <JSON record from readiness.md> -->
@@ -51,7 +52,7 @@ on edits and retries.
 
 - Use 1–3 sentences, with no word-count limit, to explain why this verdict
   was reached and what behavior is affected. Keep repair instructions in
-  Required Next Steps and detailed evidence in the linked findings.
+  🎣 Tackle These Next and detailed evidence in the linked findings.
 - Mention review limits only when they materially affect confidence or the
   verdict. Do not invent limitations or add coverage checklists.
 - Request Changes names the reason and what clears it, distinguishing verified
@@ -69,9 +70,9 @@ on edits and retries.
   independently verified Ollie finding already covered externally remains
   Ollie's own threadless entry, rendered only from its frozen record.
 
-### Required Next Steps
+### 🎣 Tackle These Next
 
-Use `#### Required Next Steps`, followed by a compact bullet list. Each bullet
+Use `#### 🎣 Tackle These Next`, followed by a compact bullet list. Each bullet
 starts with a bold action label and a middle dot: **Verify** ·, **Fix** · or
 **Human review** ·. Include only applicable actions; repeat labels when several
 independent actions need them. Omit the section entirely when no action is
@@ -83,31 +84,34 @@ details. Human review names the required non-author reviewer, affected behavior
 and approval at the current commit. Do not imply an agent can supply human
 sign-off. These are required actions, not claims that checks already ran.
 
-### Findings index
+### 🐟 Fishy Findings (findings index)
 
-Required whenever Ollie has any current or prior finding on the PR, including
-a clean re-review with only resolved findings. Omit it entirely when there are
-none; never render an empty section. Place entries one blank line after the
-assessment or Required Next Steps when present. Omit the Findings title and
-counts. No horizontal rules, tables, disclosures, status group headings or
-separate resolved sections.
+🐟 Fishy Findings is what Ollie surfaced with after the dive. Required whenever Ollie
+has any current or prior finding on the PR, including a clean re-review with
+only resolved findings. Omit it entirely when there are
+none; never render an empty section. Use `#### 🐟 Fishy Findings` as the section
+heading, one blank line after the assessment or 🎣 Tackle These Next when
+present, and never add counts to it. No horizontal rules, tables, disclosures,
+status group headings or separate resolved sections.
 
-Each distinct Ollie finding appears exactly once, in one unbulleted two-line
-entry, entries separated by a single blank line. Findings from other reviewers
-are never listed or linked. An independently frozen Ollie finding whose inline
-publication was suppressed by an external root-cause match uses the threadless
-overflow form and Ollie's own evidence; the matching external URL and wording
-must not appear anywhere in the report. Historical entries do not consume this
+Each distinct Ollie finding appears exactly once, in one bulleted two-line
+list item. Use Markdown `- ` markers with no blank lines between items. Findings from other reviewers are never listed or
+linked. An independently
+frozen Ollie finding whose inline publication was suppressed by an external
+root-cause match uses the threadless overflow form and Ollie's own evidence;
+the matching external URL and wording must not appear anywhere in the report. Historical entries do not consume this
 round's inline slots. The index counts distinct Ollie findings including
 visible overflow, which may differ from the approval count; explain the
 difference in the assessment when it matters.
 
-Entry format: put the bold severity dot and category/level, then a regular-weight
-separator and status on the first line, and the regular-weight linked short
-summary on the second. Wrap each line in its own `<sub>…</sub>` and end the first with `<br>` to preserve the line break.
-Use a short descriptive title rather than repeating the full inline finding
-summary; keep the explanation in the linked thread. Either line may wrap
-naturally on narrow screens.
+Entry format: put the bold severity dot and category/level, then a
+regular-weight separator and the status on the first line, and the
+regular-weight linked short summary on the second. Separate the two lines
+with `<br>` followed by a newline. Indent the second line by two spaces to
+align with the text after the bullet. Keep both lines at full body size,
+never in `<sub>`. Use a short descriptive title rather than repeating the
+full inline finding summary; keep the explanation in the linked thread.
+Either line may wrap naturally on narrow screens.
 
 - Severity dots are 🔴 critical, 🟠 major, 🟡 minor and 🔵 nitpick. For a fixed
   entry with a known fix SHA append `` · fixed in `<sha>` `` after the status
@@ -138,20 +142,19 @@ with updated status. Reuse known statuses for unaffected threads; indexing
 history needs no new investigation or reply.
 
 Use normal spaces so entries wrap naturally: no non-breaking spaces or CSS.
-Use only the one explicit `<br>` between the metadata and summary lines.
+Use `<br>` between an item's two lines, never between list items.
 
 ```markdown
-<sub>**🟠 correctness(major)** · ⏳ open</sub><br>
-<sub>[Missing retry limit](<original-thread-url>)</sub>
+#### 🐟 Fishy Findings
 
-<sub>**🟡 observability(minor)** · ⏸️ deferred</sub><br>
-<sub>[Missing timeout logging](<original-thread-url>) — awaiting logging follow-up.</sub>
-
-<sub>**🟡 correctness(minor)** · ✅ fixed · fixed in `a1b2c3d`</sub><br>
-<sub>[Missing null guard](<original-thread-url>)</sub>
-
-<sub>**🟡 data(minor)** · ✨ new</sub><br>
-<sub>`src/export.ts:88` · export-null-currency · Rows with a null currency are written as "undefined"; default to the account currency before formatting.</sub>
+- **🟠 correctness(major)** · ⏳ open<br>
+  [Missing retry limit](<original-thread-url>)
+- **🟡 observability(minor)** · ⏸️ deferred<br>
+  [Missing timeout logging](<original-thread-url>) — awaiting logging follow-up.
+- **🟡 correctness(minor)** · ✅ fixed · fixed in `a1b2c3d`<br>
+  [Missing null guard](<original-thread-url>)
+- **🟡 data(minor)** · ✨ new<br>
+  `src/export.ts:88` · export-null-currency · Rows with a null currency are written as "undefined"; default to the account currency before formatting.
 ```
 
 Links: use only known prior Ollie thread URLs immediately. New Ollie findings
