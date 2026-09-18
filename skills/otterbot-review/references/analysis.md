@@ -7,7 +7,7 @@ disprove it, and every discarded candidate leaves a one-line reason.
 ## Finding record
 
 Keep one compact record per candidate for the whole run. Render inline
-comments, the Findings & Observations index and the approval ledger from these
+comments, the Findings index and the approval ledger from these
 records, never from memory of the diff. Fields:
 
 ```json
@@ -36,7 +36,7 @@ cannot be established.
 
 After the freeze, compare external comments by root cause only. A match may set
 `publication` to `externally-covered`; it must not alter the record, set
-`thread_url`, appear in Findings & Observations as a linked finding, or be
+`thread_url`, appear in Findings as a linked finding, or be
 labelled as a finding sourced from that reviewer. Non-matches do not expand
 scope. Targeted replies and commands may be read earlier for their lifecycle
 job, but their claims cannot seed candidates in a simultaneous code review.

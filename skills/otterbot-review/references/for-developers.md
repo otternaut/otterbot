@@ -8,10 +8,14 @@ back.
 
 ## What a review looks like
 
-The root comment is **🦦 The Raft Report**, followed by a verdict and a one or
-two sentence explanation of the decision. Under **Findings & Observations** it
+The root comment is **🦦 The Raft Report**, followed by a verdict and a 1–3
+sentence explanation of the decision and affected behavior. When action is
+required, **Required Next Steps** lists **Verify**, **Fix** and **Human review**
+actions as applicable. Under **Findings** it
 lists every finding Ollie has ever raised on the PR, current and resolved, each
-linking to its thread. The first symbol on each line is severity and the second
+linking to its thread when one exists. Entries use one line with severity,
+bold category/status and a linked summary, wrapping naturally. Empty action
+and finding sections are omitted. The first symbol on each line is severity and the second
 is status:
 
 | Severity | | Status | |

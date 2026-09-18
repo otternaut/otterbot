@@ -16,16 +16,19 @@ editing that same body, never by posting a separate conversation comment.
 
 #### 🦦 The Raft Report · <🚢|💬|🧑‍⚖️|⚠️> <Ship It|Comment Only|Human Review Needed|Request Changes>
 
-<Brief assessment explaining the decision and affected scope.>
-<Material review limits or required steps beyond fixes, only when applicable.>
+<Summary: 1–3 sentences explaining the verdict and affected behavior.>
 
-#### Findings & Observations
+#### Required Next Steps
 
-<sub>**<severity dot> <category>(<level>) · <status glyph> <lowercase status label>**</sub>  
-<sub>[<short summary>](<original-thread-url>)</sub>
+- **Verify** · <Evidence needed to settle an unresolved concern.>
+- **Fix** · <Concrete repair needed; refer to the finding below.>
+- **Human review** · <Required reviewer, behavior and current-commit approval.>
 
-<sub>**<severity dot> <category>(<level>) · <status glyph> <lowercase status label>**</sub>  
-<sub>`<file>:<line>` · <stable ID> · <trigger/consequence and fix, for threadless overflow only></sub>
+#### Findings
+
+<severity dot> **<category>(<level>) · <status glyph> <lowercase status label>** · [<short summary>](<original-thread-url>)
+
+<severity dot> **<category>(<level>) · <status glyph> <lowercase status label>** · `<file>:<line>` · <stable ID> · <trigger/consequence and fix, for threadless overflow only>
 
 <!-- ollie-approval: {"head":"<full-sha>","unposted_minors":[]} -->
 <!-- ollie-state: <JSON record from readiness.md> -->
@@ -46,12 +49,11 @@ on edits and retries.
 
 ### Assessment
 
-- Normally one sentence, at most 60 words of prose excluding markers,
-  headings, index entries and footer. Explain the decision and affected scope
-  without repeating a linked finding's cause, impact or fix.
-- Add review limits only when they affect confidence, and next steps beyond
-  fixes only when applicable, such as the exact human approval needed. Do not
-  invent limitations or add coverage checklists.
+- Use 1–3 sentences, with no word-count limit, to explain why this verdict
+  was reached and what behavior is affected. Keep repair instructions in
+  Required Next Steps and detailed evidence in the linked findings.
+- Mention review limits only when they materially affect confidence or the
+  verdict. Do not invent limitations or add coverage checklists.
 - Request Changes names the reason and what clears it, distinguishing verified
   bugs from incomplete verification. State a three-minor threshold or an
   uncertain-impact gate failure explicitly, since the inline cap of four new
@@ -67,16 +69,30 @@ on edits and retries.
   independently verified Ollie finding already covered externally remains
   Ollie's own threadless entry, rendered only from its frozen record.
 
-### Findings & Observations index
+### Required Next Steps
+
+Use `#### Required Next Steps`, followed by a compact bullet list. Each bullet
+starts with a bold action label and a middle dot: **Verify** ·, **Fix** · or
+**Human review** ·. Include only applicable actions; repeat labels when several
+independent actions need them. Omit the section entirely when no action is
+required, including clean reviews and reviews with only optional follow-ups.
+
+Name the evidence needed, repair required or human approval that remains.
+Keep fix actions brief and point to the finding below for implementation
+details. Human review names the required non-author reviewer, affected behavior
+and approval at the current commit. Do not imply an agent can supply human
+sign-off. These are required actions, not claims that checks already ran.
+
+### Findings index
 
 Required whenever Ollie has any current or prior finding on the PR, including
 a clean re-review with only resolved findings. Omit it entirely when there are
-none; never render an empty section. Use `#### Findings & Observations` at the
+none; never render an empty section. Use `#### Findings` at the
 banner's heading level, one blank line, then the entries. No horizontal
 rules, tables, disclosures, status group headings, tallies or separate
 resolved sections.
 
-Each distinct Ollie finding appears exactly once, in one unbulleted two-line
+Each distinct Ollie finding appears exactly once, in one unbulleted single-line
 entry, entries separated by a single blank line. Findings from other reviewers
 are never listed or linked. An independently frozen Ollie finding whose inline
 publication was suppressed by an external root-cause match uses the threadless
@@ -86,18 +102,17 @@ round's inline slots. The index counts distinct Ollie findings including
 visible overflow, which may differ from the approval count; explain the
 difference in the assessment when it matters.
 
-Entry format, each line in its own `<sub>` wrapper with two trailing spaces on
-the first line for a hard break and no blank line between them:
+Entry format: severity dot, bold category/level and status, then a middle dot
+and the linked short summary, all on one source line with natural wrapping.
+Do not use `<sub>` wrappers or forced line breaks for entries.
 
-- Line one, entirely bold: `<severity dot> <category>(<level>) · <status
-  glyph> <lowercase status label>`. Severity dots are 🔴 critical, 🟠 major,
-  🟡 minor and 🔵 nitpick. For a fixed entry with a known fix SHA append
-  `` · fixed in `<sha>` `` inside the bold text; omit it when unknown.
-- Line two: for a linked finding, only the short summary linking to its
-  original thread plus any necessary status note, with no source path. Add a
-  short filename only to distinguish otherwise identical summaries. For
-  threadless overflow, the supporting `file:line` first, then the stable ID,
-  the trigger/consequence and the fix.
+- Severity dots are 🔴 critical, 🟠 major, 🟡 minor and 🔵 nitpick. For a fixed
+  entry with a known fix SHA append `` · fixed in `<sha>` `` inside the bold
+  text; omit it when unknown.
+- Link the summary to its original thread, with any necessary status note
+  after it and no source path. Add a short filename only to distinguish
+  otherwise identical summaries. For threadless overflow, replace the link
+  with the supporting `file:line`, stable ID, trigger/consequence and fix.
 
 Status glyphs are shapes distinct from the severity dots, so a major that is
 still open never shows two identical circles. Sort active findings first, in
@@ -120,23 +135,18 @@ with updated status. Reuse known statuses for unaffected threads; indexing
 history needs no new investigation or reply.
 
 Use normal spaces so entries wrap naturally: no non-breaking spaces, HTML
-breaks inside entries or CSS. On renderers without inline HTML, keep the same
-unbulleted two-line shape without the wrappers.
+breaks inside entries or CSS.
 
 ```markdown
-#### Findings & Observations
+#### Findings
 
-<sub>**🟠 correctness(major) · ⏳ open**</sub>  
-<sub>[Missing retry limit](<original-thread-url>)</sub>
+🟠 **correctness(major) · ⏳ open** · [Missing retry limit](<original-thread-url>)
 
-<sub>**🟡 observability(minor) · ⏸️ deferred**</sub>  
-<sub>[Missing timeout logging](<original-thread-url>) — awaiting logging follow-up.</sub>
+🟡 **observability(minor) · ⏸️ deferred** · [Missing timeout logging](<original-thread-url>) — awaiting logging follow-up.
 
-<sub>**🟡 correctness(minor) · ✅ fixed · fixed in `a1b2c3d`**</sub>  
-<sub>[Missing null guard](<original-thread-url>)</sub>
+🟡 **correctness(minor) · ✅ fixed · fixed in `a1b2c3d`** · [Missing null guard](<original-thread-url>)
 
-<sub>**🟡 data(minor) · ✨ new**</sub>  
-<sub>`src/export.ts:88` · export-null-currency · Rows with a null currency are written as "undefined"; default to the account currency before formatting.</sub>
+🟡 **data(minor) · ✨ new** · `src/export.ts:88` · export-null-currency · Rows with a null currency are written as "undefined"; default to the account currency before formatting.
 ```
 
 Links: use only known prior Ollie thread URLs immediately. New Ollie findings
@@ -157,7 +167,7 @@ Disclose any truncation in the conversation summary.
 
 ### Root footer
 
-Include ``<sub>🦦 Ollie reviewed `<short-sha>` &middot; <phrase></sub>`` only
+Include ``<sub>🦦 Ollie reviewed `<short-sha>` &middot; <phrase> &middot; [how Ollie reviews](<developer-guide-url>)</sub>`` only
 when no inline findings accompany the review: clean reviews, root-only
 re-reviews and threadless-overflow-only reviews. Omit it when inline findings
 are posted. Preserve this rule during link back-fill.

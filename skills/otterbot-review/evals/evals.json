@@ -7,7 +7,7 @@
       "expected_output": "One integrated review, evidenced inline findings and a matching host verdict submitted as one grouped review. Follow the format.md inline and root templates (bold title, three bold labels, footer rules, index shape, sentence limits). Back-fill new index links once after verification. The conversation summary gives link, verdict, counts and material limits.",
       "files": [],
       "must_include": [
-        "Findings & Observations",
+        "Findings",
         "Concern",
         "Verification"
       ],
@@ -255,10 +255,10 @@
     {
       "id": 21,
       "prompt": "review https://github.com/acme/widgets/pull/72, which yields five inline findings",
-      "expected_output": "Five findings may all post when budget allows, e.g. three verified blockers and two minors. Root blurb stays concise with a visible Findings & Observations index linking all five threads. Every inline has personality subtext. One batch submission and verification, then one edit back-fills all new thread links.",
+      "expected_output": "Five findings may all post when budget allows, e.g. three verified blockers and two minors. Root blurb stays concise with a visible Findings index linking all five threads. Every inline has personality subtext. One batch submission and verification, then one edit back-fills all new thread links.",
       "files": [],
       "must_include": [
-        "Findings & Observations"
+        "Findings"
       ],
       "must_not_include": [],
       "tags": [
@@ -611,10 +611,10 @@
     {
       "id": 51,
       "prompt": "Re-review a clean PR with two fixed and one withdrawn prior Ollie findings; no new findings",
-      "expected_output": "Render Findings & Observations with all three original thread links and accurate fixed/withdrawn statuses. Do not omit the section because nothing is open. No new inline findings or redundant thread replies. Preserve footer; no link edit if prior URLs are known. Use separate unbulleted <sub> entries for ✅ fixed and 🙈 withdrawn under #### Findings & Observations without heading tallies or a separate resolved section; never claim all findings fixed when one is withdrawn.",
+      "expected_output": "Render Findings with all three original thread links and accurate fixed/withdrawn statuses. Do not omit the section because nothing is open. No new inline findings or redundant thread replies. Preserve footer; no link edit if prior URLs are known. Use separate unbulleted single-line entries for ✅ fixed and 🙈 withdrawn under #### Findings without heading tallies or a separate resolved section; never claim all findings fixed when one is withdrawn.",
       "files": [],
       "must_include": [
-        "Findings & Observations",
+        "Findings",
         "withdrawn"
       ],
       "must_not_include": [],
@@ -626,7 +626,7 @@
     {
       "id": 52,
       "prompt": "Review a PR with one prior human finding, three prior Ollie findings and two new Ollie minors",
-      "expected_output": "Index the five distinct Ollie findings only, linking original threads and marking prior statuses. Historical findings do not consume the four-new-minor budget. Fill new links from delivery result in one edit; human thread remains excluded. Sort one visible list by current status with active findings first and both new minors labeled ✨ new; use #### Findings & Observations with no heading tallies or status group sections, and textual severity on entries.",
+      "expected_output": "Index the five distinct Ollie findings only, linking original threads and marking prior statuses. Historical findings do not consume the four-new-minor budget. Fill new links from delivery result in one edit; human thread remains excluded. Sort one visible list by current status with active findings first and both new minors labeled ✨ new; use #### Findings with no heading tallies or status group sections, and textual severity on entries.",
       "files": [],
       "must_include": [],
       "must_not_include": [],
@@ -640,10 +640,10 @@
     {
       "id": 53,
       "prompt": "Post a clean initial review with no current or prior findings",
-      "expected_output": "Omit Findings & Observations entirely, retain concise verdict and personality footer. No zero-count section or link update.",
+      "expected_output": "Omit Findings entirely, retain concise verdict and personality footer. No zero-count section or link update.",
       "files": [],
       "must_include": [
-        "Findings & Observations"
+        "Findings"
       ],
       "must_not_include": [],
       "tags": [
@@ -667,7 +667,7 @@
     {
       "id": 55,
       "prompt": "Review a clean PR with no minors and all approval gates satisfied",
-      "expected_output": "Ship It / Review passed with approval; no CI or merge-readiness claims, quota search or empty Findings & Observations. Persist complete coverage, context and explicit empty ledger.",
+      "expected_output": "Ship It / Review passed with approval; no CI or merge-readiness claims, quota search or empty Findings. Persist complete coverage, context and explicit empty ledger.",
       "files": [],
       "must_include": [
         "Review passed",
@@ -697,10 +697,10 @@
     {
       "id": 57,
       "prompt": "Review a PR with three credible minor candidates, no prior findings, no blockers",
-      "expected_output": "Three verified minors give Request Changes explaining the threshold without repeating inline fixes or raising their severities. All three may post inline with Findings & Observations links and footers. Do not seek a fourth to fill slots.",
+      "expected_output": "Three verified minors give Request Changes explaining the threshold without repeating inline fixes or raising their severities. All three may post inline with Findings links and footers. Do not seek a fourth to fill slots.",
       "files": [],
       "must_include": [
-        "Findings & Observations",
+        "Findings",
         "Request Changes"
       ],
       "must_not_include": [],
@@ -727,10 +727,10 @@
     {
       "id": 59,
       "prompt": "Re-review a PR with one open minor and two resolved deferred minors linked to tickets, no human risk decisions",
-      "expected_output": "Count three. Tickets and resolution do not remove deferred risks. Request Changes naming threshold, preserve deferred statuses and Findings & Observations links.",
+      "expected_output": "Count three. Tickets and resolution do not remove deferred risks. Request Changes naming threshold, preserve deferred statuses and Findings links.",
       "files": [],
       "must_include": [
-        "Findings & Observations",
+        "Findings",
         "Request Changes",
         "deferred"
       ],
@@ -1041,10 +1041,10 @@
     {
       "id": 83,
       "prompt": "Render a review with five verified new minors and no blockers",
-      "expected_output": "Request Changes because at least three minors count. Four inline; fifth visibly in Findings & Observations with stable ID, code reference, consequence, fix and status, plus ledger record. Index has five distinct findings. No fabricated thread link or hidden-only approval reason.",
+      "expected_output": "Request Changes because at least three minors count. Four inline; fifth visibly in Findings with stable ID, code reference, consequence, fix and status, plus ledger record. Index has five distinct findings. No fabricated thread link or hidden-only approval reason.",
       "files": [],
       "must_include": [
-        "Findings & Observations",
+        "Findings",
         "Request Changes"
       ],
       "must_not_include": [],
@@ -1317,10 +1317,10 @@
     {
       "id": 111,
       "prompt": "Review four verified new minors with no blockers",
-      "expected_output": "Post four inline with personality footers and Findings & Observations links. Request Changes at three-minor threshold; never approve because posting cap increased. No overflow ledger entries for these four.",
+      "expected_output": "Post four inline with personality footers and Findings links. Request Changes at three-minor threshold; never approve because posting cap increased. No overflow ledger entries for these four.",
       "files": [],
       "must_include": [
-        "Findings & Observations",
+        "Findings",
         "Request Changes"
       ],
       "must_not_include": [],
@@ -1778,10 +1778,10 @@
     {
       "id": 150,
       "prompt": "Re-review a PR whose only two Ollie findings are now verified fixed in commits a1b2c3d and e4f5a6b. Both original thread URLs are known.",
-      "expected_output": "One visible #### Findings & Observations section with two ✅ fixed entries in the standard two-line <sub> shape, each keeping its original thread link and verified fix SHA appended inside the bold status line. Root footer present because no inline findings accompany the review. No redundant replies or invented URLs. Follow the format.md inline and root templates (bold title, three bold labels, footer rules, index shape, sentence limits).",
+      "expected_output": "One visible #### Findings section with two ✅ fixed entries in the standard single-line shape, each keeping its original thread link and verified fix SHA appended inside the bold status line. Root footer present because no inline findings accompany the review. No redundant replies or invented URLs. Follow the format.md inline and root templates (bold title, three bold labels, footer rules, index shape, sentence limits).",
       "files": [],
       "must_include": [
-        "Findings & Observations",
+        "Findings",
         "fixed in",
         "✅ fixed"
       ],
@@ -1797,7 +1797,7 @@
     {
       "id": 151,
       "prompt": "Render a re-review index with one still-open regressed critical, one new minor, one deferred minor, one fixed minor, one accepted finding, one superseded finding and one withdrawn finding. The deferred minor is visible overflow without a thread; all other original URLs are known.",
-      "expected_output": "Render seven findings as unbulleted two-line <sub> entries sorted ⏳ open, ✨ new, ⏸️ deferred, ✅ fixed, 🤝 accepted, ♻️ superseded, 🙈 withdrawn under #### Findings & Observations, with no tally, disclosure or separate resolved section. Preserve the regressed critical's original link, known fix SHAs on the bold line, and the visible overflow entry with its ID, code reference, consequence and fix, without inventing a thread URL. Ledger and approval counting rules unchanged. Follow the format.md inline and root templates (bold title, three bold labels, footer rules, index shape, sentence limits).",
+      "expected_output": "Render seven findings as unbulleted single-line entries sorted ⏳ open, ✨ new, ⏸️ deferred, ✅ fixed, 🤝 accepted, ♻️ superseded, 🙈 withdrawn under #### Findings, with no tally, disclosure or separate resolved section. Preserve the regressed critical's original link, known fix SHAs on the bold line, and the visible overflow entry with its ID, code reference, consequence and fix, without inventing a thread URL. Ledger and approval counting rules unchanged. Follow the format.md inline and root templates (bold title, three bold labels, footer rules, index shape, sentence limits).",
       "files": [],
       "must_include": [
         "fixed in",
@@ -1857,10 +1857,10 @@
     {
       "id": 158,
       "prompt": "Prepare a hosted review with two independently verified safe minors, no existing matching threads, complete coverage and passing gates. The prior root used ✅ Ollie's Verdict · Ship It.",
-      "expected_output": "Use #### 🦦 The Raft Report · 🚢 Ship It and approve. Publish both minors as inline findings with evidence and fixes, index them in Findings & Observations and verify their returned comments. Do not preserve the old success icon or legacy title, or omit findings because the verdict passes.",
+      "expected_output": "Use #### 🦦 The Raft Report · 🚢 Ship It and approve. Publish both minors as inline findings with evidence and fixes, index them in Findings and verify their returned comments. Do not preserve the old success icon or legacy title, or omit findings because the verdict passes.",
       "files": [],
       "must_include": [
-        "Findings & Observations",
+        "Findings",
         "Ship It"
       ],
       "must_not_include": [],
@@ -1900,7 +1900,7 @@
     {
       "id": 161,
       "prompt": "Review a shared-role KMS decrypt change. Alias, region, S3 constraints and removable attachment are proven by inspection and the Nyquist IAM contract. Review is complete with no findings; no authorized non-author human approval covers this head.",
-      "expected_output": "Use #### 🦦 The Raft Report · 🧑‍⚖️ Human Review Needed and Human Review Needed review status. Name the KMS decryption behavior and required authorized non-author current-head approval. No fabricated finding or severity and no empty Findings & Observations section. Persist requires-human and a human hold. Use the blocking host action, reconcile any prior Ollie approval and verify delivery.",
+      "expected_output": "Use #### 🦦 The Raft Report · 🧑‍⚖️ Human Review Needed and Human Review Needed review status. Name the KMS decryption behavior and required authorized non-author current-head approval. No fabricated finding or severity and no empty Findings section. Persist requires-human and a human hold. Use the blocking host action, reconcile any prior Ollie approval and verify delivery.",
       "files": [],
       "must_include": [
         "Human Review Needed"
@@ -2239,6 +2239,26 @@
       "must_not_include": [],
       "tags": [
         "approval",
+        "delivery"
+      ]
+    },
+    {
+      "id": 182,
+      "prompt": "Render a root review where replay safety is unverified after a lost final refresh, one new minor signup routing finding has a known Ollie thread URL, and current-head approval by a non-author CODEOWNER is required.",
+      "expected_output": "Use The Raft Report with Request Changes and a 1–3 sentence summary explaining the verdict and affected behavior, with no word-count limit. Render Required Next Steps as compact bullets labeled Verify, Fix and Human review, naming evidence, repair and required current-head approval. Render Findings with the minor as one unbulleted source line: severity dot, bold category/level and status, then a linked summary. Separate entries with blank lines. Omit the root footer when the new inline finding accompanies it.",
+      "files": [],
+      "tags": [
+        "format",
+        "delivery"
+      ]
+    },
+    {
+      "id": 183,
+      "prompt": "Render a clean first review with no findings, no historical findings and no required actions; then render a clean re-review with one verified fixed finding and its known thread URL and fix SHA.",
+      "expected_output": "Both reports use a 1–3 sentence summary and omit Required Next Steps. The first omits Findings entirely. The re-review includes a single-line fixed entry with the original thread link and known fix SHA inside the bold metadata. Both include the root Ollie subline with reviewed SHA, personality phrase and review-guide link because no inline findings accompany them.",
+      "files": [],
+      "tags": [
+        "format",
         "delivery"
       ]
     }

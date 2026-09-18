@@ -57,7 +57,7 @@ behavior, who must review it, and the approval needed for the current head. It
 is delivered as a non-blocking host comment with Ollie's approval withheld,
 never as a request for changes; see `hosts.md`. Record a human hold, not a
 finding: do not assign severity, invent an inline defect, or add an empty
-Findings & Observations section. Historical resolved findings remain indexed. Do
+Findings section. Historical resolved findings remain indexed. Do
 not invent a human-review requirement from uncertainty or an unrelated host
 reviewer quota.
 
@@ -140,7 +140,7 @@ is no separate deferral-count or review-round approval limit.
 Every finding affecting approval must have a visible trigger, consequence, code
 reference and fix. Keep up to four new minors inline; render additional verified
 minors and independently verified findings covered by another reviewer as
-compact threadless entries in Findings & Observations, with their stable IDs and
+compact threadless entries in Findings, with their stable IDs and
 status. These entries are rendered only from Ollie's frozen record and remain
 visible on subsequent rounds. Link only Ollie's own existing thread; otherwise
 use a reviewed-commit code link or plain `file:line`, never another reviewer's
