@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "review this PR: https://github.com/acme/widgets/pull/42",
-      "expected_output": "One integrated review, evidenced inline findings and a matching host verdict submitted as one grouped review. Follow the format.md inline and root templates (bold title, three bold labels, footer rules, index shape, sentence limits). Back-fill new index links once after verification. The conversation summary gives link, verdict, counts and material limits.",
+      "expected_output": "One integrated review, evidenced inline findings and a matching host verdict submitted as one grouped review. Follow the format.md inline and root templates (bold severity/category prefix and regular-weight title summary, three bold labels, footer rules, index shape, sentence limits). Back-fill new index links once after verification. The conversation summary gives link, verdict, counts and material limits.",
       "files": [],
       "must_include": [
         "Findings",
@@ -611,7 +611,7 @@
     {
       "id": 51,
       "prompt": "Re-review a clean PR with two fixed and one withdrawn prior Ollie findings; no new findings",
-      "expected_output": "Render Findings with all three original thread links and accurate fixed/withdrawn statuses. Do not omit the section because nothing is open. No new inline findings or redundant thread replies. Preserve footer; no link edit if prior URLs are known. Use separate unbulleted single-line entries for ✅ fixed and 🙈 withdrawn under #### Findings without heading tallies or a separate resolved section; never claim all findings fixed when one is withdrawn.",
+      "expected_output": "Render Findings with all three original thread links and accurate fixed/withdrawn statuses. Do not omit the section because nothing is open. No new inline findings or redundant thread replies. Preserve footer; no link edit if prior URLs are known. Use separate unbulleted two-line entries with both lines in <sub> for ✅ fixed and 🙈 withdrawn without a section title without heading tallies or a separate resolved section; never claim all findings fixed when one is withdrawn.",
       "files": [],
       "must_include": [
         "Findings",
@@ -626,7 +626,7 @@
     {
       "id": 52,
       "prompt": "Review a PR with one prior human finding, three prior Ollie findings and two new Ollie minors",
-      "expected_output": "Index the five distinct Ollie findings only, linking original threads and marking prior statuses. Historical findings do not consume the four-new-minor budget. Fill new links from delivery result in one edit; human thread remains excluded. Sort one visible list by current status with active findings first and both new minors labeled ✨ new; use #### Findings with no heading tallies or status group sections, and textual severity on entries.",
+      "expected_output": "Index the five distinct Ollie findings only, linking original threads and marking prior statuses. Historical findings do not consume the four-new-minor budget. Fill new links from delivery result in one edit; human thread remains excluded. Sort one visible list by current status with active findings first and both new minors labeled ✨ new; use a findings index with no title or counts or status group sections, and textual severity on entries.",
       "files": [],
       "must_include": [],
       "must_not_include": [],
@@ -1778,7 +1778,7 @@
     {
       "id": 150,
       "prompt": "Re-review a PR whose only two Ollie findings are now verified fixed in commits a1b2c3d and e4f5a6b. Both original thread URLs are known.",
-      "expected_output": "One visible #### Findings section with two ✅ fixed entries in the standard single-line shape, each keeping its original thread link and verified fix SHA appended inside the bold status line. Root footer present because no inline findings accompany the review. No redundant replies or invented URLs. Follow the format.md inline and root templates (bold title, three bold labels, footer rules, index shape, sentence limits).",
+      "expected_output": "One visible findings index without a title or counts with two ✅ fixed entries in the standard two-line shape with both lines in <sub>, each keeping its original thread link and verified fix SHA appended on the metadata line outside the bold prefix. Root footer present because no inline findings accompany the review. No redundant replies or invented URLs. Follow the format.md inline and root templates (bold severity/category prefix and regular-weight title summary, three bold labels, footer rules, index shape, sentence limits).",
       "files": [],
       "must_include": [
         "Findings",
@@ -1797,7 +1797,7 @@
     {
       "id": 151,
       "prompt": "Render a re-review index with one still-open regressed critical, one new minor, one deferred minor, one fixed minor, one accepted finding, one superseded finding and one withdrawn finding. The deferred minor is visible overflow without a thread; all other original URLs are known.",
-      "expected_output": "Render seven findings as unbulleted single-line entries sorted ⏳ open, ✨ new, ⏸️ deferred, ✅ fixed, 🤝 accepted, ♻️ superseded, 🙈 withdrawn under #### Findings, with no tally, disclosure or separate resolved section. Preserve the regressed critical's original link, known fix SHAs on the bold line, and the visible overflow entry with its ID, code reference, consequence and fix, without inventing a thread URL. Ledger and approval counting rules unchanged. Follow the format.md inline and root templates (bold title, three bold labels, footer rules, index shape, sentence limits).",
+      "expected_output": "Render seven findings as unbulleted two-line entries with both lines in <sub> sorted ⏳ open, ✨ new, ⏸️ deferred, ✅ fixed, 🤝 accepted, ♻️ superseded, 🙈 withdrawn without a section title, with no tally, disclosure or separate resolved section. Preserve the regressed critical's original link, known fix SHAs on the metadata line outside the bold prefix, and the visible overflow entry with its ID, code reference, consequence and fix, without inventing a thread URL. Ledger and approval counting rules unchanged. Follow the format.md inline and root templates (bold severity/category prefix and regular-weight title summary, three bold labels, footer rules, index shape, sentence limits).",
       "files": [],
       "must_include": [
         "fixed in",
@@ -2032,7 +2032,7 @@
     {
       "id": 170,
       "prompt": "Review a local diff with a verified one-line null guard fix. There is no host-native apply-suggestion capability.",
-      "expected_output": "Give precise source evidence, concrete null guard guidance and a regression check under the bold title and three finding labels, in a local `file:line` block with the otter footer. A code example may follow Verification; do not claim host-native apply-suggestion support.",
+      "expected_output": "Give precise source evidence, concrete null guard guidance and a regression check under the title with only its severity/category prefix bold and three finding labels, in a local `file:line` block with the otter footer. A code example may follow Verification; do not claim host-native apply-suggestion support.",
       "files": [],
       "must_include": [],
       "must_not_include": [
@@ -2047,7 +2047,7 @@
     {
       "id": 171,
       "prompt": "Review a PR with three independent, straightforward defects, each with a verified local replacement. Explain each clearly without making the set of findings cumbersome to read.",
-      "expected_output": "Follow the format.md inline and root templates (bold title, three bold labels, footer rules, index shape, sentence limits). Keep straightforward defects shorter when the complete causal evidence and fix fit naturally; use 1–2 sentences each for Concern and Fix and 1 for Verification, with no word-count limits and an optional code example before the footer.",
+      "expected_output": "Follow the format.md inline and root templates (bold severity/category prefix and regular-weight title summary, three bold labels, footer rules, index shape, sentence limits). Keep straightforward defects shorter when the complete causal evidence and fix fit naturally; use 1–2 sentences each for Concern and Fix and 1 for Verification, with no word-count limits and an optional code example before the footer.",
       "files": [],
       "must_include": [
         "Concern",
@@ -2061,7 +2061,7 @@
     {
       "id": 172,
       "prompt": "Review a GitHub PR with a verified, self-contained 30-line replacement where the full example is needed to explain the implementation constraints.",
-      "expected_output": "Use a fully bold title, then bold Concern and Fix labels with 1–2 sentences each and Verification with 1 sentence, separated by blank lines. Put the useful 30-line code example after Verification and before the full Ollie subline. No word-count or code-line limit; preserve evidence links inline and name implementation constraints.",
+      "expected_output": "Use a title with only the severity dot and category/level bold, keeping the separator and behavioral summary in regular weight, then bold Concern and Fix labels with 1–2 sentences each and Verification with 1 sentence, separated by blank lines. Put the useful 30-line code example after Verification and before the full Ollie subline. No word-count or code-line limit; preserve evidence links inline and name implementation constraints.",
       "files": [],
       "must_include": [
         "Concern",
@@ -2080,7 +2080,7 @@
     {
       "id": 173,
       "prompt": "Present a verified notification opt-in defect: enable() stores an unscoped pending flag when account A lacks an integration ID; the account-switch handler retains it; refresh consumes it for B and updates B’s preference. Source locations for all three steps are available. No regression test was executed. The fix spans lifecycle handling and refresh, and must preserve deferred enablement for A.",
-      "expected_output": "Follow the format.md inline and root templates (bold title, three bold labels, footer rules, index shape, sentence limits). Provide enough summary context to understand the account-switch scenario without opening links. Cite all three decisive paths and what each proves, including the retained flag across the account transition. Guide account/session scoping, invalidation and ownership checks in prose. Propose checks for A-to-B isolation and same-account deferred enablement under Verification, and do not claim they passed.",
+      "expected_output": "Follow the format.md inline and root templates (bold severity/category prefix and regular-weight title summary, three bold labels, footer rules, index shape, sentence limits). Provide enough summary context to understand the account-switch scenario without opening links. Cite all three decisive paths and what each proves, including the retained flag across the account transition. Guide account/session scoping, invalidation and ownership checks in prose. Propose checks for A-to-B isolation and same-account deferred enablement under Verification, and do not claim they passed.",
       "files": [],
       "must_include": [
         "Concern",
@@ -2245,7 +2245,7 @@
     {
       "id": 182,
       "prompt": "Render a root review where replay safety is unverified after a lost final refresh, one new minor signup routing finding has a known Ollie thread URL, and current-head approval by a non-author CODEOWNER is required.",
-      "expected_output": "Use The Raft Report with Request Changes and a 1–3 sentence summary explaining the verdict and affected behavior, with no word-count limit. Render Required Next Steps as compact bullets labeled Verify, Fix and Human review, naming evidence, repair and required current-head approval. Render Findings with the minor as one unbulleted source line: severity dot, bold category/level and status, then a linked summary. Separate entries with blank lines. Omit the root footer when the new inline finding accompanies it.",
+      "expected_output": "Use The Raft Report with Request Changes and a 1–3 sentence summary explaining the verdict and affected behavior, with no word-count limit. Render Required Next Steps as compact bullets labeled Verify, Fix and Human review, naming evidence, repair and required current-head approval. Render Findings with the minor as one unbulleted two-line entry: bold severity dot and category/level with regular-weight status on the first line, then a short regular-weight linked title on the second. Omit the Findings title and counts, with no bullets or dividers. Wrap each line in <sub> and separate them with <br>. Separate entries with blank lines. Omit the root footer when the new inline finding accompanies it.",
       "files": [],
       "tags": [
         "format",
@@ -2255,7 +2255,7 @@
     {
       "id": 183,
       "prompt": "Render a clean first review with no findings, no historical findings and no required actions; then render a clean re-review with one verified fixed finding and its known thread URL and fix SHA.",
-      "expected_output": "Both reports use a 1–3 sentence summary and omit Required Next Steps. The first omits Findings entirely. The re-review includes a single-line fixed entry with the original thread link and known fix SHA inside the bold metadata. Both include the root Ollie subline with reviewed SHA, personality phrase and review-guide link because no inline findings accompany them.",
+      "expected_output": "Both reports use a 1–3 sentence summary and omit Required Next Steps. The first omits Findings entirely. The re-review includes a two-line fixed entry with both lines in <sub> with the original thread link and known fix SHA on the metadata line outside the bold prefix. Both include the root Ollie subline with reviewed SHA, personality phrase and review-guide link because no inline findings accompany them.",
       "files": [],
       "tags": [
         "format",

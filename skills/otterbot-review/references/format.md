@@ -24,11 +24,11 @@ editing that same body, never by posting a separate conversation comment.
 - **Fix** · <Concrete repair needed; refer to the finding below.>
 - **Human review** · <Required reviewer, behavior and current-commit approval.>
 
-#### Findings
+<sub>**<severity dot> <category>(<level>)** · <status glyph> <lowercase status label></sub><br>
+<sub>[<short summary>](<original-thread-url>)</sub>
 
-<severity dot> **<category>(<level>) · <status glyph> <lowercase status label>** · [<short summary>](<original-thread-url>)
-
-<severity dot> **<category>(<level>) · <status glyph> <lowercase status label>** · `<file>:<line>` · <stable ID> · <trigger/consequence and fix, for threadless overflow only>
+<sub>**<severity dot> <category>(<level>)** · <status glyph> <lowercase status label></sub><br>
+<sub>`<file>:<line>` · <stable ID> · <trigger/consequence and fix, for threadless overflow only></sub>
 
 <!-- ollie-approval: {"head":"<full-sha>","unposted_minors":[]} -->
 <!-- ollie-state: <JSON record from readiness.md> -->
@@ -87,12 +87,12 @@ sign-off. These are required actions, not claims that checks already ran.
 
 Required whenever Ollie has any current or prior finding on the PR, including
 a clean re-review with only resolved findings. Omit it entirely when there are
-none; never render an empty section. Use `#### Findings` at the
-banner's heading level, one blank line, then the entries. No horizontal
-rules, tables, disclosures, status group headings, tallies or separate
-resolved sections.
+none; never render an empty section. Place entries one blank line after the
+assessment or Required Next Steps when present. Omit the Findings title and
+counts. No horizontal rules, tables, disclosures, status group headings or
+separate resolved sections.
 
-Each distinct Ollie finding appears exactly once, in one unbulleted single-line
+Each distinct Ollie finding appears exactly once, in one unbulleted two-line
 entry, entries separated by a single blank line. Findings from other reviewers
 are never listed or linked. An independently frozen Ollie finding whose inline
 publication was suppressed by an external root-cause match uses the threadless
@@ -102,13 +102,16 @@ round's inline slots. The index counts distinct Ollie findings including
 visible overflow, which may differ from the approval count; explain the
 difference in the assessment when it matters.
 
-Entry format: severity dot, bold category/level and status, then a middle dot
-and the linked short summary, all on one source line with natural wrapping.
-Do not use `<sub>` wrappers or forced line breaks for entries.
+Entry format: put the bold severity dot and category/level, then a regular-weight
+separator and status on the first line, and the regular-weight linked short
+summary on the second. Wrap each line in its own `<sub>…</sub>` and end the first with `<br>` to preserve the line break.
+Use a short descriptive title rather than repeating the full inline finding
+summary; keep the explanation in the linked thread. Either line may wrap
+naturally on narrow screens.
 
 - Severity dots are 🔴 critical, 🟠 major, 🟡 minor and 🔵 nitpick. For a fixed
-  entry with a known fix SHA append `` · fixed in `<sha>` `` inside the bold
-  text; omit it when unknown.
+  entry with a known fix SHA append `` · fixed in `<sha>` `` after the status
+  on the first line, outside the bold prefix; omit it when unknown.
 - Link the summary to its original thread, with any necessary status note
   after it and no source path. Add a short filename only to distinguish
   otherwise identical summaries. For threadless overflow, replace the link
@@ -134,19 +137,21 @@ are never labeled fixed. A regressed critical keeps its original thread link
 with updated status. Reuse known statuses for unaffected threads; indexing
 history needs no new investigation or reply.
 
-Use normal spaces so entries wrap naturally: no non-breaking spaces, HTML
-breaks inside entries or CSS.
+Use normal spaces so entries wrap naturally: no non-breaking spaces or CSS.
+Use only the one explicit `<br>` between the metadata and summary lines.
 
 ```markdown
-#### Findings
+<sub>**🟠 correctness(major)** · ⏳ open</sub><br>
+<sub>[Missing retry limit](<original-thread-url>)</sub>
 
-🟠 **correctness(major) · ⏳ open** · [Missing retry limit](<original-thread-url>)
+<sub>**🟡 observability(minor)** · ⏸️ deferred</sub><br>
+<sub>[Missing timeout logging](<original-thread-url>) — awaiting logging follow-up.</sub>
 
-🟡 **observability(minor) · ⏸️ deferred** · [Missing timeout logging](<original-thread-url>) — awaiting logging follow-up.
+<sub>**🟡 correctness(minor)** · ✅ fixed · fixed in `a1b2c3d`</sub><br>
+<sub>[Missing null guard](<original-thread-url>)</sub>
 
-🟡 **correctness(minor) · ✅ fixed · fixed in `a1b2c3d`** · [Missing null guard](<original-thread-url>)
-
-🟡 **data(minor) · ✨ new** · `src/export.ts:88` · export-null-currency · Rows with a null currency are written as "undefined"; default to the account currency before formatting.
+<sub>**🟡 data(minor)** · ✨ new</sub><br>
+<sub>`src/export.ts:88` · export-null-currency · Rows with a null currency are written as "undefined"; default to the account currency before formatting.</sub>
 ```
 
 Links: use only known prior Ollie thread URLs immediately. New Ollie findings
@@ -176,7 +181,7 @@ are posted. Preserve this rule during link back-fill.
 
 ````markdown
 <!-- ollie-finding: <root-cause-slug>; level: <level>; category: <category>; head: <full-sha> -->
-<dot> **<category>(<level>) &middot; <short behavioral summary>**
+**<dot> <category>(<level>)** &middot; <short behavioral summary>
 
 **Concern** &middot; <Reachable trigger, cause and impact, with evidence links inline.>
 
@@ -192,8 +197,9 @@ are posted. Preserve this rule during link back-fill.
 ````
 
 Keep this order: title, Concern, Fix, Verification, optional code block, footer.
-Bold the entire title after the severity dot, including category, level and
-summary. Use the fixed bold labels **Concern**, **Fix** and **Verification**
+Bold only the severity dot and category/level prefix. Keep the separator and
+behavioral summary in regular weight. Use the fixed bold labels **Concern**,
+**Fix** and **Verification**
 followed by `&middot;` and the section text on the same line, with one blank
 line between each piece. Do not use standalone section headings or a separate
 evidence list. Keep the finding marker, reviewed commit and otter footer.
@@ -239,7 +245,8 @@ to add a footer to an old comment.
 
 Local reviews omit hidden markers and host-state claims. Use a brief
 `Blocking findings` or `No blocking findings` banner and each finding once as
-a `file:line` block with the same bold title and labels. The footer reads `working tree at
+a `file:line` block with the same bold severity/category prefix, regular-weight
+summary and bold labels. The footer reads `working tree at
 <short-sha>` for uncommitted changes, or `uncommitted repository` when no
 commit exists.
 
