@@ -95,23 +95,27 @@ present, and never add counts to it. No horizontal rules, tables, disclosures,
 status group headings or separate resolved sections.
 
 Each distinct Ollie finding appears exactly once, in one bulleted two-line
-list item. Use Markdown `- ` markers with no blank lines between items. Findings from other reviewers are never listed or
-linked. An independently
-frozen Ollie finding whose inline publication was suppressed by an external
-root-cause match uses the threadless overflow form and Ollie's own evidence;
-the matching external URL and wording must not appear anywhere in the report. Historical entries do not consume this
-round's inline slots. The index counts distinct Ollie findings including
-visible overflow, which may differ from the approval count; explain the
-difference in the assessment when it matters.
+list item. Use Markdown `- ` markers and keep the whole section blank-line
+free: none between items and none inside an item, because one blank line
+anywhere in the list makes renderers treat it as a loose list and pad every
+line into its own paragraph. Findings from other reviewers are never listed
+or linked. An independently frozen Ollie finding whose inline publication was
+suppressed by an external root-cause match uses the threadless overflow form
+and Ollie's own evidence; the matching external URL and wording must not
+appear anywhere in the report. Historical entries do not consume this round's
+inline slots. The index counts distinct Ollie findings including visible
+overflow, which may differ from the approval count; explain the difference in
+the assessment when it matters.
 
 Entry format: put the bold severity dot and category/level, then a
 regular-weight separator and the status on the first line, and the
-regular-weight linked short summary on the second. Separate the two lines
-with `<br>` followed by a newline. Indent the second line by two spaces to
-align with the text after the bullet. Keep both lines at full body size,
-never in `<sub>`. Use a short descriptive title rather than repeating the
-full inline finding summary; keep the explanation in the linked thread.
-Either line may wrap naturally on narrow screens.
+regular-weight linked short summary on the second. End the first line with
+`<br>` and start the second on the very next line — never a blank line
+between them — indented by two spaces so it aligns with the text after the
+bullet. The two lines stay one paragraph; `<br>` is the only break. Keep both
+lines at full body size, never in `<sub>`. Use a short descriptive title
+rather than repeating the full inline finding summary; keep the explanation
+in the linked thread. Either line may wrap naturally on narrow screens.
 
 - Severity dots are 🔴 critical, 🟠 major, 🟡 minor and 🔵 nitpick. For a fixed
   entry with a known fix SHA append `` · fixed in `<sha>` `` after the status
@@ -142,7 +146,8 @@ with updated status. Reuse known statuses for unaffected threads; indexing
 history needs no new investigation or reply.
 
 Use normal spaces so entries wrap naturally: no non-breaking spaces or CSS.
-Use `<br>` between an item's two lines, never between list items.
+Use `<br>` between an item's two lines, never between list items, and never
+`<br><br>` or a trailing blank line after the last item's second line.
 
 ```markdown
 #### 🐟 Fishy Findings

@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Ollie the otter reviews PRs and local diffs for evidenced bugs, posts concise inline findings with a verdict, and handles incremental re-reviews. Use for "review this PR", "review my diff", "re-review", a pull-request URL, or a code-review verdict request. Supports GitHub, GitLab, Bitbucket, and similar hosts.
-version: 13.0.4
+version: 13.0.5
 ---
 
 # Otterbot Review &middot; Ollie
@@ -182,8 +182,10 @@ Owner: `references/format.md` (templates), then `references/hosts.md`
   blank line; evidence links belong inline and findings have no word limit.
   Keep the visible findings index under a `#### 🐟 Fishy Findings` heading with no
   counts, with all current and historical Ollie findings as bulleted
-  two-line entries at full body size. Use `<br>` within each item and indent
-  its second line by two spaces; do not wrap findings in `<sub>`.
+  two-line entries at full body size. End each item's first line with `<br>`
+  and start its second line on the next line indented by two spaces, with no
+  blank line inside or between items, so the list renders tight; do not wrap
+  findings in `<sub>`.
   The root summary is 1–3 sentences with no word limit,
   followed by **🎣 Tackle These Next** with labeled action bullets when action
   is required, then **🐟 Fishy Findings** when history exists. Replies are one or two

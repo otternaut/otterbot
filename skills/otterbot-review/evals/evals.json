@@ -2316,6 +2316,24 @@
         "specialists",
         "nitpicks"
       ]
+    },
+    {
+      "id": 189,
+      "prompt": "Render a 🐟 Fishy Findings index for four new findings — one critical, one major and two minors — so each entry reads as exactly two tight lines in the rendered root comment.",
+      "expected_output": "Emit one bulleted item per finding with the bold severity dot and category/level plus status on the first line ending in <br>, and the linked summary on the immediately following line indented two spaces. No blank line between items or inside an item, no <br><br>, no <sub>, so the list renders tight instead of padding each line into its own paragraph.",
+      "files": [],
+      "must_include": [
+        "<br>",
+        "🐟 Fishy Findings"
+      ],
+      "must_not_include": [
+        "<br><br>",
+        "<sub>"
+      ],
+      "tags": [
+        "delivery",
+        "format"
+      ]
     }
   ],
   "global_must_include": [
