@@ -1,7 +1,7 @@
 # Focused risk checklists
 
-Use only sections matching the changed behavior. They guide the integrated
-review, not separate per-hunk audits. An item is a question to settle, not an
+Use only sections matching the changed behavior. They guide the lead and selected specialists,
+not repeated generic per-hunk audits. An item is a question to settle, not an
 automatic finding. Prefer repository conventions, typed contracts, validated
 boundaries and shared infrastructure over speculative missing safeguards.
 Escalate context depth only to establish an actual consequential path.
@@ -86,3 +86,13 @@ Escalate context depth only to establish an actual consequential path.
   image provenance/privileges and changes in what runs in production.
 - A version pin is not automatically safe if release behavior changes the
   relevant security or deployment boundary. Investigate actual behavior.
+
+## Maintenance and clarity
+
+- Names and comments agree with actual behavior and do not mislead callers.
+- New duplicated decisions have a concrete divergence or maintenance cost;
+  duplication alone is not a reason to demand abstraction.
+- Tests describe what their assertions establish, with realistic fixtures and
+  clear failures; do not request more tests without a specific useful check.
+- Apply the selective nitpick criteria in `analysis.md`; cosmetic preferences,
+  speculative extensibility and generic refactoring requests are not findings.

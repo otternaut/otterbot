@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Ollie the otter reviews PRs and local diffs for evidenced bugs, posts concise inline findings with a verdict, and handles incremental re-reviews. Use for "review this PR", "review my diff", "re-review", a pull-request URL, or a code-review verdict request. Supports GitHub, GitLab, Bitbucket, and similar hosts.
-version: 11.0.0
+version: 12.0.0
 ---
 
 # Otterbot Review &middot; Ollie
@@ -28,10 +28,6 @@ conversation, not in the review.
 - `--force`: bypass freshness and conflict exits, never approval gates.
 - `--no-approve`: suppress the approval action on a passing review; blockers
   still request changes and feedback is still posted.
-- `--deep`: at most two targeted independent questions via
-  `references/lenses.md`.
-- `--maintainability`: at most two useful nitpicks on an initial review with no
-  critical finding; none on re-review.
 - `--budget-steps N`: total tool-call budget for the run, set by the trusted
   invoker. It changes how much investigation fits, never evidence standards.
   Legacy `--budget-minutes N` is accepted and mapped in `performance.md`.
@@ -95,24 +91,30 @@ behavior).
 
 ## Phase 3 · Analyze
 
-Owner: `references/analysis.md` (finding record, disproof protocol, false
-positives).
+Owners: `references/lenses.md` (automatic specialist selection), then
+`references/analysis.md` (finding records, disproof and selective nitpicks).
 
-1. In one pass over the diff, inspect correctness and contracts, security and
-   data, reliability, retries and concurrency, tests, and interfaces. Start at
-   changed symbols, then real callers, guards and consumers, normally one hop.
-   Trace farther only to establish a consequential boundary. Do not run
-   additional whole-diff checklist passes or audit neighboring refactors.
-2. Open a finding record for every candidate with a reachable trigger, code
-   evidence and a concrete consequence. Form, disprove and freeze Ollie's
-   verified candidate records from code and requirements before retrieving
+1. Map the changed behaviors and assign relevant independent specialists using
+   `lenses.md` before forming conclusions; this is part of normal review.
+   Inspect correctness and contracts, security and data, reliability, retries
+   and concurrency, performance, tests, interfaces and maintainability. Follow
+   callers, guards, state transitions and consumers until the relevant contract
+   and success/failure outcomes are established, even across multiple files.
+   Use focused second passes for distinct failure paths or quality concerns;
+   avoid repeated generic whole-diff scans and unrelated refactor audits.
+2. Open a finding record for every defect candidate with a reachable trigger,
+   code evidence and a concrete consequence; apply the separate nitpick
+   criteria in `analysis.md` to maintenance or clarity improvements. Form,
+   disprove and freeze Ollie's verified candidate records from code and requirements before retrieving
    external-review content. Then fetch other reviewers' comments and compare
    root causes only to avoid redundant inline publication. A match must not
    replace Ollie's record, supply evidence, set its thread URL or appear as an
    external link in Ollie's report.
 3. Run the disproof protocol on blockers first, then credible minors in risk
-   order. Only `verified` records are posted or counted. A material unresolved
-   path with potentially serious impact becomes a specific verification hold,
+   order. Do not stop discovery or minor verification because an inline cap or
+   verdict threshold was reached. Only `verified` records are posted or counted.
+   A material unresolved path with potentially serious impact becomes a
+   specific verification hold,
    never a speculative defect. Missing tests alone are not a finding.
 
 ## Phase 4 · Verify behavior
@@ -129,7 +131,8 @@ each under the tool timeout in `performance.md`.
 Severity: 🔴 critical is security exposure, irreversible data loss or a
 main-path outage; 🟠 major is a reachable bug or unmet requirement that would
 ship broken; 🟡 minor is an actionable edge case with limited impact; 🔵 nitpick
-is maintainability with no runtime impact and is opt-in only. Between levels,
+is an evidenced maintenance or clarity improvement with no runtime impact,
+considered by default but never required. Between levels,
 choose the lower. Respect human style and design preferences, but report
 verified behavioral blockers even when a human requested the pattern.
 
@@ -168,6 +171,9 @@ Owner: `references/format.md` (templates), then `references/hosts.md`
 - Post every verified critical/major and at most four new inline minors.
   Publication is independent of the verdict. Questions occupy slots but are
   not defects. Overflow minors stay visible in the root index with evidence.
+  Include at most two useful nitpicks on an initial review with no critical
+  finding; none on re-review. They never affect the verdict or require an
+  action under Required Next Steps. Do not fill slots with cosmetic preferences.
 - Render root, inline findings and replies from the finding records using the
   `format.md` templates: a bold title, **Concern** (1–2 sentences), **Fix**
   (1–2 sentences), **Verification** (1 sentence), an optional code example

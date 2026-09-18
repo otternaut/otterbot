@@ -23,7 +23,7 @@ is status:
 | 🔴 critical | security exposure, irreversible data loss, main-path outage | ⏳ open | still present at the reviewed commit |
 | 🟠 major | a reachable bug or unmet requirement that would ship broken | ✨ new | raised this round |
 | 🟡 minor | an actionable edge case with limited impact | ⏸️ deferred | you asked to fix it later; still counted |
-| 🔵 nitpick | maintainability only; appears only when requested | ✅ fixed | verified fixed, with the commit |
+| 🔵 nitpick | specific maintenance or clarity benefit; non-blocking | ✅ fixed | verified fixed, with the commit |
 | | | 🤝 accepted | your explanation showed it does not apply |
 | | | ♻️ superseded | the behavior no longer exists |
 | | | 🙈 withdrawn | Ollie was wrong |
@@ -43,6 +43,13 @@ as much or as little code as needed. There are no finding word-count limits.
 Every inline comment and reply ends with Ollie's subline: the reviewed commit,
 a randomly chosen otter aside and the review-guide link. The footer is
 personality, not evidence.
+
+Ollie selects relevant specialist reviewers automatically and traces changed
+behavior across callers, state transitions and consumers. If independent
+reviewers are unavailable, it uses focused local passes. On an initial review
+without a critical finding, it may include up to two useful nitpicks by default;
+cosmetic preferences are excluded and nitpicks never affect the verdict. New
+nitpicks are not introduced on re-review.
 
 ## What the verdicts mean
 

@@ -4,7 +4,7 @@ Agents cannot measure wall-clock time reliably, so budgets are counted in
 **steps**. One step is one tool call: a file read, a search, a host request,
 a shell command or a subagent dispatch. Count every step from the first
 snapshot request through final delivery verification, including steps spent
-by optional specialists. Use these defaults unless a trusted invoker supplies
+by specialists. Use these defaults unless a trusted invoker supplies
 `--budget-steps N`:
 
 | Job | Step budget | Delivery reserve |
@@ -13,7 +13,7 @@ by optional specialists. Use these defaults unless a trusted invoker supplies
 | Gate reassessment only | 20 | 6 |
 | Small code review | 40 | 8 |
 | Standard code review | 80 | 10 |
-| Large, sensitive or deep review | 120 | 15 |
+| Large or sensitive review | 120 | 15 |
 
 Legacy `--budget-minutes N` remains accepted: map it to `N × 10` steps with a
 reserve of one eighth, rounded up. A trusted override replaces the total; keep
@@ -30,8 +30,10 @@ host call.
 ## Stop and resume
 
 Check the step count after the snapshot, after the integrated scan, after each
-investigation batch and before delivery. Stop optional minor and nitpick work
-first. At total minus reserve, stop new investigation, cancel owned experiments
+investigation batch and before delivery. Stop optional nitpick work first,
+prioritize credible blockers, and continue minor investigation and relevant
+coverage within the remaining budget. At total minus reserve, stop new
+investigation, cancel owned experiments
 where possible, and record verified findings plus the exact unreviewed
 behaviors and paths.
 

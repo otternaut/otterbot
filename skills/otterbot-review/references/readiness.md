@@ -93,12 +93,20 @@ older nonempty state. Retain visible history in Findings.
 
 ## Policy identity
 
-The current review policy revision is **6**. This is the authoritative value;
+The current review policy revision is **7**. This is the authoritative value;
 record it as `policy_revision` in every new root state. It is independent of the
 skill release version. Increment it when approval criteria, required
 verification, scope, evidence reuse or recovery semantics change. Phrase,
 formatting and wording-only changes do not increment it. A policy change must
 identify affected requirements here so existing evidence can be reassessed.
+Revision 7 expands discovery to automatic relevant specialist selection,
+behavior-based cross-file tracing and focused follow-through, separating minor
+investigation from publication caps and enabling selective non-blocking
+nitpicks. On migration, retain valid independently established evidence, but
+reassess changed behaviors whose callers, failure paths or outcomes were not
+covered under the earlier limits. Do not manufacture nitpicks on re-review or
+require delegation when equivalent local coverage is established. Approval
+thresholds and defect evidence standards are unchanged.
 Revision 6 requires a clean information boundary between independent candidate
 verification and external-review deduplication. On reassessment, reuse prior
 Ollie evidence only when its provenance is independent of external comments.

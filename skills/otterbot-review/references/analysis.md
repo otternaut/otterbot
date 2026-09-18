@@ -73,6 +73,31 @@ Prefer inspection; run a bounded local reproduction only when inspection
 cannot settle a verdict-affecting check, within the limits in
 `performance.md` and `verification.md`.
 
+## Selective nitpicks
+
+Consider maintenance and clarity improvements by default, but only post those
+with a specific, evidenced benefit in changed code. They do not need a runtime
+failure. For a nitpick record, `trigger` describes the maintenance task or
+reading context, `consequence` the demonstrated confusion or maintenance cost,
+and `verify` how to check the improvement while preserving behavior.
+
+Before marking one verified, confirm scope, inspect repository conventions and
+intent, identify the concrete cost, and check that the proposed change removes
+it without unnecessary refactoring. Use applicable disproof checks above;
+never invent a runtime trigger to force a suggestion into defect criteria.
+
+Useful examples include a name or comment that contradicts actual behavior,
+newly duplicated decision logic with evidenced divergence, or a test name that
+claims behavior its assertions do not exercise. A demonstrated runtime defect
+gets its actual severity instead. Missing tests alone remain insufficient.
+
+Reject personal naming preferences, formatting already handled by tooling,
+generic requests for helpers or tests, and speculative future extensibility.
+Keep at most two useful nitpicks on an initial review without a critical finding,
+none on re-review; omit the remainder rather than creating optional overflow.
+Nitpicks never count toward approval, require a fix for approval or become a
+verification hold. No nitpicks is a valid result.
+
 ## Common false positives
 
 Discard candidates that rest only on these patterns unless a check above

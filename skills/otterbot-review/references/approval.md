@@ -109,13 +109,13 @@ candidates do not count as minor defects.
   report that combined defect at its actual severity without double-counting
   the same cause as independent minors. Count alone never increases severity.
 
-Start with known prior findings and verified candidates. Verify credible minor
-candidates in risk order, up to four new inline findings within the optional
-work budget. Once three outstanding minors count, approval is withheld, but
-finish an already identified fourth candidate when useful and affordable. Do not
-search for extra minors to fill the four slots or continue optional
-investigation beyond them. Prioritize blocker work and mandatory scope until the
-step budget in `performance.md`; retain unfinished work as a verification hold.
+Start with known prior findings and verified candidates. Verify blockers first,
+then credible minors in risk order within the shared investigation budget.
+The four-minor inline cap limits publication, not discovery or verification;
+continue relevant behavior coverage after reaching it or the three-minor
+verdict threshold. Do not seek findings to fill a quota. Stop optional nitpick
+work first as the budget tightens, and preserve unfinished consequential scope
+as a specific verification hold under `performance.md`.
 Retain all already verified findings, including overflow. If budget expires with
 a credible concern whose impact is needed to decide approval, disclose
 incomplete assessment and do not approve.
