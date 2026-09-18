@@ -26,9 +26,9 @@ editing that same body, never by posting a separate conversation comment.
 
 #### 🐟 Fishy Findings
 
-- **<severity dot> <category>(<level>)** · <status glyph> <lowercase status label><br>
+- **<severity dot> <category>(<level>)** · <status glyph> <lowercase status label>\
   [<short summary>](<original-thread-url>)
-- **<severity dot> <category>(<level>)** · <status glyph> <lowercase status label><br>
+- **<severity dot> <category>(<level>)** · <status glyph> <lowercase status label>\
   `<file>:<line>` · <stable ID> · <trigger/consequence and fix, for threadless overflow only>
 
 <!-- ollie-approval: {"head":"<full-sha>","unposted_minors":[]} -->
@@ -110,9 +110,10 @@ the assessment when it matters.
 Entry format: put the bold severity dot and category/level, then a
 regular-weight separator and the status on the first line, and the
 regular-weight linked short summary on the second. End the first line with
-`<br>` and start the second on the very next line — never a blank line
+a single backslash (`\`), the Markdown hard-break syntax, and start the
+second on the very next line — never a blank line
 between them — indented by two spaces so it aligns with the text after the
-bullet. The two lines stay one paragraph; `<br>` is the only break. Keep both
+bullet. The two lines stay one paragraph with one hard break. Keep both
 lines at full body size, never in `<sub>`. Use a short descriptive title
 rather than repeating the full inline finding summary; keep the explanation
 in the linked thread. Either line may wrap naturally on narrow screens.
@@ -146,19 +147,22 @@ with updated status. Reuse known statuses for unaffected threads; indexing
 history needs no new investigation or reply.
 
 Use normal spaces so entries wrap naturally: no non-breaking spaces or CSS.
-Use `<br>` between an item's two lines, never between list items, and never
-`<br><br>` or a trailing blank line after the last item's second line.
+Use the Markdown hard break only between an item's two lines, never between
+list items. Do not emit HTML break tags (`<br>` or `<br/>`), escaped tags, or
+blank paragraphs. Keep the hard break as one literal backslash immediately
+before the newline in the delivered Markdown; transport escaping must not
+leave a literal `\n` in the comment.
 
 ```markdown
 #### 🐟 Fishy Findings
 
-- **🟠 correctness(major)** · ⏳ open<br>
+- **🟠 correctness(major)** · ⏳ open\
   [Missing retry limit](<original-thread-url>)
-- **🟡 observability(minor)** · ⏸️ deferred<br>
+- **🟡 observability(minor)** · ⏸️ deferred\
   [Missing timeout logging](<original-thread-url>) — awaiting logging follow-up.
-- **🟡 correctness(minor)** · ✅ fixed · fixed in `a1b2c3d`<br>
+- **🟡 correctness(minor)** · ✅ fixed · fixed in `a1b2c3d`\
   [Missing null guard](<original-thread-url>)
-- **🟡 data(minor)** · ✨ new<br>
+- **🟡 data(minor)** · ✨ new\
   `src/export.ts:88` · export-null-currency · Rows with a null currency are written as "undefined"; default to the account currency before formatting.
 ```
 
