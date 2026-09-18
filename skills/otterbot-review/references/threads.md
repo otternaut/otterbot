@@ -118,7 +118,7 @@ withdrawn &middot; my mistake: <what Ollie got wrong and the code that shows it>
 - **Root comment replies and mentions.** Answered where they were made, in one
   or two sentences. Never answered by posting a new root comment.
 - **The fix does not have to be Ollie's fix.** A change that removes the risk
-  is fixed, whatever Paws-On Fix said. Insisting on a particular approach is
+  is fixed, whatever Fix said. Insisting on a particular approach is
   how reviews loop.
 - **Human preferences do not waive defects.** Do not relitigate a human's
   stylistic preference. If their requested pattern causes a verified major or

@@ -164,73 +164,55 @@ are posted. Preserve this rule during link back-fill.
 
 ## Inline finding
 
-```markdown
+````markdown
 <!-- ollie-finding: <root-cause-slug>; level: <level>; category: <category>; head: <full-sha> -->
-<dot> **<category>(<level>)** &middot; <short behavioral summary>
+<dot> **<category>(<level>) &middot; <short behavioral summary>**
 
-#### Ollie’s Concern
+**Concern** &middot; <Reachable trigger, cause and impact, with evidence links inline.>
 
-<Reachable trigger, incorrect behavior and concrete user/caller impact.>
+**Fix** &middot; <Concrete change, affected components and essential constraints.>
 
-#### Pebbles of Proof
+**Verification** &middot; <Concrete check and expected outcome.>
 
-- <Linked file:line and symbol> — <observed fact and what it proves.>
-- <Additional decisive location when needed> — <next causal step.>
-
-#### Paws-On Fix
-
-<Concrete change, affected components and essential implementation constraints.>
-
-#### Splash Test
-
-<Failure scenario that must stop and the valid behavior to preserve.>
-
-<sub>🦦 Ollie reviewed `<short-sha>` &middot; <phrase> &middot; [how Ollie reviews](<developer-guide-url>)</sub>
+```<language>
+<Optional code example that guides the fix.>
 ```
 
-The four headings are fixed strings at `####` with no emojis or disclosures;
-tooling and evals key off them, so never paraphrase or translate them. Keep
-the category/severity header, the finding marker, the reviewed commit and the
-otter footer.
+<sub>🦦 Ollie reviewed `<short-sha>` &middot; <phrase> &middot; [how Ollie reviews](<developer-guide-url>)</sub>
+````
 
-- **Ollie’s Concern**: one sentence, two only when the trigger needs setup.
-  The reachable trigger, the wrong behavior and who it affects. The title
-  already names the failure; do not restate it or repeat the consequence
-  under a later heading.
-- **Pebbles of Proof**: 1–2 bullets, at most 3 when the causal chain needs
-  them, one line each. Each pairs an exact location and symbol with the fact
-  it proves, linked to the reviewed commit where supported or as `file:line`
-  locally. Cover only the decisive steps from trigger to consequence,
-  including a cross-file caller or lifecycle transition when that proves
-  reachability. Filenames and identifiers alone are not evidence; for a
-  claimed missing guard, cite the path inspected and why it allows the
-  failure. Add an excerpt, concrete input/output or executed result only when
-  prose cannot carry the proof. Distinguish inspection, observed execution
-  and proposed checks; state material assumptions; never invent locations.
-- **Paws-On Fix**: 1–3 sentences. The smallest concrete change, where it
-  belongs, and any constraint or companion edit that is easy to miss. Prefer
-  one approach; mention an alternative or a tempting incomplete fix only when
-  evidence shows it matters. If the fix depends on an unresolved contract or
-  design choice, state the dependency and the next step.
-- **Splash Test**: one sentence, two at most. The regression scenario that
-  must now fail or be rejected, its expected result, and the valid behavior
-  that must stay intact. This is the acceptance criterion for whoever applies
-  the fix. Label proposed checks as proposed; report executed ones with their
-  actual results.
+Keep this order: title, Concern, Fix, Verification, optional code block, footer.
+Bold the entire title after the severity dot, including category, level and
+summary. Use the fixed bold labels **Concern**, **Fix** and **Verification**
+followed by `&middot;` and the section text on the same line, with one blank
+line between each piece. Do not use standalone section headings or a separate
+evidence list. Keep the finding marker, reviewed commit and otter footer.
 
-Length: 60–110 words of prose per finding excluding headings, markers and
-footer; a minor is often done in 40. Pass 150 only for a multi-step causal
-chain and never exceed 200. Cut repeated impact statements first, then fix
-rationale, then non-decisive evidence. Do not narrate the investigation,
-hedge or pad a section. Compact, not cryptic: keep the locations, constraints
-and impact that make the finding actionable.
+- **Concern**: 1–2 sentences covering the reachable trigger, cause and concrete
+  user/caller impact. Integrate decisive evidence links with the facts they
+  prove, including cross-file callers or lifecycle transitions when needed.
+  Link exact locations and symbols to the reviewed commit where supported,
+  or use `file:line` locally. For a missing guard, identify the inspected path
+  and why it allows the failure; identifiers alone are not evidence. State
+  material assumptions and never invent locations.
+- **Fix**: 1–2 sentences explaining the smallest concrete change, where it
+  belongs, and essential constraints or companion edits. Prefer one approach;
+  mention alternatives or incomplete fixes only when evidence shows they
+  matter. If an unresolved contract or design choice prevents a safe fix,
+  state that dependency and the next step.
+- **Verification**: 1 sentence describing a concrete check, its expected
+  outcome and any valid behavior that must remain intact. Distinguish proposed
+  checks from executed checks; report actual results only when observed.
+- **Code block**: optional when it adds useful implementation guidance beyond
+  the Fix summary, after Verification and before the footer. Use a fenced
+  block with the appropriate language, as much or as little code as needed;
+  there is no line limit. Preserve relevant guards and name required companion
+  changes in Fix. Make illustrative omissions clear and do not invent a
+  replacement when the safe implementation depends on an unresolved contract.
 
-No patches: findings carry no replacement code, native suggestions or diff
-blocks. The anchor and four sections are the complete handoff; whoever applies
-the fix writes the code with the full file in front of them. A short
-identifier or expression inside a sentence is fine when it names the exact
-change, such as replacing `<=` with `<`. If the user explicitly asks for a
-patch, give it in conversation, not in the review.
+There are no finding word-count limits. Keep each section useful without
+repeating the impact or narrating the investigation. Preserve the evidence,
+constraints and expected behavior an agent needs to solve the issue.
 
 The slug names the root cause, not its location. Category is one lowercase
 word such as correctness, contracts, security, data, reliability, regression,
@@ -247,7 +229,7 @@ to add a footer to an old comment.
 
 Local reviews omit hidden markers and host-state claims. Use a brief
 `Blocking findings` or `No blocking findings` banner and each finding once as
-a `file:line` block with the four headings. The footer reads `working tree at
+a `file:line` block with the same bold title and labels. The footer reads `working tree at
 <short-sha>` for uncommitted changes, or `uncommitted repository` when no
 commit exists.
 

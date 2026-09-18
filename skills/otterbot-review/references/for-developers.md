@@ -24,20 +24,21 @@ is status:
 | | | ♻️ superseded | the behavior no longer exists |
 | | | 🙈 withdrawn | Ollie was wrong |
 
-Each inline finding has four short sections:
+Each inline finding starts with a bold title, followed by three bold labels
+with text on the same line and a blank line between each piece:
 
-- **Ollie’s Concern**: the input or caller that reaches the code, what goes
-  wrong, and who it affects.
-- **Pebbles of Proof**: one to three code locations, each with the fact it
-  proves. Links point at the reviewed commit.
-- **Paws-On Fix**: the smallest concrete change and anything easy to miss.
-  Ollie does not post patches; you or your agent write the code.
-- **Splash Test**: the regression scenario that must now fail or be rejected,
-  and the behavior that must keep working.
+- **Concern** · 1–2 sentences explaining the trigger, cause and impact, with
+  evidence links inline pointing at the reviewed commit.
+- **Fix** · 1–2 sentences describing the concrete change and constraints or
+  companion edits to preserve.
+- **Verification** · 1 sentence describing a check and its expected outcome;
+  proposed checks are distinguished from checks actually run.
 
-Findings run about 60 to 110 words. Every inline comment and reply ends with
-Ollie's footer, the reviewed commit and a randomly chosen otter aside. The
-footer is personality, not evidence.
+An optional code block follows Verification when it helps guide the fix, with
+as much or as little code as needed. There are no finding word-count limits.
+Every inline comment and reply ends with Ollie's subline: the reviewed commit,
+a randomly chosen otter aside and the review-guide link. The footer is
+personality, not evidence.
 
 ## What the verdicts mean
 
@@ -86,7 +87,7 @@ a collaborator:
 Every command gets exactly one answer. Critical and major findings cannot be
 deferred or accepted on assertion alone; point at the code, test or
 requirement that covers the concern and Ollie will read it. Any fix that
-removes the risk counts, even if it differs from Paws-On Fix. Ollie never
+removes the risk counts, even if it differs from Fix. Ollie never
 edits or resolves a human's thread.
 
 ## What happens next

@@ -4,12 +4,12 @@
     {
       "id": 1,
       "prompt": "review this PR: https://github.com/acme/widgets/pull/42",
-      "expected_output": "One integrated review, evidenced inline findings and a matching host verdict submitted as one grouped review. Follow the format.md inline and root templates (four fixed headings, footer rules, index shape, length guidance). Back-fill new index links once after verification. The conversation summary gives link, verdict, counts and material limits.",
+      "expected_output": "One integrated review, evidenced inline findings and a matching host verdict submitted as one grouped review. Follow the format.md inline and root templates (bold title, three bold labels, footer rules, index shape, sentence limits). Back-fill new index links once after verification. The conversation summary gives link, verdict, counts and material limits.",
       "files": [],
       "must_include": [
         "Findings & Observations",
-        "Pebbles of Proof",
-        "Splash Test"
+        "Concern",
+        "Verification"
       ],
       "must_not_include": [],
       "tags": [
@@ -1778,7 +1778,7 @@
     {
       "id": 150,
       "prompt": "Re-review a PR whose only two Ollie findings are now verified fixed in commits a1b2c3d and e4f5a6b. Both original thread URLs are known.",
-      "expected_output": "One visible #### Findings & Observations section with two ✅ fixed entries in the standard two-line <sub> shape, each keeping its original thread link and verified fix SHA appended inside the bold status line. Root footer present because no inline findings accompany the review. No redundant replies or invented URLs. Follow the format.md inline and root templates (four fixed headings, footer rules, index shape, length guidance).",
+      "expected_output": "One visible #### Findings & Observations section with two ✅ fixed entries in the standard two-line <sub> shape, each keeping its original thread link and verified fix SHA appended inside the bold status line. Root footer present because no inline findings accompany the review. No redundant replies or invented URLs. Follow the format.md inline and root templates (bold title, three bold labels, footer rules, index shape, sentence limits).",
       "files": [],
       "must_include": [
         "Findings & Observations",
@@ -1797,7 +1797,7 @@
     {
       "id": 151,
       "prompt": "Render a re-review index with one still-open regressed critical, one new minor, one deferred minor, one fixed minor, one accepted finding, one superseded finding and one withdrawn finding. The deferred minor is visible overflow without a thread; all other original URLs are known.",
-      "expected_output": "Render seven findings as unbulleted two-line <sub> entries sorted ⏳ open, ✨ new, ⏸️ deferred, ✅ fixed, 🤝 accepted, ♻️ superseded, 🙈 withdrawn under #### Findings & Observations, with no tally, disclosure or separate resolved section. Preserve the regressed critical's original link, known fix SHAs on the bold line, and the visible overflow entry with its ID, code reference, consequence and fix, without inventing a thread URL. Ledger and approval counting rules unchanged. Follow the format.md inline and root templates (four fixed headings, footer rules, index shape, length guidance).",
+      "expected_output": "Render seven findings as unbulleted two-line <sub> entries sorted ⏳ open, ✨ new, ⏸️ deferred, ✅ fixed, 🤝 accepted, ♻️ superseded, 🙈 withdrawn under #### Findings & Observations, with no tally, disclosure or separate resolved section. Preserve the regressed critical's original link, known fix SHAs on the bold line, and the visible overflow entry with its ID, code reference, consequence and fix, without inventing a thread URL. Ledger and approval counting rules unchanged. Follow the format.md inline and root templates (bold title, three bold labels, footer rules, index shape, sentence limits).",
       "files": [],
       "must_include": [
         "fixed in",
@@ -1982,10 +1982,10 @@
     {
       "id": 167,
       "prompt": "Review a GitHub diff where an off-by-one loop reads items[items.length]. The verified fix replaces <= with < on one commentable line, requires no companion changes, and preserves the caller contract.",
-      "expected_output": "Explain the off-by-one trigger and consequence with exact source evidence, name the corrected bound (`<` instead of `<=`) in the Paws-On Fix sentence, and give a boundary regression check under Splash Test. No suggestion block or replacement code.",
+      "expected_output": "Explain the off-by-one trigger and consequence with exact source evidence, name the corrected bound (`<` instead of `<=`) in the Fix sentence, and give a boundary regression check under Verification. An optional code example may follow Verification when useful.",
       "files": [],
       "must_include": [
-        "Splash Test"
+        "Verification"
       ],
       "must_not_include": [
         "<details>",
@@ -2000,10 +2000,10 @@
     {
       "id": 168,
       "prompt": "Review a defect with a verified fix that changes two files; one target is outside the commentable diff. The finding is anchored at the caller.",
-      "expected_output": "Name both affected components and the required companion change in Paws-On Fix, and give acceptance criteria under Splash Test. No multi-file code, diff or example patch; the anchor stays at the caller.",
+      "expected_output": "Name both affected components and the required companion change in Fix, and give acceptance criteria under Verification. Include a code example after Verification when useful, identifying required companion edits; the anchor stays at the caller.",
       "files": [],
       "must_include": [
-        "Splash Test"
+        "Verification"
       ],
       "must_not_include": [
         "<details>",
@@ -2015,10 +2015,10 @@
     {
       "id": 169,
       "prompt": "Review a retry timeout defect. The finding suggests reducing a timeout to roughly 100 seconds, but the total number of subprocess waits and the caller deadline contract have not been verified.",
-      "expected_output": "Do not propose a specific replacement timeout value. Check the complete retry and wait budget against affected callers; if the safe fix still depends on an unresolved contract or design choice, explain that dependency and the concrete next step under Paws-On Fix, with Splash Test naming what a correct value must satisfy.",
+      "expected_output": "Do not propose a specific replacement timeout value. Check the complete retry and wait budget against affected callers; if the safe fix still depends on an unresolved contract or design choice, explain that dependency and the concrete next step under Fix, with Verification naming what a correct value must satisfy.",
       "files": [],
       "must_include": [
-        "Splash Test"
+        "Verification"
       ],
       "must_not_include": [
         "<details>",
@@ -2032,7 +2032,7 @@
     {
       "id": 170,
       "prompt": "Review a local diff with a verified one-line null guard fix. There is no host-native apply-suggestion capability.",
-      "expected_output": "Give precise source evidence, concrete null guard guidance and a regression check under the four visible finding headings, in a local `file:line` block with the otter footer. No code example or apply-suggestion claim.",
+      "expected_output": "Give precise source evidence, concrete null guard guidance and a regression check under the bold title and three finding labels, in a local `file:line` block with the otter footer. A code example may follow Verification; do not claim host-native apply-suggestion support.",
       "files": [],
       "must_include": [],
       "must_not_include": [
@@ -2047,11 +2047,11 @@
     {
       "id": 171,
       "prompt": "Review a PR with three independent, straightforward defects, each with a verified local replacement. Explain each clearly without making the set of findings cumbersome to read.",
-      "expected_output": "Follow the format.md inline and root templates (four fixed headings, footer rules, index shape, length guidance). Keep straightforward defects shorter when the complete causal evidence and fix fit naturally; do not pad to the word guidance and never include replacement code.",
+      "expected_output": "Follow the format.md inline and root templates (bold title, three bold labels, footer rules, index shape, sentence limits). Keep straightforward defects shorter when the complete causal evidence and fix fit naturally; use 1–2 sentences each for Concern and Fix and 1 for Verification, with no word-count limits and an optional code example before the footer.",
       "files": [],
       "must_include": [
-        "Pebbles of Proof",
-        "Splash Test"
+        "Concern",
+        "Verification"
       ],
       "must_not_include": [],
       "tags": [
@@ -2060,12 +2060,12 @@
     },
     {
       "id": 172,
-      "prompt": "Review a GitHub PR with a verified, self-contained 30-line replacement. Keep the suggested change collapsed so the inline finding does not take up a huge amount of space.",
-      "expected_output": "Keep Ollie’s Concern, Pebbles of Proof, Paws-On Fix and Splash Test visible and compact; describe the 30-line change in prose that names the functions and constraints. Do not include the replacement code, a details block or a native suggestion; offer the patch in conversation only if the user explicitly asks.",
+      "prompt": "Review a GitHub PR with a verified, self-contained 30-line replacement where the full example is needed to explain the implementation constraints.",
+      "expected_output": "Use a fully bold title, then bold Concern and Fix labels with 1–2 sentences each and Verification with 1 sentence, separated by blank lines. Put the useful 30-line code example after Verification and before the full Ollie subline. No word-count or code-line limit; preserve evidence links inline and name implementation constraints.",
       "files": [],
       "must_include": [
-        "Pebbles of Proof",
-        "Splash Test"
+        "Concern",
+        "Verification"
       ],
       "must_not_include": [
         "<details>",
@@ -2080,11 +2080,11 @@
     {
       "id": 173,
       "prompt": "Present a verified notification opt-in defect: enable() stores an unscoped pending flag when account A lacks an integration ID; the account-switch handler retains it; refresh consumes it for B and updates B’s preference. Source locations for all three steps are available. No regression test was executed. The fix spans lifecycle handling and refresh, and must preserve deferred enablement for A.",
-      "expected_output": "Follow the format.md inline and root templates (four fixed headings, footer rules, index shape, length guidance). Provide enough summary context to understand the account-switch scenario without opening links. Cite all three decisive paths and what each proves, including the retained flag across the account transition. Guide account/session scoping, invalidation and ownership checks in prose. Propose checks for A-to-B isolation and same-account deferred enablement under Splash Test, and do not claim they passed.",
+      "expected_output": "Follow the format.md inline and root templates (bold title, three bold labels, footer rules, index shape, sentence limits). Provide enough summary context to understand the account-switch scenario without opening links. Cite all three decisive paths and what each proves, including the retained flag across the account transition. Guide account/session scoping, invalidation and ownership checks in prose. Propose checks for A-to-B isolation and same-account deferred enablement under Verification, and do not claim they passed.",
       "files": [],
       "must_include": [
-        "Pebbles of Proof",
-        "Splash Test",
+        "Concern",
+        "Verification",
         "deferred"
       ],
       "must_not_include": [],
@@ -2138,9 +2138,9 @@
         "skills/otterbot-review/evals/fixtures/migration-data-loss.md"
       ],
       "must_include": [
-        "Pebbles of Proof",
+        "Concern",
         "Request Changes",
-        "Splash Test",
+        "Verification",
         "critical",
         "full_name"
       ],
@@ -2158,9 +2158,9 @@
         "skills/otterbot-review/evals/fixtures/concurrency-double-spend.md"
       ],
       "must_include": [
-        "Pebbles of Proof",
+        "Concern",
         "Request Changes",
-        "Splash Test",
+        "Verification",
         "withdraw"
       ],
       "must_not_include": [
@@ -2178,9 +2178,9 @@
         "skills/otterbot-review/evals/fixtures/api-compat-break.md"
       ],
       "must_include": [
-        "Pebbles of Proof",
+        "Concern",
         "Request Changes",
-        "Splash Test",
+        "Verification",
         "parseDuration"
       ],
       "must_not_include": [],

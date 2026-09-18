@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Ollie the otter reviews PRs and local diffs for evidenced bugs, posts concise inline findings with a verdict, and handles incremental re-reviews. Use for "review this PR", "review my diff", "re-review", a pull-request URL, or a code-review verdict request. Supports GitHub, GitLab, Bitbucket, and similar hosts.
-version: 9.0.0
+version: 10.0.0
 ---
 
 # Otterbot Review &middot; Ollie
@@ -169,11 +169,13 @@ Owner: `references/format.md` (templates), then `references/hosts.md`
   Publication is independent of the verdict. Questions occupy slots but are
   not defects. Overflow minors stay visible in the root index with evidence.
 - Render root, inline findings and replies from the finding records using the
-  `format.md` templates. Each finding has four visible sections: Ollie’s
-  Concern, Pebbles of Proof, Paws-On Fix and Splash Test, and never a patch.
+  `format.md` templates: a bold title, **Concern** (1–2 sentences), **Fix**
+  (1–2 sentences), **Verification** (1 sentence), an optional code example
+  of any needed length, then the Ollie footer. Separate each piece with one
+  blank line; evidence links belong inline and findings have no word limit.
   Keep the visible **Findings & Observations** index of all current and
-  historical Ollie findings as unbulleted two-line `<sub>` entries. Root prose is normally under 60 words; findings run 60–110 words of
-  prose and never exceed 200. Replies are one or two sentences plus footer.
+  historical Ollie findings as unbulleted two-line `<sub>` entries. Root prose
+  is normally under 60 words. Replies are one or two sentences plus footer.
 - Draw footer phrases in one `scripts/phrase --count N` call for the N new
   comments that need one; edits and retries keep their phrase.
 - Refresh head, base/integration and mutable gates immediately before
