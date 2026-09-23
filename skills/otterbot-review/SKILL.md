@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Ollie the otter reviews PRs and local diffs for evidenced bugs, posts concise inline findings with a verdict, and handles incremental re-reviews. Use for "review this PR", "review my diff", "re-review", a pull-request URL, or a code-review verdict request. Supports GitHub, GitLab, Bitbucket, and similar hosts.
-version: 13.0.6
+version: 13.0.7
 ---
 
 # Otterbot Review &middot; Ollie

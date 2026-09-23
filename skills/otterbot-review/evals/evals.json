@@ -1778,15 +1778,15 @@
     {
       "id": 150,
       "prompt": "Re-review a PR whose only two Ollie findings are now verified fixed in commits a1b2c3d and e4f5a6b. Both original thread URLs are known.",
-      "expected_output": "One visible findings index under a #### 🐟 Fishy Findings heading with no counts and two ✅ fixed entries in the standard bulleted two-line shape at full body size, never in <sub>, each keeping its original thread link and verified fix SHA appended on the metadata line outside the bold prefix. Root footer present because no inline findings accompany the review. No redundant replies or invented URLs. Follow the format.md inline and root templates (bold severity/category prefix and regular-weight title summary, three bold labels, footer rules, index shape, sentence limits).",
+      "expected_output": "One visible findings index under a #### 🐟 Fishy Findings heading with no counts and two ✅ fixed entries in the standard bulleted two-line shape at full body size, never in <sub>, each keeping its original thread link and a single ✅ fixed in `<sha>` status on the metadata line outside the bold prefix, never a duplicated fixed · fixed in. Root footer present because no inline findings accompany the review. No redundant replies or invented URLs. Follow the format.md inline and root templates (bold severity/category prefix and regular-weight title summary, three bold labels, footer rules, index shape, sentence limits).",
       "files": [],
       "must_include": [
         "🐟 Fishy Findings",
-        "fixed in",
-        "✅ fixed"
+        "✅ fixed in"
       ],
       "must_not_include": [
-        "🟢 fixed"
+        "🟢 fixed",
+        "✅ fixed · fixed in"
       ],
       "tags": [
         "approval",
@@ -1806,7 +1806,8 @@
       ],
       "must_not_include": [
         "🔵 new",
-        "🟠 open"
+        "🟠 open",
+        "✅ fixed · fixed in"
       ],
       "tags": [
         "approval",

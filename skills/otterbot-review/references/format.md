@@ -119,8 +119,9 @@ rather than repeating the full inline finding summary; keep the explanation
 in the linked thread. Either line may wrap naturally on narrow screens.
 
 - Severity dots are 🔴 critical, 🟠 major, 🟡 minor and 🔵 nitpick. For a fixed
-  entry with a known fix SHA append `` · fixed in `<sha>` `` after the status
-  on the first line, outside the bold prefix; omit it when unknown.
+  entry with a known fix SHA write the status as `` ✅ fixed in `<sha>` `` on
+  the first line, outside the bold prefix — never repeat "fixed" or add a
+  second separator. Use plain `✅ fixed` when the SHA is unknown.
 - Link the summary to its original thread, with any necessary status note
   after it and no source path. Add a short filename only to distinguish
   otherwise identical summaries. For threadless overflow, replace the link
@@ -160,7 +161,7 @@ leave a literal `\n` in the comment.
   [Missing retry limit](<original-thread-url>)
 - **🟡 observability(minor)** · ⏸️ deferred\
   [Missing timeout logging](<original-thread-url>) — awaiting logging follow-up.
-- **🟡 correctness(minor)** · ✅ fixed · fixed in `a1b2c3d`\
+- **🟡 correctness(minor)** · ✅ fixed in `a1b2c3d`\
   [Missing null guard](<original-thread-url>)
 - **🟡 data(minor)** · ✨ new\
   `src/export.ts:88` · export-null-currency · Rows with a null currency are written as "undefined"; default to the account currency before formatting.
