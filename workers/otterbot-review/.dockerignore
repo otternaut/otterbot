@@ -1,0 +1,9 @@
+*
+!Dockerfile
+!package.json
+!bun.lock
+!.output/
+!.output/dist/
+!.output/dist/**
+!.output/skill/
+!.output/skill/**

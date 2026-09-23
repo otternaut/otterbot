@@ -15,8 +15,10 @@ request. For the full design rationale, read [AGENTS.md](./AGENTS.md).
 
 - `bash` and `coreutils` (already present on macOS and Linux).
 - A supported AI tool to test against (Claude Code, Codex, or Cursor).
-- No language runtime or package manager — this repo is intentionally plain
-  Markdown and Bash.
+- No language runtime or package manager is required for the portable skills
+  and installer; they remain plain Markdown and Bash.
+- The optional [review Worker](workers/otterbot-review/README.md) has an isolated
+  TypeScript/Bun toolchain. Follow its local setup and checks for app changes.
 
 ## Development setup
 

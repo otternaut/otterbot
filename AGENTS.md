@@ -34,12 +34,23 @@ toolbox/
 │   ├── install            # Publishes skills (symlink/copy); exports rules; enables the git hook
 │   ├── export-cursor-rules # Mirrors each skill into a global Cursor rule for cursor-agent
 │   └── update-readme      # Regenerates the README skills table from frontmatter
+├── workers/
+│   └── otterbot-review/   # Standalone Cloudflare application
 └── skills/
     └── <skill-name>/
         ├── SKILL.md        # Required: frontmatter + instructions
         ├── references/     # Optional: long-form docs loaded on demand
         └── evals/          # Optional: eval prompts for the skill
 ```
+
+## Standalone applications
+
+`workers/otterbot-review/` is an explicitly authorized TypeScript/Bun application
+with its own toolchain, container image, tests, and documentation. Follow its
+local [AGENTS.md](workers/otterbot-review/AGENTS.md) when editing it. Its
+formatting, import, test-location, and type-checking rules apply within that
+application. Keep its dependencies and generated files inside that folder; the portable skills and Bash installation remain
+independent of the application.
 
 ## Anatomy of a skill
 

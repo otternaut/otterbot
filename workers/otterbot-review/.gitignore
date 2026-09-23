@@ -1,0 +1,12 @@
+node_modules/
+.wrangler/
+.output/
+coverage/
+artifacts/
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
+wrangler.private.*
+config.private.*
+PLAN.md

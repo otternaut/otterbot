@@ -1,0 +1,49 @@
+{
+  "name": "otterbot-review",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.4.2",
+  "engines": {
+    "node": ">=24.15.0 <25"
+  },
+  "scripts": {
+    "dev": "bun run build && wrangler dev",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.runner.json",
+    "test": "bun run build && vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "deploy:dry-run": "bun run build && wrangler deploy --dry-run --outdir .output/worker",
+    "deploy": "bun run build && wrangler deploy",
+    "check": "bun run typecheck && bun run lint && bun run test && bun run format:check",
+    "preflight": "bun --env-file=.dev.vars scripts/preflight.ts",
+    "build": "bun scripts/build.ts",
+    "lint:fix": "bun run lint --fix",
+    "webhook:ping": "bun --env-file=.dev.vars scripts/webhook-ping.ts"
+  },
+  "dependencies": {
+    "@cloudflare/sandbox": "0.12.9",
+    "@valibot/to-json-schema": "1.8.0",
+    "hono": "4.13.5",
+    "octokit": "5.0.5",
+    "valibot": "1.5.0"
+  },
+  "devDependencies": {
+    "@anthropic-ai/claude-agent-sdk": "0.3.278",
+    "@cloudflare/workers-types": "5.20260921.1",
+    "@cursor/sdk": "1.0.31",
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "@openai/codex-sdk": "0.155.1",
+    "@types/node": "24.13.6",
+    "esbuild": "0.28.1",
+    "eslint": "10.11.0",
+    "eslint-plugin-jsdoc": "64.5.4",
+    "prettier": "3.9.8",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.70.1",
+    "vitest": "4.1.0",
+    "wrangler": "4.136.1"
+  }
+}

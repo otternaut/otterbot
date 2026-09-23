@@ -1,0 +1,7 @@
+# Fictional bindings for the local signed-ping walkthrough.
+# Copy to .dev.vars; see docs/setup.md and docs/local-testing.md.
+# Replace the config and credentials before attempting a real shadow review.
+CONFIG_JSON='{"profiles":{"default":{"provider":"claude","model":"opus","apiKeySecret":"PROVIDER_KEY_EXAMPLE","mode":"shadow"}},"organizations":[{"owner":"example-org","ownerId":100,"reviewer":"example-reviewer","reviewerId":200,"patSecret":"GH_PAT_EXAMPLE","repositories":["example-repo"],"profile":"default"}],"hooks":[{"id":"example","organization":"example-org","secret":"WEBHOOK_SECRET_EXAMPLE"}]}'
+GH_PAT_EXAMPLE=replace-with-reviewer-pat
+WEBHOOK_SECRET_EXAMPLE=local-only-fictional-signing-secret
+PROVIDER_KEY_EXAMPLE=replace-with-provider-api-key
