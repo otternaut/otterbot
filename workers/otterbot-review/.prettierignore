@@ -1,6 +1,0 @@
-node_modules
-.wrangler
-.output
-bun.lock
-coverage
-artifacts

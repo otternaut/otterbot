@@ -13,7 +13,7 @@ global directory.
 
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Made with Bash](https://img.shields.io/badge/made%20with-bash%20%2B%20markdown-1f425f.svg)
-![Portable skills](https://img.shields.io/badge/portable_skills-no_dependencies-brightgreen.svg)
+![No dependencies](https://img.shields.io/badge/dependencies-none-brightgreen.svg)
 
 </div>
 
@@ -151,22 +151,12 @@ toolbox/
 │   └── update-readme       # 🔄 Regenerates the skills table from frontmatter
 ├── .githooks/
 │   └── pre-commit       # 🪝 Keeps the README table in sync on commit
-├── workers/
-│   └── otterbot-review/   # Optional Cloudflare review application
 └── skills/
     └── otterbot-review/
         ├── SKILL.md      # 📝 Frontmatter + instructions
         ├── references/   # 📎 Long-form docs loaded on demand
         └── evals/        # 🧪 Eval prompts for the skill
 ```
-
-## Cloudflare review automation
-
-[workers/otterbot-review](workers/otterbot-review/README.md) is an optional,
-standalone TypeScript/Bun application for GitHub review-request webhooks. It runs
-the portable review skill through Claude, Codex, or Cursor in Cloudflare
-containers. Its dependencies and deployment setup are isolated from the skills
-and Bash installer.
 
 ## 🤝 Contributing
 
