@@ -7,11 +7,15 @@ usage() {
 Usage: decide --blockers N --minors N --coverage complete|incomplete|unknown
   --context current|stale|unknown --evidence adequate|inadequate|unknown
   --gates pass|human-required|hold|unknown [--minor-risk safe|uncertain]
+  --visual-evidence not-required|provided|missing|unknown
   [--no-approve] [--dry-run]
 
-The six review fields are required; counts are distinct outstanding verified defects.
+The seven review fields are required; counts are distinct outstanding verified defects.
 --minor-risk is required when --minors is nonzero: safe means every counted
 minor has a concrete, limited consequence that is safe to address after merge.
+Visual evidence is a separate gate: missing means a confirmed visible change
+has no usable screenshot, video or equivalent rendered evidence. Unknown means
+applicability or access could not be established. Other review holds take precedence.
 Gates includes other code-review gates, never CI/CD or merge eligibility.
 human-required means only explicit human review/sign-off is missing. Combined
 with other holds it yields request-changes with a human_review_required reason.
@@ -29,7 +33,7 @@ while (($#)); do
     --help|-h) usage; exit 0 ;;
     --dry-run) shift; continue ;;
     --no-approve) no_approve=true; shift; continue ;;
-    --blockers|--minors|--coverage|--context|--evidence|--gates|--minor-risk)
+    --blockers|--minors|--coverage|--context|--evidence|--gates|--minor-risk|--visual-evidence)
       key=${1#--}
       key=${key//-/_}
       [[ "$seen" != *" $key "* ]] || fail "duplicate field: $key"
@@ -39,6 +43,7 @@ while (($#)); do
         blockers:*|minors:*)
           [[ "$value" =~ ^(0|[1-9][0-9]*)$ && ${#value} -le 6 ]] || fail "invalid count: $key" ;;
         coverage:complete|coverage:incomplete|coverage:unknown|context:current|context:stale|context:unknown|evidence:adequate|evidence:inadequate|evidence:unknown|gates:pass|gates:human-required|gates:hold|gates:unknown|minor_risk:safe|minor_risk:uncertain) ;;
+        visual_evidence:not-required|visual_evidence:provided|visual_evidence:missing|visual_evidence:unknown) ;;
         *) fail "invalid value: $key" ;;
       esac
       # Key is from the allowlist, value is validated; never evaluate input.
@@ -48,17 +53,22 @@ while (($#)); do
     *) fail 'unknown option' ;;
   esac
 done
-for key in blockers minors coverage context evidence gates; do
+for key in blockers minors coverage context evidence gates visual_evidence; do
   [[ "$seen" == *" $key "* ]] || fail "missing field: $key"
 done
 if ((minors > 0)) && [[ -z "$minor_risk" ]]; then fail 'missing field: minor-risk (required when minors > 0)'; fi
 reasons=()
+case "$visual_evidence" in
+  missing) reasons+=(missing_visual_evidence) ;;
+  unknown) reasons+=(unverified_visual_evidence) ;;
+esac
 if ((blockers > 0)); then
   verdict=request-changes
   readiness=blocked
   reasons+=(verified_blockers)
-elif ((minors == 0)) && [[ "$coverage" == complete && "$context" == current &&
-  "$evidence" == adequate && "$gates" == human-required ]]; then
+elif ((minors < 3)) && { ((minors == 0)) || [[ "$minor_risk" == safe ]]; } &&
+  [[ "$coverage" == complete && "$context" == current &&
+  "$evidence" == adequate && "$gates" == human-required && ${#reasons[@]} == 0 ]]; then
   verdict=requires-human
   readiness=requires-human
   reasons+=(human_review_required)
@@ -73,7 +83,10 @@ else
   esac
   ((minors < 3)) || reasons+=(minor_threshold)
   if ((minors > 0)) && [[ "$minor_risk" == uncertain ]]; then reasons+=(minor_risk); fi
-  if ((${#reasons[@]})); then
+  if ((${#reasons[@]} == 1)) && [[ "$visual_evidence" == missing ]]; then
+    verdict=evidence-required
+    readiness=blocked
+  elif ((${#reasons[@]})); then
     verdict=request-changes
     readiness=blocked
   else

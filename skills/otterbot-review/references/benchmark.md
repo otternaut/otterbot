@@ -31,6 +31,23 @@ small fixes, and clean PR heads that become incompatible with a changed base.
 Use the same raw snapshots when comparing skill/model versions. Repeat runs to
 expose nondeterminism.
 
+### Visual-evidence fixtures
+
+Cases tagged `fixture` and `visual-evidence` provide offline PR snapshots,
+complete base/head HTML, raw diffs and optional PNG captures under
+`evals/fixtures/visual-review/`. They cover absent, matching and unrelated media,
+plus an extraction that leaves rendered behavior unchanged. The prompt gives
+no verdict or normalized gate inputs; expected outcomes stay in `evals.json`.
+
+`--prompt` inlines text and lists image paths. Attach those images to the shadow
+session or give it file-image inspection tools; a path printed into text alone
+does not test visual inspection. Keep `profile.html` out of reviewer inputs:
+it is only the source for the unrelated attachment. The captures were rendered
+from `menu-head.html` and `profile.html` in headless Chrome at 640 × 480, device
+scale 1. To refresh them, capture those files at the same viewport using an
+available browser; retain the source alongside each fixture. No browser package
+is required by the skill or eval schema checker.
+
 ## Record outcomes, not wording
 
 Save a local artifact per case/run with model and skill version, fixture/context

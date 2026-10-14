@@ -12,9 +12,9 @@ owns the new inline findings. Submit them together and back-fill links by
 editing that same body, never by posting a separate conversation comment.
 
 ```markdown
-<!-- ollie-review: head: <full-sha>; base: <full-sha>; verdict: <ship-it|comment-only|requires-human|request-changes>; gate: <pass|failed rules|->; round: <n> -->
+<!-- ollie-review: head: <full-sha>; base: <full-sha>; verdict: <ship-it|comment-only|requires-human|request-changes|evidence-required>; gate: <pass|failed rules|->; round: <n> -->
 
-#### 🦦 The Raft Report · <🚢|💬|🧑‍⚖️|⚠️> <Ship It|Comment Only|Human Review Needed|Request Changes>
+<img src="<public-banner-url>" alt="<verdict>" width="800" height="164">
 
 <Summary: 1–3 sentences explaining the verdict and affected behavior.>
 
@@ -39,14 +39,61 @@ editing that same body, never by posting a separate conversation comment.
 
 ### Banner
 
-Use a level-four heading with 🦦 before the title and the outcome emoji after
-the separator, exactly as listed. Ship It always uses 🚢, never ✅, including
-on edits and retries.
+Start hosted roots with one status image instead of the old report heading,
+including edits, retries and re-reviews. Keep a blank line before the summary.
+The finished PNGs in `../assets/banners/` are all 800 × 164 pixels; use them
+as supplied, with meaningful verdict alt text and no added tagline.
 
-- `#### 🦦 The Raft Report · 🚢 Ship It`
-- `#### 🦦 The Raft Report · 💬 Comment Only`
-- `#### 🦦 The Raft Report · 🧑‍⚖️ Human Review Needed`
-- `#### 🦦 The Raft Report · ⚠️ Request Changes`
+This table owns verdict display names, emoji, marker IDs and artwork. Select
+verdicts using `approval.md`; choose host operations using `hosts.md`.
+
+| Verdict ID | Display label | Asset filename |
+| --- | --- | --- |
+| `ship-it` | 🚢 Ship It | `ship-it.png` |
+| `requires-human` | 🧑‍⚖️ Human Review Needed | `human-review.png` |
+| `request-changes` | ⚠️ Request Changes | `request-changes.png` |
+| `evidence-required` | 📸 Evidence Required | `evidence-required.png` |
+| `comment-only` | 💬 Comment Only | `comment-only.png` |
+
+Alt text is the display label without emoji, except Comment Only uses
+`Comment Only — review passed; approval withheld`. Review status comes from the
+helper's `readiness`: `review-passed` → Review passed, `requires-human` → Human
+Review Needed, `blocked` → Blocked. Preserve that distinction in reports.
+
+For Comment Only, begin the assessment with **Comment Only — approval
+withheld (`--no-approve`).** Keep the `comment-only` marker and comment host
+action; the banner does not imply an approval was submitted.
+
+Banner selection never changes the decision or host action. The nautical
+captions are decorative; the assessment describes code-review results, not
+merge readiness.
+
+#### Image delivery
+
+For GitHub comments, append the mapped filename to this public base URL:
+
+`https://raw.githubusercontent.com/otternaut/otterbot/main/skills/otterbot-review/assets/banners/`
+
+Example passing-review header:
+
+```html
+<img src="https://raw.githubusercontent.com/otternaut/otterbot/main/skills/otterbot-review/assets/banners/ship-it.png" alt="Ship It" width="800" height="164">
+```
+
+These URLs become available after the assets are published to this
+repository's `main` branch. Check the selected URL once per delivery run;
+reuse that result for retries and back-fill. A hosted comment needs a
+viewer-accessible HTTPS image URL, not a relative path into the reviewed
+repository, a local file path, localhost or a base64 data URL. Keep the image
+at its native size or scale it down proportionally on narrow displays.
+
+On a host that supports Markdown images but strips HTML, use
+`![<verdict>](<public-banner-url>)`; the PNG's native size is already bounded.
+If the image URL is unavailable, cannot be checked, or images are unsupported,
+use `#### <verdict>` as the readable fallback and continue delivery. A missing
+decorative image is not an approval gate. Preserve the same verdict and
+assessment; the old report tagline is not the fallback. Inline comments,
+replies and local output keep their existing formats without these banners.
 
 ### Assessment
 
@@ -64,6 +111,11 @@ on edits and retries.
   approval needed at this head. Comment Only explains the `--no-approve`
   delivery choice without implying a review failure; never write a Comment
   Only "Not approving because" summary.
+- Evidence Required names the visible change that cannot yet be assessed and
+  uses a **Verify** action requesting a concrete screenshot, video or equivalent
+  capture of the changed view/state. Populate markers from the decision result;
+  holds have no severity or fabricated finding. Keep relevant visual actions
+  visible alongside other holds when the selected verdict is Request Changes.
 - Omit merge readiness everywhere. The CI/CD exclusion in `verification.md`
   applies to every visible line, marker and conversation summary.
 - Do not link, quote, summarize or identify another reviewer's thread. An
@@ -259,7 +311,9 @@ to add a footer to an old comment.
 Local reviews omit hidden markers and host-state claims. Use a brief
 `Blocking findings` or `No blocking findings` banner and each finding once as
 a `file:line` block with the same bold severity/category prefix, regular-weight
-summary and bold labels. The footer reads `working tree at
+summary and bold labels. State any withheld verdict and its specific clearing
+actions in the assessment; no blocking findings does not mean all evidence
+gates passed. The footer reads `working tree at
 <short-sha>` for uncommitted changes, or `uncommitted repository` when no
 commit exists.
 

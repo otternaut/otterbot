@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harbor settings</title>
+<style>
+  body { margin: 32px; background: #f5f7fb; color: #172b4d; font: 16px Arial, sans-serif; }
+  main { max-width: 440px; }
+  details { background: white; border: 1px solid #ced7e5; border-radius: 8px; padding: 16px; }
+  summary { cursor: pointer; font-weight: bold; }
+  nav { display: grid; gap: 8px; margin-top: 16px; }
+  nav a { padding: 8px; color: #174ea6; border-radius: 4px; text-decoration: underline; }
+</style>
+<main>
+  <h1>Harbor settings</h1>
+  <details open>
+    <summary>Account menu</summary>
+    <nav aria-label="Account">
+      <a href="#profile">Profile</a>
+      <a href="#notifications">Notifications</a>
+      <a href="#billing">Billing</a>
+    </nav>
+  </details>
+  <p id="profile">Profile preferences</p>
+  <p id="notifications">Notification preferences</p>
+  <p id="billing">Billing preferences</p>
+</main>
+</html>

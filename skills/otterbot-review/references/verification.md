@@ -35,9 +35,54 @@ Keep the boundary-to-evidence mapping in the finding records' `evidence` and
 `disproof` fields (`analysis.md`) and in the coverage areas' `evidence` strings
 (`readiness.md`); there is no separate structure. Publish only the decisive evidence or exact gap, with file/test
 references. If adequate evidence is unavailable, use Request Changes for the
-specific unverified behavior; do not label absence of tests a fabricated bug.
+specific unverified behavior, except for the visual-evidence gate below; do not
+label absence of tests a fabricated bug.
 A demonstrated defect gets its actual severity and normal verdict precedence.
 Human sign-off satisfies a human-approval gate, never this verification gate.
+
+## Visual evidence
+
+For every review, determine whether the diff changes visible UI or rendered
+output: layout, styling, displayed content, assets or visible interaction
+states. Judge the effect, not the filename. Backend-only changes, tests,
+internal frontend refactors with unchanged output and prose-only docs do not
+require visual evidence. A backend change that actually changes the UI does.
+
+For a visible change, inspect screenshots, video, GIFs or equivalent captured
+rendered output in the PR description, attachments, linked evidence or author
+replies. Local reviews may use supplied files or an already available local
+capture. Apply the external-review information boundary before reading other
+reviewers' material. Evidence must show the changed result and relevant states;
+a before image, design mockup, source diff, test assertions, logs or "tested
+locally" alone does not show the implemented change. A static screenshot may
+establish a static change; use a recording or state captures when the change is
+an interaction. Do not demand video, before/after pairs or every viewport by
+default. No new screenshot is needed when existing evidence still applies to
+unchanged visible behavior; an embedded commit SHA is not mandatory.
+
+Normalize `visual-evidence` separately from ordinary behavior verification:
+
+- `not-required`: inspection establishes no visible change.
+- `provided`: inspected visual evidence shows the affected result/states and
+  still applies to the reviewed behavior. Presence is not proof of correctness;
+  report demonstrated defects normally.
+- `missing`: a visible change is established, but relevant visual evidence is
+  absent (including unrelated or obsolete media). Name what must be shown.
+- `unknown`: applicability or access cannot be established, such as an
+  attachment the reviewer cannot open. State that limitation under Request
+  Changes rather than claiming the author supplied nothing.
+
+Record missing visual evidence as a separate verification hold and continue the
+code review. Ordinary code coverage and `evidence` exclude only the missing
+visual inspection tracked by this gate: never mark unreviewed code complete or
+an unrelated gap adequate. Use `approval.md` to select the verdict from all
+holds and findings; absence of a capture is not a defect or severity.
+
+Ask for a concrete capture, such as "Attach a screenshot of the updated account
+menu in its open state." Record a verification hold and the missing views in
+`readiness.md`. Relevant added or edited evidence triggers bounded reassessment
+even without a new commit. Inspect it, clear only this hold, and rerun all
+gates; neither attaching media nor human sign-off automatically approves.
 
 ## Sufficient evidence and stopping
 

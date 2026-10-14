@@ -8,10 +8,16 @@ back.
 
 ## What a review looks like
 
-The root comment is **🦦 The Raft Report**, followed by a verdict and a 1–3
-sentence explanation of the decision and affected behavior. When action is
-required, **🎣 Tackle These Next** lists **Verify**, **Fix** and **Human review**
-actions as applicable. The findings index sits under **🐟 Fishy Findings** — what Ollie surfaced with —
+The root comment starts with a nautical otter status banner, followed by a
+1–3 sentence explanation of the decision and affected behavior. The banners
+are 800 × 164 pixels: a lookout for Human Review Needed, a sailboat for Ship
+It, and a shipwright for Request Changes. Comment Only shows an otter writing
+a note on deck, with an explicit note that approval was withheld. Evidence
+Required uses the ship's-log image when a visible change is missing visual
+proof. If images are unavailable, a plain verdict heading appears.
+When action is required, **🎣 Tackle These Next** lists **Verify**, **Fix** and
+**Human review** actions as applicable. The findings index sits under
+**🐟 Fishy Findings** — what Ollie surfaced with —
 with no counts, and lists every finding Ollie has ever raised on the PR,
 current and resolved, each linking to its thread when one exists. Each finding
 is a bullet with two lines: bold severity/category and regular-weight status
@@ -62,9 +68,17 @@ nitpicks are not introduced on re-review.
   outstanding minors, a required source Ollie could not read, or a behavior
   Ollie could not verify. The root says exactly what clears it. A verification
   gap is stated as a gap, never dressed up as a bug.
-- **🧑‍⚖️ Human Review Needed**: the code review is complete with nothing
-  outstanding, but the change touches something that needs a named human
-  sign-off: authentication or authorization, secrets, irreversible external
+- **📸 Evidence Required**: a UI or visual change needs a screenshot, video or
+  equivalent capture of the changed result before Ollie can assess it. This
+  blocks approval and asks for the specific view/state needed, without claiming
+  a bug. It applies only when missing visual evidence is the sole approval
+  hold; other blocking issues keep Request Changes. Nonvisual changes and
+  frontend refactors with unchanged output do not need screenshots. Add the
+  evidence to the PR description or a reply; reassessment can clear this hold
+  without a new commit, but still checks every approval rule.
+- **🧑‍⚖️ Human Review Needed**: the code review is complete with at most two
+  safe minors and only a required human sign-off outstanding. This covers
+  authentication or authorization, secrets, irreversible external
   effects such as moving money or deleting user data, destructive migrations,
   or what runs in production. Ollie posts this as a comment and withholds
   approval; it does not block the PR. The root names who must approve which
@@ -84,7 +98,7 @@ claims a PR is ready to merge; that is your call and your branch rules.
 Things that never move a verdict: deferring a minor, resolving a thread,
 saying "this is fine", the number of review rounds, or Ollie running out of
 budget. Things that do: code that removes the consequence, evidence that the
-finding does not apply, or the required human sign-off.
+finding does not apply, relevant visual captures, or the required human sign-off.
 
 ## Replying to Ollie
 

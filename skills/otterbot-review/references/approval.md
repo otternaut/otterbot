@@ -1,7 +1,9 @@
 # Approval gates and minor accounting
 
-Read the approval gates for every proposed host verdict. Load minor accounting
-and reassessment sections only when applicable.
+This is the authoritative decision contract: approval gates, verdict precedence
+and normalized inputs. Read it before every decision. Use `format.md` for
+presentation and `hosts.md` for state actions. Load accounting and reassessment
+sections when applicable.
 
 ## Approval gates
 
@@ -26,6 +28,8 @@ These gates govern approval, not whether to perform or publish the review.
 - Each consequential changed behavior has adequate evidence under
   `references/verification.md`; no material coverage claim rests on
   human assurance or presumed caller behavior alone.
+- UI or visual changes have relevant rendered evidence under that reference's
+  **Visual evidence** section. Nonvisual changes do not need captures.
 - The author is not the reviewing identity. A bot author such as dependabot
   or renovate is not a failure on its own: its dependency bump is approved
   when the compatibility check is clean and every other rule holds, and a bot
@@ -50,36 +54,77 @@ These gates govern approval, not whether to perform or publish the review.
 - The selected review scope was completed, and nothing in the verdict rests
   on an author assertion Ollie could not confirm in code.
 
-Use **🧑‍⚖️ Human Review Needed** when review coverage is complete, context is
-current, behavior has adequate evidence, no outstanding findings remain, and the
-only unmet gate is an explicitly required human review or sign-off. Name the
-behavior, who must review it, and the approval needed for the current head. It
-is delivered as a non-blocking host comment with Ollie's approval withheld,
-never as a request for changes; see `hosts.md`. Record a human hold, not a
-finding: do not assign severity, invent an inline defect, or add an empty
-Catch section. Historical resolved findings remain indexed. Do
-not invent a human-review requirement from uncertainty or an unrelated host
-reviewer quota.
+Record missing authorized sign-off as a human hold, not a defect. Name the
+behavior, required reviewer and approval needed for the reviewed head. Do not
+infer this requirement from uncertainty or an unrelated host reviewer quota.
+Verification gaps likewise remain holds with concrete clearing conditions;
+only demonstrated defects receive severity and finding records.
 
-For example, a migration that drops a legacy column can be shown correct by
-inspecting every reader of that column and the backfill that preceded it, yet
-dropping data is irreversible and still needs explicit approval covering this
-head from an authorized non-author human. With no outstanding findings or
-other gaps, that outcome is Human Review Needed.
+## Decision table
 
-Outstanding findings, another failed code-review gate or incomplete assessment
-yield Request Changes when approval is withheld.
-Explain the specific defect, risk threshold or verification gap and what must
-change or be established to clear it. A verification gap is not a proven bug;
-do not invent a defect or severity to justify the verdict.
+Apply in order; every review input needs evidence or is unknown. Each row
+gives the verdict, then the review status after the slash:
 
-Benign feedback accompanies Ship It when all gates pass. Never use Comment Only
-with a "Not approving because" explanation: select Human Review Needed for the
-human-only case above, otherwise Request Changes. The explicit `--no-approve`
-option suppresses only a passing review's approval action, yielding Comment Only
-/ Review passed with a short explanation of the requested delivery mode. A
-host's inability to submit a verdict is a delivery limitation; retain the
-intended verdict in the banner.
+1. Verified outstanding critical/major: Request Changes / Blocked.
+2. Complete review, current context, adequate evidence, at most two
+   demonstrably safe minors, no blockers and only an explicit required human
+   review/sign-off missing: Human Review Needed / Human Review Needed. Record
+   the exact human action needed; retain safe minors in the findings index.
+3. Actual UI/visual change with missing visual evidence as the only approval
+   hold: Evidence Required / Blocked. Safe one or two minors may remain. Ask
+   for a capture of the changed view/state, without inventing a defect.
+4. Outside the human-only and visual-only cases above, incomplete review,
+   stale/unknown context, any failed review gate or three counted minors:
+   Request Changes / Blocked.
+   Name each unmet gate and what clears it; distinguish verification gaps from
+   verified defects.
+5. All review gates pass: Ship It / Review passed, including benign comments.
+6. For an otherwise passing review only, explicit `--no-approve` selects
+   Comment Only / Review passed. Explain the requested approval-action opt-out.
+
+`--shadow` leaves the hypothetical decision unchanged but prohibits every host
+mutation. Shadow output never claims actual host approval. A host delivery
+restriction preserves the intended verdict in a plain comment and discloses
+why the corresponding host action could not be submitted.
+
+## Deterministic helper
+
+Run `scripts/decide --help` for normalized input flags. It emits JSON with
+`verdict`, `readiness` (the legacy field name for review status) and reason
+codes. Required review inputs fail on invalid/missing values. The helper reads
+no credentials or network state and trusts evidence established by the reviewer:
+
+- blockers/minors: distinct outstanding verified counts from Ollie's own review.
+- coverage: complete only when every relevant changed code area has been
+  addressed; pending visual inspection is tracked separately below.
+- context: current only after verifying head, target/base and integration
+  context.
+- evidence: adequate only after consequential-behavior verification.
+- visual-evidence: required; `not-required`, `provided`, `missing` or `unknown`
+  as defined in `verification.md`. Missing records `missing_visual_evidence`;
+  unknown records `unverified_visual_evidence`, never a claim of absent media.
+  This field owns the visual hold; do not duplicate it in coverage, evidence or
+  gates. Other gaps stay in those fields and take precedence over this verdict.
+- gates: pass only when every other code-review gate passes, including
+  sign-offs. Use `human-required` when an explicit required human review/sign-off
+  is the only unmet gate represented by this field; coverage, evidence, visual
+  proof and minor risk use their own fields. Use hold/unknown for other
+  failed/unverified gates. The table above governs the combined result;
+  `human_review_required` records missing sign-off even when another hold
+  requires Request Changes.
+- minor-risk: required when minors is nonzero. `safe` only when every counted
+  minor has a concrete, limited consequence that is demonstrably safe to
+  address after merge; `uncertain` otherwise, which withholds approval with a
+  `minor_risk` reason. It never raises a minor's severity.
+- no-approve: optional delivery opt-out, never a code-review gate.
+
+Persist the helper's verdict and readiness IDs as returned. Display labels and
+assets are mapped in `format.md`. If Bash is unavailable, apply the decision
+table above and disclose that fallback. The helper accepts no CI, host or
+merge-eligibility inputs.
+Use the result to choose delivery. After transitions verify Ollie's effective
+review state and update markers and advisory links in one bounded root edit.
+Never overwrite failure reasons with a generic clean message.
 
 ## Minor accounting
 
@@ -93,21 +138,11 @@ against its ledger and prior threads. External root-cause matching changes only
 publication and never supplies evidence. Questions, nitpicks and unverified
 candidates do not count as minor defects.
 
-## Decision
-
-- A verified critical/major still yields Request Changes, regardless of count.
-- Zero counted minors permits Ship It only when all other gates pass.
-- One or two permits Ship It only when consequences are concrete, limited,
-  and safe to address after merge, and all other gates pass.
-- Three or more yields Request Changes; explain the outstanding minor count
-  and the fixes needed without inflating individual severities.
-- A concrete unresolved concern about serious data, authorization or
-  compatibility impact prevents auto-approval even if provisionally called
-  minor or question. Investigate or state the uncertainty in Request Changes;
-  do not manufacture a blocker from speculation.
-- When several minors combine into a demonstrated major/critical failure,
-  report that combined defect at its actual severity without double-counting
-  the same cause as independent minors. Count alone never increases severity.
+When several minors combine into a demonstrated major/critical failure,
+report that combined defect at its actual severity without double-counting
+its cause. Count alone never increases severity. Investigate concrete concerns
+about serious impact; unresolved impact is a verification hold, not a safe
+minor or a speculative blocker.
 
 Start with known prior findings and verified candidates. Verify blockers first,
 then credible minors in risk order within the shared investigation budget.
@@ -177,7 +212,8 @@ findings without inventing threads.
 ## Bounded gate reassessment
 
 Code-review freshness and decision freshness are separate. New evidence from
-a reply, a required source, a human sign-off, or an explicit request to
+a reply, a screenshot/video or edited visual attachment, a required source,
+a human sign-off, or an explicit request to
 reassess gates may change the decision without a new commit. Reuse the prior
 completed code review only when its head, target/base context and affected
 evidence remain current under `readiness.md`. Fetch the

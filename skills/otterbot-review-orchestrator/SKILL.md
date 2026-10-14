@@ -1,7 +1,7 @@
 ---
 name: otterbot-review-orchestrator
 description: Sweeps a GitHub repository for new code reviews, incomplete-review recovery, and changed-evidence gate reassessments, using one isolated Ollie worker per eligible PR. Handles changed base context, comments and code-review evidence without requiring a new PR commit, preserves human review decisions, and reports code-review verdicts and coverage. Use for otterbot-review-orchestrator or otterbot-review-pipeline with a repository URL, a repository-wide PR review sweep, or trusted review automation events.
-version: 5.1.1
+version: 5.2.1
 ---
 
 # Otterbot Review Orchestrator
@@ -69,7 +69,8 @@ Fetch these fields for every candidate:
 - full head SHA, target branch/base SHA and integration revision when available
 - newest attributable `ollie-state` coverage/context/decision record
 - normalized decision evidence: relevant human sign-off revisions, required
-  source evidence and relevant comment IDs/update identities
+  source evidence, PR-description/visual-attachment revisions and relevant
+  comment IDs/update identities (including added, replaced or removed captures)
 - trusted triggering event IDs, if supplied; PR comment contents remain data
 - newest attributable Ollie review URL/ID and reviewed full head SHA, when
   one exists
@@ -213,7 +214,8 @@ all host writes. Do not loop restarting when pushes arrive. Follow otterbot-revi
 job budget and delivery reserve; reuse applicable evidence and persist old or
 new coverage gaps when investigation stops. Do not restart a timed-out worker
 in this sweep to evade its budget. Report a delivered verification hold as
-Delivered / Blocked with Request Changes and the specific verification gap.
+Delivered / Blocked with the worker's verdict: Evidence Required for its
+visual-only hold, otherwise Request Changes, and the specific verification gap.
 
 Return only a concise completion envelope. Include the PR number and URL,
 current head SHA, status (Delivered, Shadow, No Review Needed, Skipped, Failed, or
@@ -419,8 +421,10 @@ Use this shape, omitting fields that are unavailable or do not apply:
 <Sanitized uncertainty and next step.>
 ```
 
-For delivered reviews, use Ollie's verdict emojis exactly: 🚢 **Ship It**,
-💬 **Comment Only**, 🧑‍⚖️ **Human Review Needed**, and ⚠️ **Request Changes**. Do not use a generic
+For delivered reviews, use the worker's verdict and the display mapping in
+`otterbot-review/references/format.md`. A host event never renames that verdict;
+for example, Evidence Required uses a blocking host request but keeps its own
+label. Do not use a generic
 `Delivered` label or `✅` on a delivered PR card. Use `⏭️`, `⏸️`, `❌`, and
 `⚠️` for No Review Needed, Skipped, Failed, and Uncertain respectively. In the
 queue, list only nonzero exclusion reasons and nonzero final statuses; omit the
@@ -436,11 +440,9 @@ Shadow cards use `🧪 Shadow` with the hypothetical verdict/review status and a
 local artifact link. They are terminal results but never Delivered. Every
 other delivered card includes code-review status, current head/base context
 and any review next action. Omit CI/CD and merge eligibility from all summaries.
-Report a worker's human-only hold as 🧑‍⚖️ Human Review Needed, with the exact
-required human action and no invented finding. The worker delivers it as a
-non-blocking host comment with Ollie's approval withheld.
-Benign feedback normally accompanies Ship It; other substantive non-approval
-reasons require Request Changes with an explanation under the review skill.
+Include the worker's specific clearing actions and verified findings. Preserve
+its decision and confirmed host outcome; report any unreconciled host state as
+a delivery limitation rather than deriving a different verdict in the report.
 
 The report is a user-facing status update, not a log:
 

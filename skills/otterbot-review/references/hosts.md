@@ -9,13 +9,9 @@ conversation summary.
 
 ## Review states
 
-Select the verdict under `approval.md` before choosing the host operation.
-Benign comments accompany an approval. Human Review Needed is delivered as a
-non-blocking comment carrying the 🧑‍⚖️ banner with Ollie's approval withheld;
-other substantive non-approval reasons require Request Changes with a clear
-explanation. Comment Only is only an explicit opt-out for otherwise passing
-code. A host limitation can require a
-plain comment carrying the intended verdict; never mislabel it Comment Only.
+Apply the decision from `approval.md`; display it using `format.md`. Host
+operations below implement that decision without reclassifying it. A delivery
+limitation preserves the intended verdict and discloses the failed operation.
 
 Prepare the root and eligible inline findings together, regardless of verdict.
 Where the host supports review grouping, the verdict body and every new inline
@@ -41,14 +37,14 @@ silently drop findings or mark delivery complete while comments remain pending.
 | Comment Only | `COMMENT` plus reconcile prior Ollie state | note plus reconcile prior Ollie state | comment plus reconcile prior Ollie state |
 | Human Review Needed | review event `COMMENT` with the 🧑‍⚖️ banner; dismiss any prior Ollie approval, and dismiss Ollie's prior request for changes once every old blocker is cleared | note with the 🧑‍⚖️ banner; remove any Ollie approval and clear Ollie's prior request for changes once every old blocker is cleared | comment with the 🧑‍⚖️ banner; remove any Ollie approval and clear Ollie's prior request for changes once every old blocker is cleared |
 | Request Changes | review event `REQUEST_CHANGES` | request changes where the version supports it; otherwise unapprove and post the root note | request changes |
+| Evidence Required | review event `REQUEST_CHANGES` with the Evidence Required banner | request changes where supported; otherwise unapprove and post the root note | request changes |
 
-Human Review Needed never leaves a blocking Ollie state on the host: the
-missing sign-off is the human reviewer's to give, and a red request from Ollie
-would misreport a clean review. Its state actions are the Comment Only rows of
-the transition table below; preserve `requires-human` in Ollie markers and
-reports. When the sign-off arrives, reassess all gates and approve normally.
-A legacy human-only Request Changes from an older policy is dismissed on its
-next reassessment and replaced by the comment banner.
+For Human Review Needed, use the Comment Only transition rows below while
+preserving `requires-human`. For Evidence Required, use the Request Changes
+rows while preserving `evidence-required`. On reassessment, use the newly
+computed decision to reconcile prior state, including a hold cleared by policy
+migration. Remaining safe minors stay visible and do not keep a blocking host
+state when the current decision calls for a comment.
 
 Where a host cannot express a state, retain the intended verdict banner in
 the grouped review body where supported and state the limitation. Use a plain
@@ -129,7 +125,8 @@ Post the review with `COMMENT`; the verdict banner carries the verdict.
 Approvals are separate from notes. Post inline findings as draft notes and
 publish them together so the review lands at once; post the root comment as the
 first note. For Ship It, approve with the reviewed head as the API SHA
-precondition; a mismatch prevents approval. For Request Changes, use the
+precondition; a mismatch prevents approval. For Request Changes or Evidence
+Required, use the
 reviewer request-changes action where available, otherwise remove any existing
 Ollie approval and rely on the verdict banner. For an explicit Comment Only
 delivery opt-out, remove any prior Ollie approval. Resolve discussions Ollie
@@ -153,6 +150,7 @@ longer counts. Determine and reconcile Ollie's effective host state:
 | Ship It | Approve at the reviewed head after all gates pass; supersede or clear Ollie's prior request for changes using the supported host operation |
 | Human Review Needed | Apply the Comment Only rows below to Ollie's prior state; the banner names the required human action and approval stays withheld |
 | Request Changes | Submit that state and remove any prior Ollie approval if the host does not supersede it automatically |
+| Evidence Required | Apply the Request Changes action above; retain the visual-evidence verdict and name the capture needed |
 | Comment Only after approval | Withdraw/dismiss only Ollie's prior approval, then leave the explanatory comment |
 | Comment Only after Request Changes | Clear/dismiss Ollie's prior request only when every old blocker is verified fixed, superseded or disproven; retain any unresolved blocker as Request Changes |
 | Comment Only with no active Ollie decision | Post the explanation; no removal needed |

@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Harbor basket</title>
+<h1>Your basket</h1>
+<p id="total"></p>
+<script>
+  const items = [{ priceCents: 1200, quantity: 2 }, { priceCents: 350, quantity: 1 }];
+  function sumCents(rows) {
+    return rows.reduce((sum, item) => sum + item.priceCents * item.quantity, 0);
+  }
+  const totalCents = sumCents(items);
+  document.getElementById('total').textContent = `Total: $${(totalCents / 100).toFixed(2)}`;
+</script>
+</html>

@@ -14,8 +14,8 @@ Usage: run-evals --check
 
 --check   validate ids, fixtures, assertion shapes and the global lists.
 --list    print id, tags and the first line of each prompt.
---prompt  print one case's prompt with its fixture files inlined, ready to
-          paste into a fresh --shadow session.
+--prompt  print one case's prompt with text fixtures inlined and image paths
+          to attach or inspect in a fresh --shadow session.
 --score   read DIR/<id>.md (the saved shadow output per case) and report
           pass / fail / unscored per case plus totals; exit 1 on any fail.
 Assertions: must_include are case-insensitive substrings; must_not_include
@@ -76,7 +76,11 @@ if mode == "prompt":
     if not c: print(f"no case {arg}", file=sys.stderr); sys.exit(2)
     print(c["prompt"].rstrip())
     for f in c.get("files", []):
-        print(f"\n--- fixture: {f} ---\n" + fixture_path(f).read_text().rstrip())
+        path = fixture_path(f)
+        if path.suffix.lower() in (".png", ".jpg", ".jpeg", ".gif", ".webp"):
+            print(f"\n--- image fixture: {f} ---\nInspect or attach this image: {path.resolve()}")
+        else:
+            print(f"\n--- fixture: {f} ---\n" + path.read_text().rstrip())
     sys.exit(0)
 if mode == "score":
     outdir = pathlib.Path(arg)

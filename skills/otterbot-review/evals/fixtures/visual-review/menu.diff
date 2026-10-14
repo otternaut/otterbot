@@ -1,0 +1,13 @@
+--- a/index.html
++++ b/index.html
+@@ -8,8 +8,8 @@
+   main { max-width: 440px; }
+   details { background: white; border: 1px solid #ced7e5; border-radius: 8px; padding: 16px; }
+   summary { cursor: pointer; font-weight: bold; }
+-  nav { display: grid; gap: 8px; margin-top: 16px; }
+-  nav a { padding: 8px; color: #174ea6; border-radius: 4px; text-decoration: underline; }
++  nav { display: grid; gap: 12px; margin-top: 16px; }
++  nav a { padding: 12px; background: #e9f2ff; color: #174ea6; border-radius: 4px; text-decoration: underline; }
+ </style>
+ <main>
+   <h1>Harbor settings</h1>

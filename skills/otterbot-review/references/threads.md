@@ -106,7 +106,8 @@ withdrawn &middot; my mistake: <what Ollie got wrong and the code that shows it>
 - **Uncertain serious impact needs investigation.** A concrete concern that
   could be critical or major must be investigated, not waved through as a
   harmless question. If it cannot be settled, withhold auto-approval and name
-  the uncertainty. Request Changes requires a verified blocker.
+  the uncertainty as a verification hold. Apply the verdict rules in
+  `approval.md`; a gap is never a fabricated blocker.
 - **Other reviewers' threads.** Keep their content out of the code-review
   context until Ollie's candidates are formed, disproved, verified and frozen.
   Then use them only to suppress redundant inline posts by root cause. Never
