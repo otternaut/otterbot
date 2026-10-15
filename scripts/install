@@ -5,6 +5,7 @@
 #
 # For each skill directory `skills/<name>/`, an entry is published at:
 #   ~/.claude/skills/<name>  (symlink -> <repo>/skills/<name>)
+#   ~/.agents/skills/<name>  (real copy of <repo>/skills/<name>)
 #   ~/.codex/skills/<name>   (real copy of <repo>/skills/<name>)
 #   ~/.cursor/skills/<name>  (real copy of <repo>/skills/<name>)
 #
@@ -41,6 +42,7 @@ MARKER=".toolbox-managed"
 # they get real copies.
 TARGETS=(
   "$HOME/.claude/skills|symlink"
+  "$HOME/.agents/skills|copy"
   "$HOME/.codex/skills|copy"
   "$HOME/.cursor/skills|copy"
 )
@@ -56,11 +58,12 @@ Usage: ./scripts/install [options]
 
 Options:
   --dry-run    Show what would happen without touching the filesystem.
-  --sync       Alias for a normal run; re-copies edited skills into Codex/Cursor.
+  --sync       Alias for a normal run; refreshes all managed skill copies.
   -h, --help   Show this help.
 
 Publish model:
   ~/.claude/skills   symlink (Claude Code follows links; edits apply live)
+  ~/.agents/skills   copy    (shared discovery directory; re-run to refresh)
   ~/.codex/skills    copy    (Codex does not follow links; re-run to refresh)
   ~/.cursor/skills   copy    (Cursor does not follow links; re-run to refresh)
 

@@ -32,6 +32,10 @@ copies (they don't follow symlinks), so re-run `./scripts/install` (or
 `./scripts/install --sync`) to refresh their copies after an edit, and restart
 the tool to reload skills.
 
+The installer also refreshes managed copies in the shared `~/.agents/skills`
+directory. Include this target when checking install and sync behavior; a
+stale shared copy can be discovered alongside the current tool-specific copy.
+
 ## Adding a new skill
 
 1. **Create the directory.** Use a kebab-case name that matches what the skill
@@ -111,6 +115,7 @@ the tool to reload skills.
   real file or directory is skipped with a warning.
 - **Symlink Claude Code, copy Codex/Cursor** — only Claude Code follows
   symlinks during skill discovery, so the others must get real directories.
+  The shared `~/.agents/skills` target also gets managed copies.
 
 Always validate before committing:
 

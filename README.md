@@ -45,6 +45,7 @@ symlinks when discovering skills. ✨
   | Tool | Skills directory |
   | --- | --- |
   | Claude Code | `~/.claude/skills` |
+  | Shared agent discovery | `~/.agents/skills` |
   | Codex | `~/.codex/skills` |
   | Cursor | `~/.cursor/skills` |
 
@@ -72,6 +73,7 @@ symlinks when it discovers skills:
 | Tool | Published as | Edits apply |
 | --- | --- | --- |
 | Claude Code | 🔗 symlink | immediately |
+| Shared agent discovery (`~/.agents/skills`) | 📁 real copy | after re-running the installer |
 | Codex | 📁 real copy | after re-running the installer |
 | Cursor (app) | 📁 real copy | after re-running the installer |
 | Cursor CLI (`cursor-agent`) | 📄 generated rule | after re-running the installer |
@@ -81,7 +83,7 @@ re-run `./scripts/install` (or `./scripts/install --sync`) to refresh them.
 Every tool also loads skills only at **startup**, so restart Codex, Cursor, or
 any super.engineering session using them to pick up changes.
 
-> 🧩 **Why the fourth row?** The Cursor Agent **CLI** (`cursor-agent`) — what
+> 🧩 **Why the CLI row?** The Cursor Agent **CLI** (`cursor-agent`) — what
 > runs when you pick the "cursor" model in super.engineering / Superconductor —
 > has no skills feature; it reads Cursor **rules**. So the installer also runs
 > [`scripts/export-cursor-rules`](scripts/export-cursor-rules), mirroring each
@@ -101,6 +103,11 @@ The installer is **idempotent and non-destructive**:
   [Keeping docs in sync](#-keeping-docs-in-sync).
 
 Run `./scripts/install --help` for all options.
+
+The installer refreshes managed copies in `~/.agents/skills` as well as the
+tool-specific directories, so shared discovery cannot pick up a stale managed
+copy. Unmanaged directories there are skipped with the same warning and
+ownership checks as other copy targets.
 
 ## 💡 Using a skill
 

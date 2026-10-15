@@ -100,6 +100,7 @@ directories:
 
 ```
 ~/.claude/skills/<name>  ->  <repo>/skills/<name>   (symlink)
+~/.agents/skills/<name>      copy of <repo>/skills/<name>
 ~/.codex/skills/<name>       copy of <repo>/skills/<name>
 ~/.cursor/skills/<name>      copy of <repo>/skills/<name>
 ```
@@ -109,6 +110,11 @@ and Cursor (including when they run as backends inside super.engineering /
 Superconductor) — those tools skip symlinked entries during discovery. Copies
 are stamped with a `.toolbox-managed` marker file so the installer can tell its
 own copies apart from a real directory the user created.
+
+The shared `~/.agents/skills` directory is also a copy target. Keep it in sync
+alongside the tool-specific directories so discovery cannot select a stale
+managed copy. Apply the same marker checks to shared copies; unmanaged
+directories are skipped with a warning.
 
 Key properties to preserve when editing it:
 
