@@ -1,7 +1,6 @@
 These examples illustrate formatting. Unchanged exclusions assume completed
 coverage, unchanged head/base context and decision evidence, and no unfinished
-delivery. Human-review exclusions refer to unsolicited new-review jobs, not
-targeted recovery. Every delivered card reports code-review status and omits CI/CD and merge
+delivery. Every delivered card reports code-review status and omits CI/CD and merge
 eligibility. Shadow cards reference local artifacts only.
 
 # Worked examples
@@ -29,8 +28,7 @@ Two reviews were posted and verified. PR #7 needs changes; PR #104 can ship.
 
 - **Checked:** 7 pull requests
 - **Excluded:** 5
-  - Draft: 1
-  - Review decision satisfied by a human: 1
+  - Draft: 2
   - `stale` label: 1
   - Inactive for 14+ days: 1
   - Already reviewed, unchanged: 1
@@ -174,8 +172,7 @@ No pull requests require an Otterbot review.
 
 - **Checked:** 5 pull requests
 - **Excluded:** 5
-  - Draft: 2
-  - Review decision satisfied by a human: 1
+  - Draft: 3
   - Inactive for 14+ days: 1
   - Already reviewed, unchanged: 1
 - **Eligible:** 0

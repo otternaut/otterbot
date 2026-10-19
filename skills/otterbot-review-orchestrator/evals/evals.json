@@ -52,19 +52,19 @@
     {
       "id": 9,
       "prompt": "scan https://github.com/acme/widgets; PR #9 is open and fresh but reviewDecision is APPROVED because a human reviewer approved it; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
-      "expected_output": "Schedule an independent review when other ordinary filters pass. Human APPROVED does not exclude the PR or limit findings. Preserve human state and report code-review status.",
+      "expected_output": "Schedule an independent review when other ordinary filters pass. The host review decision is not fetched or consulted; it neither excludes the PR nor limits findings. Preserve human state and report code-review status.",
       "files": []
     },
     {
       "id": 10,
       "prompt": "scan https://github.com/acme/widgets; PR #10 has reviewDecision CHANGES_REQUESTED from a human reviewer; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
-      "expected_output": "Schedule an independent review when other ordinary filters pass. Human CHANGES_REQUESTED does not suppress Ollie review or determine its verdict; host merge eligibility is outside the report.",
+      "expected_output": "Schedule an independent review when other ordinary filters pass. The host review decision is not consulted and does not suppress Ollie review or determine its verdict; host merge eligibility is outside the report.",
       "files": []
     },
     {
       "id": 11,
       "prompt": "scan https://github.com/acme/widgets; PR #11's reviewDecision field is null; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
-      "expected_output": "An absent reviewDecision alone does not exclude the PR. Apply open, draft, stale and activity filters and coverage freshness normally; host merge requirements are not review inputs.",
+      "expected_output": "The review decision is not an input. Apply open, draft, stale and activity filters and coverage freshness normally; host merge requirements are not review inputs.",
       "files": []
     },
     {
@@ -94,7 +94,7 @@
     {
       "id": 16,
       "prompt": "worker for PR #16 finishes analysis, but a human approval flips reviewDecision to APPROVED before delivery; ordinary new-review job with no prior Ollie state requiring cleanup and no targeted recovery event",
-      "expected_output": "Continue delivery of independently verified findings and Ollie verdict after final context checks. A new human approval does not cancel the job or suppress findings. Preserve human state and verify Ollie's review state.",
+      "expected_output": "Continue delivery of independently verified findings and Ollie verdict after final context checks. A new human approval does not cancel, rerun or change the job. Preserve human state and verify Ollie's review state.",
       "files": []
     },
     {
@@ -190,13 +190,13 @@
     {
       "id": 32,
       "prompt": "scan https://github.com/acme/widgets; PR #32 has reviewDecision CHANGES_REQUESTED, but the only changes-requested review is Ollie's own and the head has moved since the reviewed SHA in Ollie's marker",
-      "expected_output": "PR #32 passes condition 3 because the only non-required decision belongs to the reviewing identity, and it passes condition 6 because the current head differs from Ollie's reviewed head with a different tree. A fresh worker runs otterbot-review, which handles the re-review, thread replies, and Ollie's own prior review state.",
+      "expected_output": "PR #32 stays eligible: host review decisions never exclude a PR, and the current head differs from Ollie's reviewed head with a different tree. A fresh worker runs otterbot-review, which handles the re-review, thread replies, and Ollie's own prior review state.",
       "files": []
     },
     {
       "id": 33,
       "prompt": "scan https://github.com/acme/widgets; PR #33 has reviewDecision APPROVED where the only approval is Ollie's own, and a new commit was pushed after that approval",
-      "expected_output": "PR #33 stays eligible: an approval from the reviewing identity alone never excludes a PR, and the moved head proves an effective change. A worker re-reviews it so the follow-up push does not ship on a stale Ollie approval.",
+      "expected_output": "PR #33 stays eligible: review decisions never exclude a PR, and the moved head proves an effective change. A worker re-reviews it so the follow-up push does not ship on a stale Ollie approval.",
       "files": []
     },
     {
@@ -208,7 +208,7 @@
     {
       "id": 36,
       "prompt": "scan https://github.com/acme/widgets; the repository requires two approvals, PR #36 already has one approval from a human reviewer, and reviewDecision is still REVIEW_REQUIRED",
-      "expected_output": "A partial human approval does not exclude the PR, and neither would a completed approval or rejection. Run the independent review under ordinary eligibility and freshness rules; report host review requirements separately.",
+      "expected_output": "Human approvals and the review decision are not consulted and do not exclude the PR. Run the independent review under ordinary eligibility and freshness rules; host review requirements are outside the report.",
       "files": []
     },
     {
@@ -291,8 +291,8 @@
     },
     {
       "id": 49,
-      "prompt": "A worker delivers requires-human / requires-human for a complete KMS review with one safe minor finding, missing authorized non-author sign-off, and verified host COMMENT and no remaining Ollie approval or request for changes.",
-      "expected_output": "Render 🧑‍⚖️ Human Review Needed in the delivered PR card and Human Review Needed review status, with the exact sign-off needed and delivered review link. Count job as Delivered. Include the safe minor in the findings count. Do not relabel as Request Changes from the host event, invent findings, or include CI or merge eligibility.",
+      "prompt": "A worker delivers requires-human / requires-human for a complete KMS review with one safe minor finding, verified host COMMENT and no remaining Ollie approval or request for changes.",
+      "expected_output": "Render 🧑‍⚖️ Human Review Needed in the delivered PR card and Human Review Needed review status, with the KMS behavior that needs human eyes and delivered review link. Count job as Delivered. Include the safe minor in the findings count. Do not relabel as Request Changes from the host event, invent findings, name a required reviewer, or include CI or merge eligibility.",
       "files": []
     },
     {
@@ -305,6 +305,12 @@
       "id": 51,
       "prompt": "A worker delivers evidence-required / blocked for a completed code review of a UI change missing screenshots, with verified GitHub REQUEST_CHANGES and no defect findings.",
       "expected_output": "Render 📸 Evidence Required and Blocked on the Delivered PR card, retain the review link and specific capture needed. Do not relabel it Request Changes from the host event or invent findings.",
+      "files": []
+    },
+    {
+      "id": 52,
+      "prompt": "scan https://github.com/acme/widgets; PR #52 has a current Ollie Human Review Needed review at its unchanged head, and since then a human (who happens to share Ollie's account) approved it. Nothing else changed.",
+      "expected_output": "No job: a human review or approval is not decision evidence and never triggers a gate reassessment. Report it as already reviewed, unchanged, with Human Review Needed status. Do not post a new review or change any review state.",
       "files": []
     }
   ]

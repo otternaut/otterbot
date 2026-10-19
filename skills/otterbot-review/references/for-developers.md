@@ -77,12 +77,18 @@ nitpicks are not introduced on re-review.
   evidence to the PR description or a reply; reassessment can clear this hold
   without a new commit, but still checks every approval rule.
 - **🧑‍⚖️ Human Review Needed**: the code review is complete with at most two
-  safe minors and only a required human sign-off outstanding. This covers
-  authentication or authorization, secrets, irreversible external
-  effects such as moving money or deleting user data, destructive migrations,
-  or what runs in production. Ollie posts this as a comment and withholds
-  approval; it does not block the PR. The root names who must approve which
-  behavior at this commit.
+  safe minors, but auto-approving would be unsafe if Ollie were wrong. That
+  happens when the change goes in a high-risk direction (widening access, new
+  secret handling, destructive or non-reversible data changes, money movement
+  or mass customer sends, production deploy changes), depends on something
+  Ollie cannot verify from the code, or makes a product or access decision no
+  linked requirement settles. Touching a sensitive area is not enough: a
+  verified change that narrows access or adds a nullable column is approved
+  normally. It depends only on the diff and evidence, never on who wrote or
+  reviewed the PR. Ollie posts this as a comment and withholds its own
+  approval; it does not block the PR or wait for your approval. The root asks
+  a yes/no question, points at the lines, and says what Ollie already
+  verified, so you only check what needs a person.
 - **💬 Comment Only**: the review passed but the operator asked Ollie not to
   approve. Feedback is still posted.
 
@@ -98,7 +104,7 @@ claims a PR is ready to merge; that is your call and your branch rules.
 Things that never move a verdict: deferring a minor, resolving a thread,
 saying "this is fine", the number of review rounds, or Ollie running out of
 budget. Things that do: code that removes the consequence, evidence that the
-finding does not apply, relevant visual captures, or the required human sign-off.
+finding does not apply, or relevant visual captures. A human approval does not change Ollie's verdict.
 
 ## Replying to Ollie
 

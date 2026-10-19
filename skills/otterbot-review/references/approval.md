@@ -30,35 +30,78 @@ These gates govern approval, not whether to perform or publish the review.
   human assurance or presumed caller behavior alone.
 - UI or visual changes have relevant rendered evidence under that reference's
   **Visual evidence** section. Nonvisual changes do not need captures.
-- The author is not the reviewing identity. A bot author such as dependabot
-  or renovate is not a failure on its own: its dependency bump is approved
-  when the compatibility check is clean and every other rule holds, and a bot
-  PR that changes anything else is gated exactly like a human's.
-- The change either has no human-approval-zone behavior, or that exact
-  behavior has explicit approval from an authorized human reviewer other than
-  the PR author, applicable to the reviewed head. Zones cover: who is
-  authenticated or what they may do; how secrets are stored, read, or
-  transmitted; irreversible effects outside the system such as moving money,
-  deleting user data, or sending to customers at scale; migrations that
-  drop, rewrite, or cannot be rolled back; CI or deployment definitions that
-  change what runs in production. Zones trigger on behavior, not vocabulary:
-  a log line, test, comment, rename, read-only query, or pinned-version bump
-  inside one is not a zone change. When a zone triggers, the blurb names the
-  exact behavior that changed and links the human decision when satisfied.
-  Verify reviewer authority from repository rules or host permissions. A
-  generic approval without clear coverage is insufficient; changed behavior
-  invalidates prior sign-off. Human sign-off never waives verified blockers.
+- A bot author such as dependabot or renovate is not a failure on its own:
+  its dependency bump is approved when the compatibility check is clean and
+  every other rule holds, and a bot PR that changes anything else is gated
+  exactly like a human's.
+- No human-review trigger holds (see **Human review** below).
 - Fewer than three verified outstanding minors count under the approval
   accounting rules, and every remaining minor is demonstrably safe to address
   after merge. No material uncertainty about serious impact remains.
 - The selected review scope was completed, and nothing in the verdict rests
   on an author assertion Ollie could not confirm in code.
 
-Record missing authorized sign-off as a human hold, not a defect. Name the
-behavior, required reviewer and approval needed for the reviewed head. Do not
-infer this requirement from uncertainty or an unrelated host reviewer quota.
+Record a human-review trigger as a `human` hold, not a defect.
 Verification gaps likewise remain holds with concrete clearing conditions;
 only demonstrated defects receive severity and finding records.
+
+## Human review
+
+Human Review Needed means a developer must actually look before merge, not
+that the change sits in a sensitive area. Ask one question: **would
+auto-approving be unsafe if Ollie were wrong?** Escalate only when at least one
+trigger holds after analysis and verification; otherwise the ordinary gates
+decide, even inside auth, database or payment code.
+
+- **Costly miss:** the changed behavior has a high-risk direction from the
+  table below, so an undetected mistake would be severe or hard to undo.
+- **Unverifiable:** correctness of consequential behavior in a sensitive area
+  depends on facts Ollie cannot establish from code, tests or readable
+  sources, such as production data shape, external-system or infrastructure
+  state, or live permissions. Elsewhere an evidence gap stays an ordinary
+  verification hold.
+- **Judgment call:** the change makes a product, policy or access decision that
+  no accessible requirement settles, so a person must own the choice. A
+  behavior the linked ticket or spec explicitly asks for is not a judgment call.
+
+| Area | Escalate (high-risk direction) | Ordinary gates (when verified) |
+| --- | --- | --- |
+| Access | Widens who may authenticate, read or act; adds a login or token path; weakens or bypasses a check; moves a tenant or data-visibility boundary outward | Narrows or preserves access with every caller and path traced; refactors with equivalent checks |
+| Secrets | New place keys or credentials are stored, logged, sent or granted to a role | Unchanged handling; reads through an existing secret mechanism |
+| Data | Drops, rewrites, deletes or backfills persisted data; a migration that cannot be rolled back or locks a live table | Additive nullable columns or tables; non-blocking index creation; read-only queries |
+| External effects | New or changed money movement, customer-facing sends at scale, or other irreversible external effects | Logging, metrics, retries proven idempotent |
+| Production | CI, deployment or infrastructure definitions that change what runs or who can deploy | Test-only workflow changes; documentation |
+
+A test, comment, rename, log line or pinned-version bump inside a sensitive area
+never escalates on its own. Do not escalate from file location, keywords, size
+or vague unease: a concrete concern Ollie can investigate is verification work,
+and a demonstrated problem is a finding. When a change mixes directions, any
+escalating part triggers.
+
+Escalation is stateless. It never reads or depends on who authored the PR,
+which identity Ollie posts as, who else reviewed it, any approval or request
+for changes, the host's review decision, requested reviewers, CODEOWNERS or
+team membership. The same diff and evidence always yield the same decision.
+
+A trigger withholds Ollie's approval at that head and is never cleared by a
+review, approval, comment or command. Humans act through the host's normal
+review and branch rules; Ollie neither tracks nor waits for that approval, and
+a human review is not an event that reruns Ollie. A trigger clears only when a
+later head removes the escalating behavior, or new code or source evidence
+removes its reason (for example, a linked spec now settles a judgment call).
+A human review never waives verified blockers.
+
+Give the developer a focused, bounded task per trigger, never a request to
+re-review the whole PR:
+
+- **Question:** the single decision the developer must make, answerable yes
+  or no.
+- **Where:** the reviewed-commit lines that carry the behavior.
+- **Verified:** what Ollie already established, so it is not redone.
+- **Unverified:** what Ollie could not establish, or `nothing` for a pure
+  costly-miss or judgment-call trigger.
+
+Never name, assign or qualify a reviewer.
 
 ## Decision table
 
@@ -67,9 +110,9 @@ gives the verdict, then the review status after the slash:
 
 1. Verified outstanding critical/major: Request Changes / Blocked.
 2. Complete review, current context, adequate evidence, at most two
-   demonstrably safe minors, no blockers and only an explicit required human
-   review/sign-off missing: Human Review Needed / Human Review Needed. Record
-   the exact human action needed; retain safe minors in the findings index.
+   demonstrably safe minors, no blockers and a human-review trigger as the
+   only hold: Human Review Needed / Human Review Needed. Give each trigger's
+   focused task; retain safe minors in the findings index.
 3. Actual UI/visual change with missing visual evidence as the only approval
    hold: Evidence Required / Blocked. Safe one or two minors may remain. Ask
    for a capture of the changed view/state, without inventing a defect.
@@ -105,12 +148,12 @@ no credentials or network state and trusts evidence established by the reviewer:
   unknown records `unverified_visual_evidence`, never a claim of absent media.
   This field owns the visual hold; do not duplicate it in coverage, evidence or
   gates. Other gaps stay in those fields and take precedence over this verdict.
-- gates: pass only when every other code-review gate passes, including
-  sign-offs. Use `human-required` when an explicit required human review/sign-off
-  is the only unmet gate represented by this field; coverage, evidence, visual
+- gates: pass only when every other code-review gate passes and no
+  human-review trigger holds. Use `human-required` when a trigger is the only
+  unmet gate represented by this field; coverage, evidence, visual
   proof and minor risk use their own fields. Use hold/unknown for other
   failed/unverified gates. The table above governs the combined result;
-  `human_review_required` records missing sign-off even when another hold
+  `human_review_required` records a human-review trigger even when another hold
   requires Request Changes.
 - minor-risk: required when minors is nonzero. `safe` only when every counted
   minor has a concrete, limited consequence that is demonstrably safe to
@@ -167,7 +210,7 @@ Recheck affected code, new replies and purported clearing evidence. Reuse
 prior verified evidence only if the relevant behavior and context are
 unchanged. If that cannot be established, verify again or withhold approval
 for incomplete assessment. Minor accounting never
-waives blocker or sensitive-change gates. Use this unified risk count; there
+waives blocker or human-review gates. Use this unified risk count; there
 is no separate deferral-count or review-round approval limit.
 
 ## Visible accounting and continuity
@@ -204,8 +247,7 @@ absence alone proves neither outstanding risk nor clearance. If records needed
 to decide approval cannot be recovered, explain incomplete accounting and
 withhold approval. Deduplicate ledger entries against findings now in threads.
 
-Persist required sensitive-behavior sign-offs as linked evidence in the thread
-or root when used to clear that gate; they never erase findings. Commands can
+Commands can
 reference visible overflow IDs on the root; process those just like inline
 findings without inventing threads.
 
@@ -213,8 +255,7 @@ findings without inventing threads.
 
 Code-review freshness and decision freshness are separate. New evidence from
 a reply, a screenshot/video or edited visual attachment, a required source,
-a human sign-off, or an explicit request to
-reassess gates may change the decision without a new commit. Reuse the prior
+or an explicit request to reassess gates may change the decision without a new commit. Reuse the prior
 completed code review only when its head, target/base context and affected
 evidence remain current under `readiness.md`. Fetch the
 latest findings/statuses, ledger, behavior evidence and mutable review-gate

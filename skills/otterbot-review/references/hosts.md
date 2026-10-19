@@ -118,7 +118,9 @@ Replace placeholders; never pass a filename as the body.
    comment's event. Never touch another reviewer's review.
 
 Self-review: GitHub rejects approving or requesting changes on your own PR.
-Post the review with `COMMENT`; the verdict banner carries the verdict.
+Post the review with `COMMENT`; the verdict banner carries the verdict. This is
+a delivery limitation only; authorship never changes the verdict or triggers
+Human Review Needed.
 
 ## GitLab
 
@@ -148,7 +150,7 @@ longer counts. Determine and reconcile Ollie's effective host state:
 | Desired verdict | Required state action |
 | --- | --- |
 | Ship It | Approve at the reviewed head after all gates pass; supersede or clear Ollie's prior request for changes using the supported host operation |
-| Human Review Needed | Apply the Comment Only rows below to Ollie's prior state; the banner names the required human action and approval stays withheld |
+| Human Review Needed | Apply the Comment Only rows below to Ollie's prior state; the root carries the focused human-review task and approval stays withheld |
 | Request Changes | Submit that state and remove any prior Ollie approval if the host does not supersede it automatically |
 | Evidence Required | Apply the Request Changes action above; retain the visual-evidence verdict and name the capture needed |
 | Comment Only after approval | Withdraw/dismiss only Ollie's prior approval, then leave the explanatory comment |

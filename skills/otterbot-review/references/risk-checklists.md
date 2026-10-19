@@ -39,8 +39,10 @@ Escalate context depth only to establish an actual consequential path.
   financial precision; existing data must satisfy new assumptions.
 - Backfills, null/default handling, locks on live tables, transactions, partial
   failures and recoverability. Check both old and new app/schema combinations.
-- Irreversible changes require current human sign-off as well as independent
-  correctness evidence; sign-off does not prove data will survive.
+- Destructive, rewriting or non-reversible migrations escalate for human
+  review (`approval.md`) and still need independent correctness evidence;
+  additive changes that verify cleanly follow the ordinary gates. Human review
+  does not prove data survives.
 
 ## Concurrency, reliability and operations
 

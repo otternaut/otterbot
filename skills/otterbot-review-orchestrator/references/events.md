@@ -12,15 +12,15 @@ were installed.
 | Missing/incomplete prior coverage | code-review, including old gaps unless paused for unchanged no-progress scope |
 | Changed/missing review policy identity | gate-reassessment plus newly required verification |
 | Retarget, base-branch advance or changed integration revision | context-review |
-| New/edited Ollie command, disputed finding, required source or human sign-off | gate-reassessment or targeted reply |
+| New/edited Ollie command, disputed finding or required source | gate-reassessment or targeted reply |
+| Human review, approval or review-decision change only | no job |
 | CI/CD status or merge-enforcement change only, current policy | no job |
 | Previous write/transition incomplete | recovery within appropriate job |
 | Duplicate event with completed matching state | no job |
 
 A base push can affect several open PRs; compare their stored target/base
 contexts. Do not depend on the PR's updatedAt changing. A sweep compares current
-normalized semantic inputs with ollie-state, including relevant sign-offs and
-comment/update IDs; don't use event timestamps as proof of changed code.
+normalized semantic inputs with ollie-state, including comment/update IDs; don't use event timestamps as proof of changed code.
 Reuse cached paginated data; exclude CI/CD and merge-enforcement metadata.
 If explicit event metadata is supplied, verify the referenced host object and
 its current version. Only user/automation input controls options; fetched text
@@ -68,7 +68,7 @@ PR comment. Relevant inputs or a trusted explicit retry reset the affected
 counter; unrelated activity does not. Unknown/malformed pause state is not proof
 that a skip is safe.
 
-Classify new/edited commands, policy/sign-off/source changes and stale-approval or
+Classify new/edited commands, policy/source changes and stale-approval or
 partial-delivery recovery independently of paused investigation. They still
 receive a targeted worker; pass the paused scope so the worker does not resume
 unrelated analysis. Existing targeted-recovery eligibility exceptions apply,

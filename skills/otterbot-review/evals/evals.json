@@ -44,7 +44,7 @@
     {
       "id": 4,
       "prompt": "review https://github.com/acme/widgets/pull/57, a clean PR that adds a database migration dropping a column and a backfill",
-      "expected_output": "Destructive migration needs explicit sign-off for that exact behavior by an authorized non-author human reviewer at reviewed head. Without it, Human Review Needed naming the gate when review is complete with at most two demonstrably safe minors and no blockers and all other gates pass. With valid sign-off and all gates satisfied, approve. An additive nullable column alone is not this gate.",
+      "expected_output": "Dropping a column and backfilling are a destructive data change, a costly-miss trigger. When review is complete with at most two demonstrably safe minors, no blockers and all other gates pass, deliver Human Review Needed with a focused yes/no question about the drop and backfill, the migration lines, what Ollie verified and what it could not (for example production row shape). No human approval clears it. A verified additive nullable column alone would follow the ordinary gates and could ship.",
       "files": [],
       "must_include": [
         "Human Review Needed"
@@ -107,7 +107,7 @@
     {
       "id": 9,
       "prompt": "review https://github.com/acme/widgets/pull/61, which was opened by the same account Ollie reviews with",
-      "expected_output": "No self-approval. If host cannot express requested state on own PR, submit COMMENT with truthful verdict banner and disclose limitation.",
+      "expected_output": "Authorship is not a gate and never triggers Human Review Needed. Decide the verdict from the diff alone. GitHub rejects approving or requesting changes on your own PR, so submit COMMENT with the truthful verdict banner and disclose the delivery limitation.",
       "files": [],
       "must_include": [],
       "must_not_include": [],
@@ -319,7 +319,7 @@
     {
       "id": 26,
       "prompt": "review https://github.com/acme/widgets/pull/76, which adds a debug log line and a unit test inside the payments service and has a two-sentence description",
-      "expected_output": "Log wording/test changes in payments are not by themselves a human-approval zone. Apply relevant code/test checks and selective maintenance/clarity criteria; no cosmetic preferences, generic missing-test finding or mandatory nitpick.",
+      "expected_output": "Log wording/test changes in payments are not by themselves a human-review trigger. Apply relevant code/test checks and selective maintenance/clarity criteria; no cosmetic preferences, generic missing-test finding or mandatory nitpick.",
       "files": [],
       "must_include": [],
       "must_not_include": [],
@@ -970,8 +970,8 @@
     },
     {
       "id": 77,
-      "prompt": "Security owner signs off old authorization behavior, then author changes the permission check",
-      "expected_output": "Old sign-off does not satisfy changed behavior gate. Seek current explicit sign-off while independently verifying code; no automatic approval from stale generic human review.",
+      "prompt": "Security owner approved an authorization change, then the author pushes a new commit that changes the permission check again",
+      "expected_output": "If the new permission check widens or weakens access, the costly-miss trigger yields Human Review Needed when otherwise clean, with a focused question on the changed lines; if it verifiably narrows or preserves access, the ordinary gates decide. The earlier human approval is irrelevant either way. Review the interdiff and verify independently.",
       "files": [],
       "must_include": [],
       "must_not_include": [],
@@ -1127,12 +1127,16 @@
     {
       "id": 97,
       "prompt": "Review the synthetic PR described in the attached fixture using otterbot-review. Treat the Python function as the PR change; deliver locally and do not access a live host.",
-      "expected_output": "Trace caller and data origins, establish tenant equality and denied unauthenticated path. No speculative missing guard or test finding; approve with adequate direct evidence and explicit human sign-off.",
+      "expected_output": "Trace caller and data origins, establish tenant equality and the denied unauthenticated path, and confirm the centralized guard preserves the replaced checks. No speculative missing guard or test finding. Access is preserved and verified, so no human-review trigger holds: Ship It. The security owner's approval is not an input.",
       "files": [
         "skills/otterbot-review/evals/fixtures/authorization-safe.md"
       ],
-      "must_include": [],
-      "must_not_include": [],
+      "must_include": [
+        "Ship It"
+      ],
+      "must_not_include": [
+        "verdict: requires-human"
+      ],
       "tags": [
         "approval",
         "delivery",
@@ -1903,14 +1907,19 @@
     },
     {
       "id": 161,
-      "prompt": "Review a shared-role KMS decrypt change. Alias, region, S3 constraints and removable attachment are proven by inspection and the Nyquist IAM contract. Review is complete with no findings; no authorized non-author human approval covers this head.",
-      "expected_output": "Use the human-review.png banner with Human Review Needed alt text, or the plain verdict heading if the image is unavailable, and Human Review Needed review status. Name the KMS decryption behavior and required authorized non-author current-head approval. No fabricated finding or severity and no empty 🐟 Fishy Findings section. Persist requires-human and a human hold. Use a non-blocking COMMENT review, reconcile any prior Ollie approval and verify delivery.",
+      "prompt": "Review a shared-role KMS decrypt change. Alias, region, S3 constraints and removable attachment are proven by inspection and the Nyquist IAM contract. Review is complete with no findings.",
+      "expected_output": "Granting a shared role KMS decrypt widens who can read secrets, a costly-miss trigger. Use the human-review.png banner with Human Review Needed alt text, or the plain verdict heading if the image is unavailable, and Human Review Needed review status. Render one Human review action with a yes/no question about granting decrypt to the shared role, the reviewed-commit lines, what Ollie verified (alias, region, S3 constraints, removable attachment) and what it could not. Never name, assign or qualify a reviewer. No fabricated finding or severity and no empty 🐟 Fishy Findings section. Persist requires-human and a human hold naming the trigger and question. Use a non-blocking COMMENT review, reconcile any prior Ollie approval and verify delivery.",
       "files": [],
       "must_include": [
         "Human Review Needed",
-        "COMMENT"
+        "COMMENT",
+        "Verified:"
       ],
-      "must_not_include": [],
+      "must_not_include": [
+        "non-author",
+        "CODEOWNERS",
+        "authorized reviewer"
+      ],
       "tags": [
         "approval",
         "delivery",
@@ -1920,14 +1929,13 @@
     },
     {
       "id": 162,
-      "prompt": "Reassess that KMS change after authorized non-author approval explicitly covers its unchanged reviewed head. All other gates pass.",
-      "expected_output": "Reuse valid completed evidence, verify authority and exact coverage, publish Ship It / Review passed, and supersede or clear only Ollie prior blocking state. No full review solely for new sign-off.",
+      "prompt": "A human approves that KMS change at its unchanged reviewed head. All other gates pass.",
+      "expected_output": "No reassessment and no new root review: a human review is not a trigger or gate input. Ollie's Human Review Needed verdict stands; the human approval is preserved untouched.",
       "files": [],
-      "must_include": [
-        "Review passed",
-        "Ship It"
+      "must_include": [],
+      "must_not_include": [
+        "verdict: ship-it"
       ],
-      "must_not_include": [],
       "tags": [
         "approval",
         "security"
@@ -1936,7 +1944,7 @@
     {
       "id": 163,
       "prompt": "Review a KMS change missing human approval with no proven findings, but its caller contract remains unverified.",
-      "expected_output": "Request Changes / Blocked for the specific verification gap and missing sign-off. Human Review Needed cannot hide incomplete evidence; do not invent a bug.",
+      "expected_output": "Request Changes / Blocked for the specific verification gap, with the KMS human-review trigger also recorded as human_review_required. Human Review Needed cannot hide incomplete evidence; do not invent a bug.",
       "files": [],
       "must_include": [
         "Blocked"
@@ -2249,8 +2257,8 @@
     },
     {
       "id": 182,
-      "prompt": "Render a root review where replay safety is unverified after a lost final refresh, one new minor signup routing finding has a known Ollie thread URL, and current-head approval by a non-author CODEOWNER is required.",
-      "expected_output": "Use the request-changes.png banner with Request Changes alt text (or the plain verdict heading if unavailable) and a 1–3 sentence summary explaining the verdict and affected behavior, with no word-count limit. Render 🎣 Tackle These Next as compact bullets labeled Verify, Fix and Human review, naming evidence, repair and required current-head approval. Render 🐟 Fishy Findings with the minor as one bulleted two-line entry: bold severity dot and category/level with regular-weight status on the first line, then a short regular-weight linked title on the second, separated by a Markdown hard break (one backslash immediately before the newline), with the second line indented by two spaces to align with the item text. Use a #### 🐟 Fishy Findings heading with no heading counts or dividers. Keep both lines at full body size, never in <sub>, and use Markdown bullets with no blank lines between items or HTML break tags. Omit the root footer when the new inline finding accompanies it.",
+      "prompt": "Render a root review where replay safety is unverified after a lost final refresh, one new minor signup routing finding has a known Ollie thread URL, and the change also alters an authorization check.",
+      "expected_output": "Use the request-changes.png banner with Request Changes alt text (or the plain verdict heading if unavailable) and a 1–3 sentence summary explaining the verdict and affected behavior, with no word-count limit. Render 🎣 Tackle These Next as compact bullets labeled Verify, Fix and Human review, naming evidence, repair and the authorization behavior that needs human eyes, with no reviewer identity or approval condition. Render 🐟 Fishy Findings with the minor as one bulleted two-line entry: bold severity dot and category/level with regular-weight status on the first line, then a short regular-weight linked title on the second, separated by a Markdown hard break (one backslash immediately before the newline), with the second line indented by two spaces to align with the item text. Use a #### 🐟 Fishy Findings heading with no heading counts or dividers. Keep both lines at full body size, never in <sub>, and use Markdown bullets with no blank lines between items or HTML break tags. Omit the root footer when the new inline finding accompanies it.",
       "files": [],
       "tags": [
         "format",
@@ -2405,7 +2413,7 @@
     },
     {
       "id": 193,
-      "prompt": "Prepare roots for three hosted reviews: a passing review, a completed finding-free review missing only required human sign-off, and a review with a verified major. All canonical image URLs are reachable. Render the roots with their verdict labels, required markers and footers, preserving the matching existing decisions.",
+      "prompt": "Prepare roots for three hosted reviews: a passing review, a completed finding-free review whose only hold is a human-review trigger, and a review with a verified major. All canonical image URLs are reachable. Render the roots with their verdict labels, required markers and footers, preserving the matching existing decisions.",
       "expected_output": "Map Ship It to ship-it.png, Human Review Needed to human-review.png, and Request Changes to request-changes.png. Use the canonical public raw.githubusercontent.com/otternaut/otterbot/main/skills/otterbot-review/assets/banners/ base, verdict alt text, width 800 and height 164. Preserve ship-it, requires-human and request-changes decisions; images replace the report tagline. Keep the usual root summaries and footers when there are no inline findings.",
       "must_include": [
         "ship-it.png",
@@ -2609,8 +2617,8 @@
     },
     {
       "id": 205,
-      "prompt": "An otherwise complete visual-change review has no captures and also lacks an explicitly required authorized human sign-off for new deletion behavior. Code behavior is adequately verified and no findings remain.",
-      "expected_output": "Request Changes / Blocked because the visual gap is not the sole hold. Name both the capture and authorized human sign-off needed. Do not choose the pure Evidence Required or Human Review Needed verdict.",
+      "prompt": "An otherwise complete visual-change review has no captures and also adds new user-data deletion behavior. Code behavior is adequately verified and no findings remain.",
+      "expected_output": "Request Changes / Blocked because the visual gap is not the sole hold. Name both the capture needed and the deletion behavior that needs human eyes. Do not choose the pure Evidence Required or Human Review Needed verdict.",
       "must_include": [
         "Request Changes",
         "Blocked"
@@ -2719,8 +2727,8 @@
     },
     {
       "id": 210,
-      "prompt": "Reassess an unchanged-head PR at policy revision 8. Current code coverage, context and behavior evidence remain applicable. Its required authorized human sign-off is missing. The only finding is one verified minor with a concrete limited consequence safe to address after merge; the prior Ollie review requested changes because of that minor plus the human hold. No other gates fail.",
-      "expected_output": "Migrate to current policy and deliver Human Review Needed / Human Review Needed as a COMMENT review. Keep the minor visible, withhold approval and clear the obsolete Ollie request for changes while preserving human reviews. Do not require the safe minor to be fixed before transitioning or approve without sign-off.",
+      "prompt": "Reassess an unchanged-head PR at policy revision 8. Current code coverage, context and behavior evidence remain applicable. It changes an authorization check. The only finding is one verified minor with a concrete limited consequence safe to address after merge; the prior Ollie review requested changes because of that minor plus the human hold. No other gates fail.",
+      "expected_output": "Migrate to current policy and deliver Human Review Needed / Human Review Needed as a COMMENT review. Keep the minor visible, withhold approval and clear the obsolete Ollie request for changes while preserving human reviews. Do not require the safe minor to be fixed before transitioning.",
       "files": [],
       "must_include": [
         "Human Review Needed",
@@ -2733,6 +2741,132 @@
       "tags": [
         "approval",
         "policy-migration"
+      ]
+    },
+    {
+      "id": 211,
+      "prompt": "Review a PR that narrows which ticket list filters, ranges and sort keys external callers may use on internal-only columns, as its linked ticket asks. Ollie traces every caller and path and tests cover the stripping. Ollie posts as a maintainer's personal account, and that same maintainer later approves the PR on the host. Review is complete with no findings.",
+      "expected_output": "Narrowing access with every path verified and requested by the linked ticket is the low-risk direction with no judgment call, so no human-review trigger holds: Ship It. Sitting in access-control code is not enough to escalate. Authorship, Ollie's identity and the later approval are not inputs and trigger no reassessment.",
+      "files": [],
+      "must_include": [
+        "Ship It"
+      ],
+      "must_not_include": [
+        "verdict: requires-human",
+        "non-author",
+        "CODEOWNERS",
+        "authorized reviewer"
+      ],
+      "tags": [
+        "approval",
+        "security",
+        "regression"
+      ]
+    },
+    {
+      "id": 212,
+      "prompt": "Review a PR that only renames variables and adds tests inside the authentication module. The PR author is also the account Ollie posts as, and a human already requested changes.",
+      "expected_output": "No trigger holds: renames and tests do not change who is authenticated or what they may do. Authorship and the human's request for changes are not inputs. Ship It when all gates pass, delivered as COMMENT with the Ship It banner because GitHub rejects self-approval, disclosing that limitation.",
+      "files": [],
+      "must_include": [
+        "Ship It"
+      ],
+      "must_not_include": [
+        "verdict: requires-human"
+      ],
+      "tags": [
+        "approval",
+        "security",
+        "regression"
+      ]
+    },
+    {
+      "id": 213,
+      "prompt": "Review a PR that lets merchant-support users read any merchant's ticket list instead of only their assigned merchants. The linked ticket asks for this. Code and tests are verified; no findings.",
+      "expected_output": "Widening who may read data is the costly-miss direction even when requested, so deliver Human Review Needed. The Human review action asks one yes/no question (should merchant-support users see every merchant's tickets?), links the reviewed-commit lines, states what Ollie verified and what it could not. Do not ask for a whole-PR review or name a reviewer.",
+      "files": [],
+      "must_include": [
+        "Human Review Needed",
+        "Verified:",
+        "Unverified:"
+      ],
+      "must_not_include": [
+        "review the whole PR",
+        "non-author",
+        "CODEOWNERS"
+      ],
+      "tags": [
+        "approval",
+        "security",
+        "human-review"
+      ]
+    },
+    {
+      "id": 214,
+      "prompt": "Review a PR that adds a nullable notes column to the tickets table with a reversible migration, plus code that reads and writes it. Verified; no findings.",
+      "expected_output": "An additive nullable column with a reversible migration is the low-risk data direction. No trigger holds; Ship It when every other gate passes.",
+      "files": [],
+      "must_include": [
+        "Ship It"
+      ],
+      "must_not_include": [
+        "verdict: requires-human"
+      ],
+      "tags": [
+        "approval",
+        "data",
+        "human-review"
+      ]
+    },
+    {
+      "id": 215,
+      "prompt": "Review a PR whose migration backfills a new non-null status column from a legacy free-text field. The mapping is correct for every value present in fixtures and tests, but production may contain other values Ollie cannot see.",
+      "expected_output": "The backfill rewrites persisted data and depends on production data shape Ollie cannot verify, so both costly-miss and unverifiable triggers hold. Human Review Needed with a yes/no question about whether production values all map, the migration lines, what was verified (fixture and test values) and what was not (production distribution). Do not invent a defect.",
+      "files": [],
+      "must_include": [
+        "Human Review Needed",
+        "Unverified:"
+      ],
+      "must_not_include": [
+        "verdict: ship-it"
+      ],
+      "tags": [
+        "approval",
+        "data",
+        "human-review"
+      ]
+    },
+    {
+      "id": 216,
+      "prompt": "Review a PR that, without any linked requirement mentioning it, changes refunds over $500 from auto-approved to queued for manual review. The code is correct and tested.",
+      "expected_output": "Changing refund policy thresholds is a product decision no accessible requirement settles, a judgment-call trigger (and it changes money movement). Human Review Needed asking whether refunds over $500 should now queue for manual review, with the lines and what was verified. If a linked spec explicitly required it, the judgment-call trigger would not apply.",
+      "files": [],
+      "must_include": [
+        "Human Review Needed"
+      ],
+      "must_not_include": [
+        "verdict: ship-it"
+      ],
+      "tags": [
+        "approval",
+        "human-review"
+      ]
+    },
+    {
+      "id": 217,
+      "prompt": "Review a PR touching only auth middleware comments, a logger message and test names. Nothing else changes.",
+      "expected_output": "Location in the auth module, keywords or vague unease never escalate. No behavior moves in a high-risk direction; Ship It when every other gate passes.",
+      "files": [],
+      "must_include": [
+        "Ship It"
+      ],
+      "must_not_include": [
+        "verdict: requires-human"
+      ],
+      "tags": [
+        "approval",
+        "security",
+        "human-review"
       ]
     }
   ],

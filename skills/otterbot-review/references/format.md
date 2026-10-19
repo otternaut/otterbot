@@ -22,7 +22,7 @@ editing that same body, never by posting a separate conversation comment.
 
 - **Verify** · <Evidence needed to settle an unresolved concern.>
 - **Fix** · <Concrete repair needed; refer to the finding below.>
-- **Human review** · <Required reviewer, behavior and current-commit approval.>
+- **Human review** · <Yes/no question> at [`<path:line>`](<reviewed-commit-link>). Verified: <what Ollie established>. Unverified: <gap or nothing>.
 
 #### 🐟 Fishy Findings
 
@@ -107,8 +107,10 @@ replies and local output keep their existing formats without these banners.
   uncertain-impact gate failure explicitly, since the inline cap of four new
   minors can hide the count. `gate: -` means blockers decided the verdict
   before approval was considered.
-- Human Review Needed names the behavior, the required reviewer and the
-  approval needed at this head. Comment Only explains the `--no-approve`
+- Human Review Needed says which trigger holds (costly miss, unverifiable or
+  judgment call) and the behavior behind it; the **Human review** actions
+  carry the focused task. Never name, assign or qualify a reviewer, or
+  describe an approval Ollie is waiting for. Comment Only explains the `--no-approve`
   delivery choice without implying a review failure; never write a Comment
   Only "Not approving because" summary.
 - Evidence Required names the visible change that cannot yet be assessed and
@@ -130,11 +132,13 @@ starts with a bold action label and a middle dot: **Verify** ·, **Fix** · or
 independent actions need them. Omit the section entirely when no action is
 required, including clean reviews and reviews with only optional follow-ups.
 
-Name the evidence needed, repair required or human approval that remains.
+Name the evidence needed, repair required or decision a developer must make.
 Keep fix actions brief and point to the finding below for implementation
-details. Human review names the required non-author reviewer, affected behavior
-and approval at the current commit. Do not imply an agent can supply human
-sign-off. These are required actions, not claims that checks already ran.
+details. Each Human review action follows `approval.md`: one yes/no question,
+the reviewed-commit lines, what Ollie verified and what it could not, in at
+most three short sentences. Use one action per question; never ask for a
+whole-PR review, and never name a reviewer identity, authority, CODEOWNERS team
+or approval condition. These are required actions, not claims that checks already ran.
 
 ### 🐟 Fishy Findings (findings index)
 

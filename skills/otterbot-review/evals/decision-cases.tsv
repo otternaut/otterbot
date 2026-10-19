@@ -12,7 +12,7 @@ base-changed 0 0 complete stale adequate pass - not-required request-changes blo
 unknown-context 0 0 complete unknown adequate pass - not-required request-changes blocked unverified_context
 evidence-gap 0 0 complete current inadequate pass - not-required request-changes blocked insufficient_evidence
 unknown-evidence 0 0 complete current unknown pass - not-required request-changes blocked insufficient_evidence
-human-signoff-missing 0 0 complete current adequate human-required - not-required requires-human requires-human human_review_required
+human-trigger-only 0 0 complete current adequate human-required - not-required requires-human requires-human human_review_required
 unknown-gates 0 0 complete current adequate unknown - not-required request-changes blocked review_gates
 all-gaps-cleared 0 1 complete current adequate pass safe not-required ship-it review-passed -
 human-plus-blocker 1 0 complete current adequate human-required - not-required request-changes blocked verified_blockers
