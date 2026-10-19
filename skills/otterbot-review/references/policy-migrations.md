@@ -7,11 +7,27 @@ malformed state cannot support cached approval. Reuse valid evidence and
 reassess affected scope, then record the current revision. Current decisions
 always come from `approval.md`; historical behavior is not an instruction.
 
+## Revision 10 · Risk-based, stateless human review
+
+Human review now asks whether auto-approving would be unsafe if Ollie were
+wrong, using the costly-miss, unverifiable and judgment-call triggers and the
+risk-direction table in `approval.md`, instead of escalating every change in a
+sensitive area. Verified changes in the low-risk direction, such as narrowing
+access or an additive nullable column, follow the ordinary gates. Escalation
+ignores author, reviewing identity and every review state, and no human
+approval clears it. The reviewing identity being the PR author is no longer an
+approval gate; `hosts.md` covers the self-review delivery limitation.
+On migration, drop sign-off states from `decision_key`, re-evaluate each old
+`human` hold against the triggers with the existing evidence, rewrite any
+surviving hold with its trigger and focused question, and recompute the
+verdict. A hold that no trigger supports is dropped. Reuse code coverage; do
+not reassess solely because a human approved.
+
 ## Revision 9 · Human sign-off with safe minors
 
 One or two demonstrably safe minors no longer turn an otherwise human-only
 hold into Request Changes. Recount current findings and rerun the decision;
-keep safe minors visible. If the only hold is required human sign-off, deliver
+keep safe minors visible. If the only hold is a human-review hold, deliver
 Human Review Needed and reconcile the old Ollie request under `hosts.md`.
 Three minors, uncertain impact, blockers and other holds still prevent this
 outcome. Existing code coverage remains reusable when applicable.

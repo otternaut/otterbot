@@ -1,7 +1,7 @@
 ---
 name: otterbot-review
 description: Ollie the otter reviews PRs and local diffs for evidenced bugs, posts concise inline findings with a verdict, and handles incremental re-reviews. Use for "review this PR", "review my diff", "re-review", a pull-request URL, or a code-review verdict request. Supports GitHub, GitLab, Bitbucket, and similar hosts.
-version: 15.0.0
+version: 16.0.0
 ---
 
 # Otterbot Review &middot; Ollie
@@ -57,8 +57,8 @@ Owner: `references/readiness.md` (state, policy identity, progress control).
    - Changed code: review the interdiff plus affected context and old gaps.
    - Changed target/base/integration: reassess affected compatibility even
      when the PR tree is identical; unknown impact cannot support approval.
-   - Changed reply, visual evidence, sign-off, requirement or rules: bounded
-     gate reassessment.
+   - Changed reply, visual evidence, requirement or rules: bounded gate
+     reassessment. A human review or approval is not a trigger.
    - Changed or missing policy identity: reassess gates and newly required
      verification; never restamp a cached approval.
    - Incomplete coverage: resume the outstanding scope unless its persisted
@@ -67,7 +67,8 @@ Owner: `references/readiness.md` (state, policy identity, progress control).
 
 Merge conflicts prevent approval but not replies or stale-state cleanup.
 Other reviewers' states and comments never limit scope or decide Ollie's
-verdict. Their comments suppress only redundant publication after Ollie has
+verdict, and neither does who authored the PR. Human review is triggered only
+by the **Human review** triggers in `references/approval.md`. Their comments suppress only redundant publication after Ollie has
 independently frozen the matching finding. CI/CD is excluded from every input
 and output; the single owner of that rule is the **CI/CD exclusion** section
 of `references/verification.md`.
@@ -126,7 +127,7 @@ Owner: `references/verification.md`.
 
 For each consequential changed behavior establish one adequate evidence route:
 a relevant test read (or run), a bounded local reproduction, or a concrete
-code-path argument. Author assurance and human sign-off are never proof. Stop
+code-path argument. Author assurance and human approval are never proof. Stop
 after one sufficient route absent contradiction. Local experiments run in an
 isolated workspace with no installs, credentials, network or external state,
 each under the tool timeout in `performance.md`.
@@ -151,6 +152,9 @@ Owner: `references/approval.md` (gates, minor accounting, gate reassessment).
 2. Evaluate every approval gate and normalize the evidenced inputs using its
    **Deterministic helper** section. Run `scripts/decide`; use the owner's
    decision table only when Bash is unavailable and disclose that fallback.
+   Decide human review from the analyzed and verified behavior, not the
+   touched area: escalate only on a trigger in that section, with its focused
+   question.
 3. Preserve the resulting verdict, review status and specific clearing actions.
    Local output reports findings and gaps without claiming host approval.
 

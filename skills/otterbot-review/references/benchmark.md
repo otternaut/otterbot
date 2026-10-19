@@ -72,8 +72,8 @@ and repeat variability rather than claiming a universal detection rate.
 ## Rollout
 
 Start with shadow, then sandbox delivery, then explicitly enabled autonomous
-approval for supported lower-risk classes. Retain current human sign-off gates
-for sensitive behavior. Expand only after comparing false holds, serious misses
+approval for supported lower-risk classes. Retain human-review triggers for
+sensitive behavior. Expand only after comparing false holds, serious misses
 and convergence against the previous version. Set quantitative acceptance
 thresholds with repository owners before the trial, not after seeing results.
 Pause expansion when evidence regresses; preserve normal human merge paths.

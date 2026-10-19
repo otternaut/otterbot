@@ -17,7 +17,8 @@ Visual evidence is a separate gate: missing means a confirmed visible change
 has no usable screenshot, video or equivalent rendered evidence. Unknown means
 applicability or access could not be established. Other review holds take precedence.
 Gates includes other code-review gates, never CI/CD or merge eligibility.
-human-required means only explicit human review/sign-off is missing. Combined
+human-required means a human-review trigger is the only other unmet gate. It is
+a property of the diff, never of reviewer identity or review state. Combined
 with other holds it yields request-changes with a human_review_required reason.
 --no-approve suppresses approval only for an otherwise passing review.
 Outputs JSON only. This helper trusts normalized inputs; it does not verify them.

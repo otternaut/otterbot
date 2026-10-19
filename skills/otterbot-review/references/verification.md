@@ -38,7 +38,7 @@ references. If adequate evidence is unavailable, use Request Changes for the
 specific unverified behavior, except for the visual-evidence gate below; do not
 label absence of tests a fabricated bug.
 A demonstrated defect gets its actual severity and normal verdict precedence.
-Human sign-off satisfies a human-approval gate, never this verification gate.
+Human review never satisfies this verification gate.
 
 ## Visual evidence
 
@@ -82,7 +82,7 @@ Ask for a concrete capture, such as "Attach a screenshot of the updated account
 menu in its open state." Record a verification hold and the missing views in
 `readiness.md`. Relevant added or edited evidence triggers bounded reassessment
 even without a new commit. Inspect it, clear only this hold, and rerun all
-gates; neither attaching media nor human sign-off automatically approves.
+gates; attaching media never automatically approves.
 
 ## Sufficient evidence and stopping
 
